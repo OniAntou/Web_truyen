@@ -14,7 +14,10 @@ const HomePage = () => {
     useEffect(() => {
         fetch('http://localhost:5000/api/test')
             .then(res => res.json())
-            .then(data => setServerMessage(data.message))
+            .then(data => {
+                console.log('Backend connected:', data);
+                setServerMessage(data.message);
+            })
             .catch(err => console.error('Failed to connect to server:', err));
     }, []);
 
