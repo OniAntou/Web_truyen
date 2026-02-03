@@ -19,7 +19,7 @@ const ComicCard = ({ comic }) => {
 
                 {/* Overlay Tags */}
                 <div className="card-tag">
-                    {comic.chapters[0]?.title || 'New'}
+                    {comic.chapters?.[0]?.title || 'New'}
                 </div>
             </div>
 

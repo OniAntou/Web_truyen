@@ -8,7 +8,7 @@ const ComicInfo = ({ comic }) => {
             {/* Background Banner */}
             <div
                 className="info-banner-bg"
-                style={{ backgroundImage: `url(${comic.cover})` }}
+                style={{ backgroundImage: `url(${comic.cover_url || comic.cover})` }}
             >
                 <div className="info-banner-overlay"></div>
             </div>
@@ -17,7 +17,7 @@ const ComicInfo = ({ comic }) => {
                 {/* Cover Image */}
                 <div className="info-cover-box">
                     <img
-                        src={comic.cover}
+                        src={comic.cover_url || comic.cover}
                         alt={comic.title}
                         className="info-cover-img"
                     />
@@ -52,7 +52,7 @@ const ComicInfo = ({ comic }) => {
 
                     <div className="info-actions">
                         <Link
-                            to={`/read/${comic.id}`}
+                            to={`/read/${comic.id || comic._id}`}
                             className="btn btn-primary"
                         >
                             <BookOpen size={20} />
@@ -80,7 +80,7 @@ export const ChapterList = ({ chapters, comicId }) => {
                 <div className="chapter-list-grid">
                     {chapters.map(chapter => (
                         <Link
-                            key={chapter.id}
+                            key={chapter._id || chapter.id}
                             to={`/read/${comicId}`}
                             className="chapter-item"
                         >

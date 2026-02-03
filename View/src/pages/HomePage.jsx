@@ -3,15 +3,26 @@ import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
-import { comics } from '../data/mockData';
 
 const HomePage = () => {
-    const featuredComic = comics[0];
-    const popularComics = comics;
-    const newComics = comics.slice().reverse();
+    const [comics, setComics] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [serverMessage, setServerMessage] = useState('');
 
     useEffect(() => {
+        // Fetch comics
+        fetch('http://localhost:5000/api/comics')
+            .then(res => res.json())
+            .then(data => {
+                setComics(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('Failed to fetch comics:', err);
+                setLoading(false);
+            });
+
+        // Test connection
         fetch('http://localhost:5000/api/test')
             .then(res => res.json())
             .then(data => {
@@ -20,6 +31,14 @@ const HomePage = () => {
             })
             .catch(err => console.error('Failed to connect to server:', err));
     }, []);
+
+    const featuredComic = comics[0] || {};
+    const popularComics = comics;
+    const newComics = [...comics].reverse();
+
+    if (loading) {
+        return <div style={{ paddingTop: '8rem', textAlign: 'center', color: 'white' }}>Loading comics...</div>;
+    }
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
@@ -40,7 +59,7 @@ const HomePage = () => {
                 </div>
             )}
             <Navbar />
-            <HeroSection featuredComic={featuredComic} />
+            {comics.length > 0 && <HeroSection featuredComic={featuredComic} />}
 
             {/* Trending Section wrapper */}
             <div className="container trending-section">
@@ -50,8 +69,8 @@ const HomePage = () => {
                     </h3>
                     <div className="trending-scroll">
                         {comics.map(c => (
-                            <div key={c.id} className="trending-item">
-                                <img src={c.cover} className="trending-img" alt={c.title} />
+                            <div key={c._id || c.id} className="trending-item">
+                                <img src={c.cover_url || c.cover} className="trending-img" alt={c.title} />
                                 <p style={{ fontWeight: 500, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {c.title}
                                 </p>
