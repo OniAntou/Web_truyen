@@ -1,11 +1,12 @@
+const dotenv = require('dotenv');
+dotenv.config(); // Load env vars immediately
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const multer = require('multer');
 const { Comic, Chapter, Pages, Upload } = require('../Database/database');
-const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED } = require('./r2');
-
-dotenv.config();
+const r2Module = require('./r2');
+const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED } = r2Module;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -170,7 +171,11 @@ app.get('/api/comics', async (req, res) => {
         }
 
         const comics = await Comic.find(query);
-        res.json(comics);
+        const results = await Promise.all(comics.map(async (c) => {
+            const coverUrl = await resolveR2Url(c.cover_url);
+            return { ...c.toObject(), cover_url: coverUrl || c.cover_url };
+        }));
+        res.json(results);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

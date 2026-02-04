@@ -18,17 +18,19 @@ const endpoint = accountId
 
 const s3Client = endpoint && accessKeyId && secretAccessKey
   ? new S3Client({
-      region: 'auto',
-      endpoint,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-      forcePathStyle: true,
-    })
+    region: 'auto',
+    endpoint,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+    forcePathStyle: true,
+  })
   : null;
 
+
 const R2_ENABLED = Boolean(s3Client && bucket);
+
 
 /**
  * Upload buffer lên R2.
