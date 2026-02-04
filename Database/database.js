@@ -46,4 +46,16 @@ const PageSchema = new mongoose.Schema({
 
 const Pages = mongoose.model('Pages', PageSchema);
 
-module.exports = { Comic, Chapter, Pages };
+// 4. Upload Collection – liên kết file R2 với Comic/Chapter (ảnh bìa + ảnh chapter)
+const UploadSchema = new mongoose.Schema({
+  key: { type: String, required: true },           // R2 key (vd: "r2:covers/xxx.jpg")
+  type: { type: String, enum: ['cover', 'page'], required: true },
+  comic_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Comic', required: true },
+  chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Chapter' }, // null cho ảnh bìa
+  page_number: { type: Number },                    // cho type 'page'
+  created_at: { type: Date, default: Date.now }
+}, { collection: 'uploads' });
+
+const Upload = mongoose.model('Upload', UploadSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload };
