@@ -109,7 +109,7 @@ const ComicList = () => {
                                         <div className="text-xs text-gray-500 flex gap-2">
                                             <span>{comic.author}</span>
                                             <span className="text-gray-700">•</span>
-                                            <span className="bg-gray-800 px-1.5 rounded text-gray-400 border border-gray-700">{comic.chapters?.length || 0} Ch</span>
+                                            <span className="bg-gray-800 px-1.5 rounded text-gray-400 border border-gray-700">{comic.chapter_count || 0} Ch</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">

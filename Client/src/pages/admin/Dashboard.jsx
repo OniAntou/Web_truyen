@@ -3,12 +3,19 @@ import { Library, Eye, Activity, Users } from 'lucide-react';
 
 const Dashboard = () => {
     const [stats, setStats] = React.useState({ totalComics: 0, totalViews: '0' });
+    const [systemStatus, setSystemStatus] = React.useState('Checking...');
 
     React.useEffect(() => {
         fetch('http://localhost:5000/api/stats')
             .then(res => res.json())
-            .then(data => setStats(data))
-            .catch(err => console.error('Error fetching stats:', err));
+            .then(data => {
+                setStats(data);
+                setSystemStatus('Active');
+            })
+            .catch(err => {
+                console.error('Error fetching stats:', err);
+                setSystemStatus('Offline');
+            });
     }, []);
 
     const StatCard = ({ title, value, icon: Icon, color, subtext }) => (
@@ -54,10 +61,10 @@ const Dashboard = () => {
                 
                 <StatCard 
                     title="System Status" 
-                    value="Active" 
+                    value={systemStatus} 
                     icon={Activity} 
-                    color="text-blue-500"
-                    subtext="Server running normally" 
+                    color={systemStatus === 'Active' ? "text-blue-500" : "text-red-500"}
+                    subtext={systemStatus === 'Active' ? "Server running normally" : "Cannot connect to server"} 
                 />
             </div>
 

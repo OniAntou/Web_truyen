@@ -173,7 +173,12 @@ app.get('/api/comics', async (req, res) => {
         const comics = await Comic.find(query);
         const results = await Promise.all(comics.map(async (c) => {
             const coverUrl = await resolveR2Url(c.cover_url);
-            return { ...c.toObject(), cover_url: coverUrl || c.cover_url };
+            const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
+            return { 
+                ...c.toObject(), 
+                cover_url: coverUrl || c.cover_url,
+                chapter_count: chapterCount 
+            };
         }));
         res.json(results);
     } catch (err) {
@@ -296,6 +301,21 @@ app.delete('/api/chapters/:id', async (req, res) => {
         const chapter = await Chapter.findByIdAndDelete(req.params.id);
         if (!chapter) return res.status(404).json({ message: 'Chapter not found' });
         res.json({ message: 'Chapter deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// BULK DELETE chapters
+app.post('/api/chapters/bulk-delete', async (req, res) => {
+    try {
+        const { chapterIds } = req.body;
+        if (!chapterIds || !Array.isArray(chapterIds)) {
+            return res.status(400).json({ message: 'Invalid payload: chapterIds must be an array' });
+        }
+        
+        const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
+        res.json({ message: 'Chapters deleted', count: result.deletedCount });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

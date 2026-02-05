@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
         element: <ComicInfoPage />,
     },
     {
-        path: '/read/:id',
+        path: '/read/:comicId/:chapterId',
         element: <ReadPage />,
     },
     {

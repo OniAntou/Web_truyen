@@ -52,8 +52,17 @@ const ComicInfo = ({ comic }) => {
 
                     <div className="info-actions">
                         <Link
-                            to={`/read/${comic.id || comic._id}`}
+                            to={comic.chapters && comic.chapters.length > 0 
+                                ? `/read/${comic.id || comic._id}/${comic.chapters[0]._id || comic.chapters[0].id}`
+                                : '#'
+                            }
                             className="btn btn-primary"
+                            onClick={(e) => {
+                                if (!comic.chapters || comic.chapters.length === 0) {
+                                    e.preventDefault();
+                                    alert('No chapters available');
+                                }
+                            }}
                         >
                             <BookOpen size={20} />
                             Read First Chapter
@@ -81,7 +90,7 @@ export const ChapterList = ({ chapters, comicId }) => {
                     {chapters.map(chapter => (
                         <Link
                             key={chapter._id || chapter.id}
-                            to={`/read/${comicId}`}
+                            to={`/read/${comicId}/${chapter._id || chapter.id}`}
                             className="chapter-item"
                         >
                             <span className="chapter-title">{chapter.title}</span>
