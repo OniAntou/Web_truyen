@@ -11,11 +11,6 @@ const ComicCard = ({ comic }) => {
                     alt={comic.title}
                     className="card-image"
                 />
-                <div className="card-overlay">
-                    <span className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
-                        Read Now
-                    </span>
-                </div>
 
                 {/* Overlay Tags */}
                 <div className="card-tag">

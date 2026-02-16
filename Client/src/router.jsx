@@ -3,6 +3,9 @@ import HomePage from './pages/HomePage';
 import ComicInfoPage from './pages/ComicInfoPage';
 import ReadPage from './pages/ReadPage';
 import SearchPage from './pages/SearchPage';
+import PopularPage from './pages/PopularPage';
+import GenresPage from './pages/GenresPage';
+import LatestPage from './pages/LatestPage';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
 import ComicList from './pages/admin/ComicList';
@@ -25,6 +28,18 @@ export const router = createBrowserRouter([
     {
         path: '/search',
         element: <SearchPage />,
+    },
+    {
+        path: '/popular',
+        element: <PopularPage />,
+    },
+    {
+        path: '/genres',
+        element: <GenresPage />,
+    },
+    {
+        path: '/latest',
+        element: <LatestPage />,
     },
     // Admin Routes
     {

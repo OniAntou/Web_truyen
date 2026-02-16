@@ -5,11 +5,9 @@ import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react
 const ComicInfo = ({ comic }) => {
     return (
         <div className="relative">
-            {/* Background Banner */}
-            <div
-                className="info-banner-bg"
-                style={{ backgroundImage: `url(${comic.cover_url || comic.cover})` }}
-            >
+            {/* Banner Background */}
+            <div className="info-banner-bg">
+                <div className="info-banner-blur" style={{ backgroundImage: `url(${comic.cover_url || comic.cover})` }}></div>
                 <div className="info-banner-overlay"></div>
             </div>
 
