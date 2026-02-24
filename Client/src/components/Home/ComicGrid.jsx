@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye } from 'lucide-react';
+import { formatViews } from '../../utils/format';
 
 const ComicCard = ({ comic }) => {
     return (
@@ -29,7 +30,7 @@ const ComicCard = ({ comic }) => {
                     </div>
                     <div className="flex items-center" style={{ gap: '4px' }}>
                         <Eye size={12} />
-                        <span>{comic.views}</span>
+                        <span>{formatViews(comic.views)}</span>
                     </div>
                 </div>
             </div>

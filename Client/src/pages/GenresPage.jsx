@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star, Eye, Grid3X3, BookOpen, Search, X } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
+import { formatViews } from '../utils/format';
 
 // Genre color mapping for visual variety
 const genreThemes = {
@@ -72,7 +73,7 @@ const ComicCard = ({ comic }) => (
                 </div>
                 <div className="flex items-center" style={{ gap: '4px' }}>
                     <Eye size={12} />
-                    <span>{comic.views || '0'}</span>
+                    <span>{formatViews(comic.views)}</span>
                 </div>
             </div>
         </div>

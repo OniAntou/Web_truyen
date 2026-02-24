@@ -157,17 +157,8 @@ app.get("/api/stats", async (req, res) => {
     const comics = await Comic.find();
     let totalViews = 0;
 
-    // Helper to parse view string: "12.5M" -> 12500000
-    const parseViews = (str) => {
-      if (!str) return 0;
-      const s = str.toString().toUpperCase();
-      if (s.includes("M")) return parseFloat(s) * 1000000;
-      if (s.includes("K")) return parseFloat(s) * 1000;
-      return parseFloat(s) || 0;
-    };
-
     comics.forEach((c) => {
-      totalViews += parseViews(c.views);
+      totalViews += (c.views || 0);
     });
 
     // Format back to compact string
@@ -212,20 +203,12 @@ app.get('/api/genres', async (req, res) => {
                 (c.genres || []).some(g => g.toLowerCase() === genre.toLowerCase())
             );
 
-            const parseViewsNum = (str) => {
-                if (!str) return 0;
-                const s = str.toString().toUpperCase();
-                if (s.includes('M')) return parseFloat(s) * 1000000;
-                if (s.includes('K')) return parseFloat(s) * 1000;
-                return parseFloat(s) || 0;
-            };
-
             if (sort === 'rating') {
                 filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
             } else if (sort === 'newest') {
                 filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             } else {
-                filtered.sort((a, b) => parseViewsNum(b.views) - parseViewsNum(a.views));
+                filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
             }
 
             comics = await Promise.all(filtered.map(async (c) => {
@@ -299,14 +282,6 @@ app.get("/api/comics/popular", async (req, res) => {
       filter.genres = { $regex: genre, $options: "i" };
     }
 
-    const parseViewsNum = (str) => {
-      if (!str) return 0;
-      const s = str.toString().toUpperCase();
-      if (s.includes("M")) return parseFloat(s) * 1000000;
-      if (s.includes("K")) return parseFloat(s) * 1000;
-      return parseFloat(s) || 0;
-    };
-
     let comics = await Comic.find(filter);
 
     // Sort
@@ -316,7 +291,7 @@ app.get("/api/comics/popular", async (req, res) => {
       comics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     } else {
       // Default: sort by views descending
-      comics.sort((a, b) => parseViewsNum(b.views) - parseViewsNum(a.views));
+      comics.sort((a, b) => (b.views || 0) - (a.views || 0));
     }
 
     if (limit) {
