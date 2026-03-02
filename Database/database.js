@@ -58,4 +58,15 @@ const UploadSchema = new mongoose.Schema({
 
 const Upload = mongoose.model('Upload', UploadSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload };
+// 5. Admin Collection - Login
+const AdminSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  password_hash: { type: String, required: true }, // Updated to match DB
+  email: String,
+  role: String,
+  status: String
+}, { collection: 'adminlogin' });
+
+const Admin = mongoose.model('Admin', AdminSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, Admin };

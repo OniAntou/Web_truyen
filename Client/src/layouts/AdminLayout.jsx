@@ -6,8 +6,8 @@ const AdminLayout = () => {
     const location = useLocation();
 
     const isActive = (path) => {
-        return location.pathname === path 
-            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' 
+        return location.pathname === path
+            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
             : 'text-gray-400 hover:bg-gray-800 hover:text-white hover:pl-5';
     };
 
@@ -26,7 +26,7 @@ const AdminLayout = () => {
 
                 <nav className="flex-1 px-4 py-8 space-y-2">
                     <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Menu</p>
-                    
+
                     <Link
                         to="/admin"
                         className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin')}`}
@@ -44,14 +44,25 @@ const AdminLayout = () => {
                     </Link>
                 </nav>
 
-                <div className="p-4 border-t border-gray-800">
+                <div className="p-4 border-t border-gray-800 space-y-2">
                     <Link
                         to="/"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition-all duration-300"
+                    >
+                        <BookOpen size={20} />
+                        <span className="font-medium">View Site</span>
+                    </Link>
+
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('admin');
+                            window.location.href = '/admin/login';
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 text-left"
                     >
                         <LogOut size={20} />
-                        <span className="font-medium">Back to Site</span>
-                    </Link>
+                        <span className="font-medium">Logout</span>
+                    </button>
                 </div>
             </aside>
 
@@ -59,7 +70,7 @@ const AdminLayout = () => {
             <main className="flex-1 overflow-y-auto bg-[#0a0a0a] relative">
                 {/* Background Decoration */}
                 <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
-                
+
                 <div className="container mx-auto px-8 py-10 relative z-10 max-w-7xl">
                     <Outlet />
                 </div>

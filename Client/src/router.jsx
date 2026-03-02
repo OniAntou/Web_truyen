@@ -8,6 +8,8 @@ import Dashboard from './pages/admin/Dashboard';
 import ComicList from './pages/admin/ComicList';
 import ComicEditor from './pages/admin/ComicEditor';
 import ChapterManager from './pages/admin/ChapterManager';
+import Login from './pages/admin/Login';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 export const router = createBrowserRouter([
     {
@@ -28,14 +30,23 @@ export const router = createBrowserRouter([
     },
     // Admin Routes
     {
-        path: '/admin',
-        element: <AdminLayout />,
+        path: '/admin/login',
+        element: <Login />,
+    },
+    {
+        element: <ProtectedAdminRoute />,
         children: [
-            { path: '', element: <Dashboard /> },
-            { path: 'comics', element: <ComicList /> },
-            { path: 'comics/new', element: <ComicEditor /> },
-            { path: 'comics/edit/:id', element: <ComicEditor /> },
-            { path: 'comics/:id/chapters', element: <ChapterManager /> },
+            {
+                path: '/admin',
+                element: <AdminLayout />,
+                children: [
+                    { path: '', element: <Dashboard /> },
+                    { path: 'comics', element: <ComicList /> },
+                    { path: 'comics/new', element: <ComicEditor /> },
+                    { path: 'comics/edit/:id', element: <ComicEditor /> },
+                    { path: 'comics/:id/chapters', element: <ChapterManager /> },
+                ]
+            }
         ]
     },
     {

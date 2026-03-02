@@ -4,7 +4,7 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, Admin } = require('../Database/database');
 const r2Module = require('./r2');
 const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED } = r2Module;
 
@@ -25,6 +25,35 @@ const upload = multer({
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// [DEBUG] Log startup
+console.log('✅ Registering /api/admin/login route...');
+
+// Admin Login (Moved to top)
+app.post('/api/admin/login', async (req, res) => {
+    console.log('🔌 API /api/admin/login hit!', req.body);
+    try {
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Vui lòng nhập username và password' });
+        }
+
+        // Find by username first
+        const admin = await Admin.findOne({ username });
+
+        // Check password (plain text comparision as per current data "123456")
+        if (admin && admin.password_hash === password) {
+            console.log('✅ Login success');
+            res.json({ success: true, message: 'Đăng nhập thành công', admin: { username: admin.username, role: admin.role } });
+        } else {
+            console.log('❌ Login failed - Invalid credentials');
+            res.status(401).json({ success: false, message: 'Sai tên đăng nhập hoặc mật khẩu' });
+        }
+    } catch (err) {
+        console.error('❌ Login error:', err);
+        res.status(500).json({ message: err.message });
+    }
+});
 
 
 
@@ -174,10 +203,10 @@ app.get('/api/comics', async (req, res) => {
         const results = await Promise.all(comics.map(async (c) => {
             const coverUrl = await resolveR2Url(c.cover_url);
             const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-            return { 
-                ...c.toObject(), 
+            return {
+                ...c.toObject(),
                 cover_url: coverUrl || c.cover_url,
-                chapter_count: chapterCount 
+                chapter_count: chapterCount
             };
         }));
         res.json(results);
@@ -220,6 +249,8 @@ app.get('/api/comics/:id', async (req, res) => {
 });
 
 // --- ADMIN API ENDPOINTS ---
+
+// [MOVED] Admin Login route moved to top
 
 // CREATE a new comic
 app.post('/api/comics', async (req, res) => {
@@ -313,7 +344,7 @@ app.post('/api/chapters/bulk-delete', async (req, res) => {
         if (!chapterIds || !Array.isArray(chapterIds)) {
             return res.status(400).json({ message: 'Invalid payload: chapterIds must be an array' });
         }
-        
+
         const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
         res.json({ message: 'Chapters deleted', count: result.deletedCount });
     } catch (err) {
