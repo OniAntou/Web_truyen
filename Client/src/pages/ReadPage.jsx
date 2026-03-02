@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home } from 'lucide-react';
+import Navbar from '../components/Layout/Navbar';
 import ReaderControls from '../components/Reader/ReaderControls';
+import Footer from '../components/Layout/Footer';
 
 const ReadPage = () => {
     const { comicId, chapterId } = useParams();
@@ -15,7 +18,6 @@ const ReadPage = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch comic details which includes chapters and pages
         fetch(`http://localhost:5000/api/comics/${comicId}`)
             .then(res => {
                 if (!res.ok) throw new Error('Comic not found');
@@ -23,10 +25,6 @@ const ReadPage = () => {
             })
             .then(data => {
                 setComic(data);
-                
-                // Find current chapter
-                // Note: The backend sorts chapters ascending (oldest first usually)
-                // chapter_number is usually consistent
                 if (data.chapters) {
                     const found = data.chapters.find(c => c._id === chapterId || c.id === chapterId);
                     if (found) {
@@ -46,26 +44,20 @@ const ReadPage = () => {
             });
     }, [comicId, chapterId]);
 
+    const currentIndex = comic?.chapters?.findIndex(c => c._id === chapter?._id) ?? -1;
+    const hasPrev = currentIndex > 0;
+    const hasNext = comic?.chapters && currentIndex < comic.chapters.length - 1;
+
     const handleNextChapter = () => {
-        if (!comic || !chapter) return;
-        const currentIndex = comic.chapters.findIndex(c => c._id === chapter._id);
-        if (currentIndex < comic.chapters.length - 1) {
-            const nextChapter = comic.chapters[currentIndex + 1];
-            navigate(`/read/${comicId}/${nextChapter._id}`);
-        } else {
-            alert('This is the latest chapter.');
-        }
+        if (!comic || !chapter || !hasNext) return;
+        const nextChapter = comic.chapters[currentIndex + 1];
+        navigate(`/read/${comicId}/${nextChapter._id}`);
     };
 
     const handlePrevChapter = () => {
-        if (!comic || !chapter) return;
-        const currentIndex = comic.chapters.findIndex(c => c._id === chapter._id);
-        if (currentIndex > 0) {
-            const prevChapter = comic.chapters[currentIndex - 1];
-            navigate(`/read/${comicId}/${prevChapter._id}`);
-        } else {
-            alert('This is the first chapter.');
-        }
+        if (!comic || !chapter || !hasPrev) return;
+        const prevChapter = comic.chapters[currentIndex - 1];
+        navigate(`/read/${comicId}/${prevChapter._id}`);
     };
 
     if (loading) return <div style={{ paddingTop: '5rem', textAlign: 'center', color: 'white' }}>Loading...</div>;
@@ -75,47 +67,87 @@ const ReadPage = () => {
     const pages = chapter.pages || [];
 
     return (
-        <div className="reader-container">
-            {/* Pages */}
-            {pages.length > 0 ? (
-                pages.map((page, index) => (
-                    <div key={index} style={{ marginBottom: '0.5rem' }}>
-                        <img
-                            src={page.image_url}
-                            alt={`Page ${index + 1}`}
-                            className="reader-page-img"
-                            loading="lazy"
-                        />
-                    </div>
-                ))
-            ) : (
-                <div style={{ padding: '4rem', textAlign: 'center', color: 'gray' }}>
-                    <p>No images in this chapter.</p>
-                </div>
-            )}
+        <div className="reader-page">
+            <Navbar />
 
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                <p>End of Chapter {chapter.chapter_number}</p>
-                <div className="flex justify-center gap-4 mt-4">
-                     <button 
-                        onClick={handlePrevChapter}
-                        className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-white"
-                     >
-                        Previous
-                     </button>
-                     <button 
-                        onClick={handleNextChapter}
-                        className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700 text-white"
-                     >
-                        Next
-                     </button>
+            {/* Reader Info Bar */}
+            <div className="reader-info-bar">
+                <div className="reader-info-content">
+                    <Link to={`/p/${comicId}`} className="reader-info-back" title="Back to Comic">
+                        <ArrowLeft size={16} />
+                        {comic.title}
+                    </Link>
+
+                    {chapter.title && (
+                        <span className="reader-info-center-chapter">
+                            {chapter.title}
+                        </span>
+                    )}
+
+                    {chapter.title && <div className="reader-info-spacer"></div>}
                 </div>
             </div>
-            
-            {/* We passed comicId to controls, but let's just make controls simpler or keep as is */}
-            <ReaderControls comicId={comicId} />
+
+            {/* Reader Content */}
+            <div className="reader-container reader-container-spacing">
+                {pages.length > 0 ? (
+                    pages.map((page, index) => (
+                        <div key={index}>
+                            <img
+                                src={page.image_url}
+                                alt={`Page ${index + 1}`}
+                                className="reader-page-img"
+                                loading="lazy"
+                            />
+                        </div>
+                    ))
+                ) : (
+                    <div style={{ padding: '4rem', textAlign: 'center', color: 'gray' }}>
+                        <p>No images in this chapter.</p>
+                    </div>
+                )}
+
+                <ReaderControls 
+                    comicId={comicId} 
+                    chapters={comic?.chapters || []}
+                    currentChapterId={chapter?._id}
+                    onPrev={handlePrevChapter} 
+                    onNext={handleNextChapter} 
+                />
+            </div>
+        
+            {/* End of Chapter */}
+            <div className="reader-end-section">
+                <div className="reader-end-inner">
+                    <div className="reader-end-actions">
+                        <button 
+                            onClick={handlePrevChapter}
+                            className={`reader-end-btn reader-end-btn-secondary ${!hasPrev ? 'reader-end-btn-disabled' : ''}`}
+                            disabled={!hasPrev}
+                        >
+                            <ChevronLeft size={18} />
+                            Previous
+                        </button>
+                        <Link to={`/p/${comicId}`} className="reader-end-btn reader-end-btn-outline">
+                            <BookOpen size={16} />
+                            Comic Info
+                        </Link>
+                        <button 
+                            onClick={handleNextChapter}
+                            className={`reader-end-btn reader-end-btn-primary ${!hasNext ? 'reader-end-btn-disabled' : ''}`}
+                            disabled={!hasNext}
+                        >
+                            Next
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <Footer />
         </div>
     );
 };
 
 export default ReadPage;
+

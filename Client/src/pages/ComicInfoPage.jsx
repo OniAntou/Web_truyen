@@ -38,7 +38,7 @@ const ComicInfoPage = () => {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
             <Navbar />
-            <div style={{ paddingTop: '5rem' }}>
+            <div>
                 <ComicInfo comic={comic} />
                 <ChapterList chapters={comic.chapters} comicId={comic.id || comic._id} />
             </div>

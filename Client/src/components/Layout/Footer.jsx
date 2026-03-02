@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github, Twitter, Facebook } from 'lucide-react';
+import { Twitter, Facebook } from 'lucide-react';
 
 const Footer = () => {
     return (
@@ -37,7 +37,6 @@ const Footer = () => {
                 <div className="footer-bottom">
                     <p>© 2024 ComicVerse. All rights reserved.</p>
                     <div className="social-links">
-                        <a href="#"><Github size={20} /></a>
                         <a href="#"><Twitter size={20} /></a>
                         <a href="#"><Facebook size={20} /></a>
                     </div>

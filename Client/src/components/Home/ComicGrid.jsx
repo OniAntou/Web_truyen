@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye } from 'lucide-react';
+import { formatViews } from '../../utils/format';
 
 const ComicCard = ({ comic }) => {
     return (
@@ -11,11 +12,6 @@ const ComicCard = ({ comic }) => {
                     alt={comic.title}
                     className="card-image"
                 />
-                <div className="card-overlay">
-                    <span className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
-                        Read Now
-                    </span>
-                </div>
 
                 {/* Overlay Tags */}
                 <div className="card-tag">
@@ -34,7 +30,7 @@ const ComicCard = ({ comic }) => {
                     </div>
                     <div className="flex items-center" style={{ gap: '4px' }}>
                         <Eye size={12} />
-                        <span>{comic.views}</span>
+                        <span>{formatViews(comic.views)}</span>
                     </div>
                 </div>
             </div>

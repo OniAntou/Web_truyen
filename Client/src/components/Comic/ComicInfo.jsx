@@ -1,15 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
+import { formatViews } from '../../utils/format';
 
 const ComicInfo = ({ comic }) => {
     return (
         <div className="relative">
-            {/* Background Banner */}
-            <div
-                className="info-banner-bg"
-                style={{ backgroundImage: `url(${comic.cover_url || comic.cover})` }}
-            >
+            {/* Banner Background */}
+            <div className="info-banner-bg">
+                <div className="info-banner-blur" style={{ backgroundImage: `url(${comic.cover_url || comic.cover})` }}></div>
                 <div className="info-banner-overlay"></div>
             </div>
 
@@ -37,7 +36,7 @@ const ComicInfo = ({ comic }) => {
                         <span className="flex items-center gap-4" style={{ color: '#22c55e' }}>
                             {comic.status}
                         </span>
-                        <span>{comic.views} views</span>
+                        <span>{formatViews(comic.views)} views</span>
                     </div>
 
                     <p className="info-desc">{comic.description}</p>
