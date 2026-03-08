@@ -22,7 +22,7 @@ const ComicSchema = new mongoose.Schema(
     description: String,
     rating: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
-    genres: [String],
+    genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
     created_at: { type: Date, default: Date.now },
   },
   { collection: "comic" },
@@ -75,4 +75,28 @@ const UploadSchema = new mongoose.Schema(
 
 const Upload = mongoose.model("Upload", UploadSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload };
+// 5. AdminLogin Collection
+const AdminLoginSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+  },
+  { collection: "adminlogin" },
+);
+
+const AdminLogin = mongoose.model("AdminLogin", AdminLoginSchema);
+
+// 6. Genre Collection – Lưu thể loại truyện
+const GenreSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true }, // Tên thể loại (vd: "Hành Động")
+    slug: { type: String, required: true, unique: true }, // URL-friendly (vd: "hanh-dong")
+    description: { type: String, default: "" },            // Mô tả thể loại
+    created_at: { type: Date, default: Date.now },
+  },
+  { collection: "genres" },
+);
+
+const Genre = mongoose.model("Genre", GenreSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre };
