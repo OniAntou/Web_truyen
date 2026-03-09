@@ -12,14 +12,10 @@ const ChapterManager = () => {
     });
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
-    
+
     // For uploading to existing chapters
     const fileInputRef = useRef(null);
     const targetChapterIdRef = useRef(null);
-
-    useEffect(() => {
-        fetchData();
-    }, [id]);
 
     const fetchData = async () => {
         try {
@@ -32,13 +28,17 @@ const ChapterManager = () => {
         }
     };
 
+    useEffect(() => {
+        fetchData();
+    }, [id]);
+
     const handleAddChapter = async (e) => {
         e.preventDefault();
         try {
             // 1. Get Comic ID (ensure MongoDB _id)
             const comicRes = await fetch(`http://localhost:5000/api/comics/${id}`);
             const comicData = await comicRes.json();
-            
+
             const payload = {
                 comic_id: comicData._id,
                 chapter_number: Number(newChapter.chapter_number),
@@ -55,7 +55,7 @@ const ChapterManager = () => {
 
             if (response.ok) {
                 const createdChapter = await response.json();
-                
+
                 // 3. Upload Images if selected
                 if (files.length > 0) {
                     setUploading(true);
@@ -67,9 +67,9 @@ const ChapterManager = () => {
                 setFiles([]);
                 // Reset file input value manually
                 if (document.getElementById('new-chapter-files')) {
-                    document.getElementById('new-chapter-files').value = ''; 
+                    document.getElementById('new-chapter-files').value = '';
                 }
-                
+
                 fetchData(); // Refresh list
             } else {
                 alert('Failed to add chapter');
@@ -91,7 +91,7 @@ const ChapterManager = () => {
                 method: 'POST',
                 body: formData
             });
-            
+
             if (!res.ok) {
                 const err = await res.json();
                 alert(`Upload failed: ${err.message}`);
@@ -158,11 +158,11 @@ const ChapterManager = () => {
                 fileInputRef.current.value = '';
                 return;
             }
-            
+
             setUploading(true);
             await uploadImages(targetChapterIdRef.current, selected);
             setUploading(false);
-            
+
             fileInputRef.current.value = '';
             targetChapterIdRef.current = null;
             alert('Images uploaded successfully!');
@@ -193,9 +193,9 @@ const ChapterManager = () => {
     return (
         <div className="max-w-4xl mx-auto">
             {/* Hidden Input for Quick Upload */}
-            <input 
-                type="file" 
-                multiple 
+            <input
+                type="file"
+                multiple
                 accept="image/*"
                 ref={fileInputRef}
                 className="hidden"
@@ -203,7 +203,7 @@ const ChapterManager = () => {
             />
 
             <div className="flex items-center gap-4 mb-6">
-                 <Link to="/admin/comics" className="text-gray-400 hover:text-white">
+                <Link to="/admin/comics" className="text-gray-400 hover:text-white">
                     &larr; Back
                 </Link>
                 <div className="flex-1">
@@ -235,7 +235,7 @@ const ChapterManager = () => {
                             <input
                                 type="number"
                                 value={newChapter.chapter_number}
-                                onChange={(e) => setNewChapter({...newChapter, chapter_number: e.target.value})}
+                                onChange={(e) => setNewChapter({ ...newChapter, chapter_number: e.target.value })}
                                 className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:border-purple-500 outline-none"
                                 required
                             />
@@ -245,7 +245,7 @@ const ChapterManager = () => {
                             <input
                                 type="text"
                                 value={newChapter.title}
-                                onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
+                                onChange={(e) => setNewChapter({ ...newChapter, title: e.target.value })}
                                 placeholder="e.g. The Beginning"
                                 className="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:border-purple-500 outline-none"
                             />
@@ -265,11 +265,10 @@ const ChapterManager = () => {
                         <button
                             type="submit"
                             disabled={uploading}
-                            className={`w-full font-bold py-2 rounded transition-colors ${
-                                uploading 
-                                ? 'bg-gray-600 cursor-not-allowed text-gray-300' 
-                                : 'bg-green-600 hover:bg-green-700 text-white'
-                            }`}
+                            className={`w-full font-bold py-2 rounded transition-colors ${uploading
+                                    ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                                    : 'bg-green-600 hover:bg-green-700 text-white'
+                                }`}
                         >
                             {uploading ? 'Processing...' : 'Add Chapter'}
                         </button>

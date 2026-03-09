@@ -7,10 +7,6 @@ const ComicList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        fetchComics();
-    }, []);
-
     const fetchComics = async () => {
         try {
             const response = await fetch('http://localhost:5000/api/comics');
@@ -22,6 +18,10 @@ const ComicList = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchComics();
+    }, []);
 
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this comic?')) return;
@@ -40,7 +40,7 @@ const ComicList = () => {
         }
     };
 
-    const filteredComics = comics.filter(comic => 
+    const filteredComics = comics.filter(comic =>
         comic.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -58,19 +58,19 @@ const ComicList = () => {
                     <h2 className="text-3xl font-bold text-white">Comics Library</h2>
                     <p className="text-gray-400 mt-1">Manage your collection of {comics.length} comics</p>
                 </div>
-                
+
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <div className="relative group w-full md:w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-500 transition-colors" size={18} />
-                        <input 
-                            type="text" 
-                            placeholder="Search comics..." 
+                        <input
+                            type="text"
+                            placeholder="Search comics..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full bg-[#1e1e1e] border border-gray-800 rounded-xl py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-600"
                         />
                     </div>
-                    
+
                     <Link
                         to="/admin/comics/new"
                         className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/20 font-semibold flex items-center gap-2 whitespace-nowrap"
@@ -113,11 +113,10 @@ const ComicList = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
-                                            comic.status === 'Ongoing' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                            comic.status === 'Completed' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                            'bg-gray-700 text-gray-300 border-gray-600'
-                                        }`}>
+                                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${comic.status === 'Ongoing' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                                                comic.status === 'Completed' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                                    'bg-gray-700 text-gray-300 border-gray-600'
+                                            }`}>
                                             {comic.status}
                                         </span>
                                     </td>

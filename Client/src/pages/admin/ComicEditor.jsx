@@ -18,12 +18,6 @@ const ComicEditor = () => {
     const [coverFile, setCoverFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
 
-    useEffect(() => {
-        if (isEditing) {
-            fetchComic();
-        }
-    }, [id]);
-
     const fetchComic = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/comics/${id}`);
@@ -41,6 +35,12 @@ const ComicEditor = () => {
             console.error('Error fetching comic:', error);
         }
     };
+
+    useEffect(() => {
+        if (isEditing) {
+            fetchComic();
+        }
+    }, [id]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
