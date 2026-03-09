@@ -14,11 +14,12 @@ const HomePage = () => {
         fetch('http://localhost:5000/api/comics')
             .then(res => res.json())
             .then(data => {
-                setComics(data);
+                setComics(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
             .catch(err => {
                 console.error('Failed to fetch comics:', err);
+                setComics([]);
                 setLoading(false);
             });
 

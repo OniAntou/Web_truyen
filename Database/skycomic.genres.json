@@ -1,0 +1,40 @@
+[{
+  "_id": {
+    "$oid": "69ad50467cb908ed1ae17b8c"
+  },
+  "name": "Hành động",
+  "slug": "hanh-dong",
+  "description": "Thể loại có những tình tiết kịch tính, chiến đấu, võ thuật."
+},
+{
+  "_id": {
+    "$oid": "69ad50467cb908ed1ae17b8d"
+  },
+  "name": "Hài hước",
+  "slug": "hai-huoc",
+  "description": "Truyện mang yếu tố gây cười, giải trí nhẹ nhàng."
+},
+{
+  "_id": {
+    "$oid": "69ad50467cb908ed1ae17b8e"
+  },
+  "name": "Chuyển sinh",
+  "slug": "chuyen-sinh",
+  "description": "Nhân vật chính đi đến hoặc tái sinh ở một thế giới khác (Isekai)."
+},
+{
+  "_id": {
+    "$oid": "69ad50467cb908ed1ae17b8f"
+  },
+  "name": "Tình cảm",
+  "slug": "tinh-cam",
+  "description": "Tập trung vào mối quan hệ tình cảm, lãng mạn giữa các nhân vật."
+},
+{
+  "_id": {
+    "$oid": "69ad50467cb908ed1ae17b90"
+  },
+  "name": "Kinh dị",
+  "slug": "kinh-di",
+  "description": "Chứa các yếu tố rùng rợn, ma quái, gây sợ hãi."
+}]
