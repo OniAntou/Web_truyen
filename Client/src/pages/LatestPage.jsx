@@ -4,6 +4,7 @@ import { Star, Eye, Clock, Filter, ChevronDown, ChevronLeft, ChevronRight, Spark
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
+import LazyImage from '../components/LazyImage';
 
 const LatestComicCard = ({ comic }) => {
     const timeAgo = (date) => {
@@ -21,7 +22,7 @@ const LatestComicCard = ({ comic }) => {
     return (
         <Link to={`/p/${comic.id || comic._id}`} className="latest-comic-card">
             <div className="latest-card-image-wrapper">
-                <img
+                <LazyImage
                     src={comic.cover_url || comic.cover}
                     alt={comic.title}
                     className="card-image"

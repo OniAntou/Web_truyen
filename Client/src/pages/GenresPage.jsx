@@ -4,6 +4,7 @@ import { Star, Eye, Grid3X3, BookOpen, Search, X } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
+import LazyImage from '../components/LazyImage';
 
 // Genre color mapping for visual variety
 const genreThemes = {
@@ -61,7 +62,7 @@ const GenreCard = ({ genre, isSelected, onClick }) => {
 const ComicCard = ({ comic }) => (
     <Link to={`/p/${comic.id || comic._id}`} className="popular-comic-card">
         <div className="popular-card-image-wrapper">
-            <img src={comic.cover_url || comic.cover} alt={comic.title} className="card-image" />
+            <LazyImage src={comic.cover_url || comic.cover} alt={comic.title} className="card-image" />
 
         </div>
         <div style={{ padding: '0 0.25rem' }}>

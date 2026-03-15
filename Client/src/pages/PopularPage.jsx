@@ -4,12 +4,13 @@ import { Star, Eye, TrendingUp, Filter, ChevronDown, Flame } from 'lucide-react'
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
+import LazyImage from '../components/LazyImage';
 
 const PopularComicCard = ({ comic, rank }) => {
     return (
         <Link to={`/p/${comic.id || comic._id}`} className="popular-comic-card">
             <div className="popular-card-image-wrapper">
-                <img
+                <LazyImage
                     src={comic.cover_url || comic.cover}
                     alt={comic.title}
                     className="card-image"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, User, Star, Sun, Moon } from 'lucide-react';
+import LazyImage from '../LazyImage';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -140,7 +141,7 @@ const Navbar = () => {
                                                 className="search-dropdown-item"
                                                 onClick={() => { setShowDropdown(false); setSearchQuery(''); }}
                                             >
-                                                <img
+                                                <LazyImage
                                                     src={comic.cover_url || comic.cover}
                                                     alt={comic.title}
                                                     className="search-dropdown-img"

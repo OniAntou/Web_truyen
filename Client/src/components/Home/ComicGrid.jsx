@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye } from 'lucide-react';
 import { formatViews } from '../../utils/format';
+import LazyImage from '../LazyImage';
 
 const ComicCard = ({ comic }) => {
     return (
         <Link to={`/p/${comic.id}`} className="comic-card">
             <div className="card-image-wrapper">
-                <img
+                <LazyImage
                     src={comic.cover_url || comic.cover}
                     alt={comic.title}
                     className="card-image"

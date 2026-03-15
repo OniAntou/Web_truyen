@@ -4,6 +4,7 @@ import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
+import LazyImage from '../components/LazyImage';
 
 const HomePage = () => {
     const [comics, setComics] = useState([]);
@@ -50,9 +51,9 @@ const HomePage = () => {
                         Trending Now
                     </h3>
                     <div className="trending-scroll">
-                        {comics.map(c => (
+                        {comics.slice(0, 7).map(c => (
                             <Link key={c._id || c.id} to={`/p/${c.id || c._id}`} className="trending-item">
-                                <img src={c.cover_url || c.cover} className="trending-img" alt={c.title} />
+                                <LazyImage src={c.cover_url || c.cover} className="trending-img" alt={c.title} />
                                 <p style={{ fontWeight: 500, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {c.title}
                                 </p>

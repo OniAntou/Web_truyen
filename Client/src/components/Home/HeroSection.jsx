@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
+import LazyImage from '../LazyImage';
 
 const HeroSection = ({ featuredComic }) => {
     if (!featuredComic) return null;
@@ -40,7 +41,7 @@ const HeroSection = ({ featuredComic }) => {
                     {/* Cover Image on the right */}
                     <div className="hero-cover-wrapper">
                         <div className="hero-cover-frame">
-                            <img
+                            <LazyImage
                                 src={featuredComic.cover_url || featuredComic.cover}
                                 alt={featuredComic.title}
                                 className="hero-cover-img"

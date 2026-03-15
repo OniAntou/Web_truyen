@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
 import { formatViews } from '../../utils/format';
+import LazyImage from '../LazyImage';
 
 const ComicInfo = ({ comic }) => {
     return (
@@ -15,7 +16,7 @@ const ComicInfo = ({ comic }) => {
             <div className="container info-content-wrapper">
                 {/* Cover Image */}
                 <div className="info-cover-box">
-                    <img
+                    <LazyImage
                         src={comic.cover_url || comic.cover}
                         alt={comic.title}
                         className="info-cover-img"

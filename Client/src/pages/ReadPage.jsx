@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import ReaderControls from '../components/Reader/ReaderControls';
+import LazyImage from '../components/LazyImage';
 import Footer from '../components/Layout/Footer';
 
 const ReadPage = () => {
@@ -93,11 +94,10 @@ const ReadPage = () => {
                 {pages.length > 0 ? (
                     pages.map((page, index) => (
                         <div key={index}>
-                            <img
+                            <LazyImage
                                 src={page.image_url}
                                 alt={`Page ${index + 1}`}
                                 className="reader-page-img"
-                                loading="lazy"
                             />
                         </div>
                     ))
