@@ -44,8 +44,8 @@ const ComicInfo = ({ comic }) => {
 
                     <div className="info-genres">
                         {comic.genres.map(genre => (
-                            <span key={genre} className="genre-tag">
-                                {genre}
+                            <span key={genre._id || genre} className="genre-tag">
+                                {genre.name || genre}
                             </span>
                         ))}
                     </div>

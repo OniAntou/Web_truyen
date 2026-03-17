@@ -42,7 +42,7 @@ const PopularComicCard = ({ comic, rank }) => {
                 {comic.genres && comic.genres.length > 0 && (
                     <div className="popular-card-genres">
                         {comic.genres.slice(0, 2).map((g, i) => (
-                            <span key={i} className="popular-card-genre-tag">{g}</span>
+                            <span key={i} className="popular-card-genre-tag">{g.name || g}</span>
                         ))}
                     </div>
                 )}
@@ -141,11 +141,11 @@ const PopularPage = () => {
                                     </button>
                                     {genres.map(g => (
                                         <button
-                                            key={g}
-                                            className={`popular-dropdown-item ${selectedGenre === g ? 'active' : ''}`}
-                                            onClick={() => { setSelectedGenre(g); setShowGenreDropdown(false); }}
+                                            key={g._id || g}
+                                            className={`popular-dropdown-item ${selectedGenre === (g.name || g) ? 'active' : ''}`}
+                                            onClick={() => { setSelectedGenre(g.name || g); setShowGenreDropdown(false); }}
                                         >
-                                            {g}
+                                            {g.name || g}
                                         </button>
                                     ))}
                                 </div>
