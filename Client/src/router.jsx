@@ -6,7 +6,7 @@ import SearchPage from './pages/SearchPage';
 import PopularPage from './pages/PopularPage';
 import GenresPage from './pages/GenresPage';
 import LatestPage from './pages/LatestPage';
-import AdminLayout from './layouts/AdminLayout';
+import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
 import ComicList from './pages/admin/ComicList';
 import ComicEditor from './pages/admin/ComicEditor';
