@@ -475,6 +475,38 @@ app.get("/api/comics/:id", async (req, res) => {
 
 // [MOVED] Admin Login route moved to top
 
+// Helper to process genres array
+async function processGenres(genresInput) {
+  if (!genresInput || !Array.isArray(genresInput)) return [];
+  const genreIds = [];
+  for (const g of genresInput) {
+    if (typeof g === 'string') {
+      if (g.match(/^[0-9a-fA-F]{24}$/)) {
+        genreIds.push(g);
+        continue;
+      }
+      let genreDoc = await Genre.findOne({ name: { $regex: new RegExp(`^${g}$`, 'i') } });
+      if (!genreDoc) {
+        const slug = g.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        genreDoc = await Genre.create({ name: g, slug: slug || Date.now().toString() });
+      }
+      genreIds.push(genreDoc._id);
+    } else if (g && g._id) {
+      genreIds.push(g._id);
+    } else {
+      genreIds.push(g);
+    }
+  }
+  return genreIds;
+}
+
 // CREATE a new comic
 app.post("/api/comics", async (req, res) => {
   try {
@@ -483,9 +515,14 @@ app.post("/api/comics", async (req, res) => {
     const lastComic = await Comic.findOne().sort({ id: -1 });
     const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 
+    const payload = { ...req.body };
+    if (payload.genres) {
+      payload.genres = await processGenres(payload.genres);
+    }
+
     const comicData = {
       id: newId,
-      ...req.body,
+      ...payload,
     };
 
     const newComic = new Comic(comicData);
@@ -502,10 +539,15 @@ app.put("/api/comics/:id", async (req, res) => {
     const { id } = req.params;
     let comic;
 
+    const payload = { ...req.body };
+    if (payload.genres) {
+      payload.genres = await processGenres(payload.genres);
+    }
+
     if (id.match(/^[0-9a-fA-F]{24}$/)) {
-      comic = await Comic.findByIdAndUpdate(id, req.body, { new: true });
+      comic = await Comic.findByIdAndUpdate(id, payload, { new: true });
     } else {
-      comic = await Comic.findOneAndUpdate({ id: parseInt(id) }, req.body, {
+      comic = await Comic.findOneAndUpdate({ id: parseInt(id) }, payload, {
         new: true,
       });
     }

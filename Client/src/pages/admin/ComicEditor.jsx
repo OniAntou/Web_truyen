@@ -24,7 +24,9 @@ const ComicEditor = () => {
             const data = await response.json();
             setFormData({
                 ...data,
-                genres: Array.isArray(data.genres) ? data.genres.join(', ') : data.genres
+                genres: Array.isArray(data.genres) 
+                    ? data.genres.map(g => typeof g === 'object' && g.name ? g.name : g).join(', ') 
+                    : data.genres
             });
             // Display existing cover if available
             // If data.cover_url is a full R2 url (or resolved one), show it
