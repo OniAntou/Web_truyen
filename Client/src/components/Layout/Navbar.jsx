@@ -156,7 +156,7 @@ const Navbar = () => {
                                                             </span>
                                                         )}
                                                         {comic.genres && comic.genres.length > 0 && (
-                                                            <span className="search-dropdown-genre">{comic.genres[0]}</span>
+                                                            <span className="search-dropdown-genre">{comic.genres[0].name || comic.genres[0]}</span>
                                                         )}
                                                     </div>
                                                 </div>
