@@ -116,6 +116,17 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+// Get User Profile
+app.get("/api/users/me", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: "User không tồn tại" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Self-Delete (Authenticated User)
 app.delete("/api/users/me", authenticateToken, async (req, res) => {
   try {

@@ -8,6 +8,7 @@ import GenresPage from './pages/GenresPage';
 import LatestPage from './pages/LatestPage';
 import AuthPage from './pages/AuthPage';
 import FollowingPage from './pages/FollowingPage';
+import ProfilePage from './pages/ProfilePage';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
     {
         path: '/following',
         element: <FollowingPage />,
+    },
+    {
+        path: '/profile',
+        element: <ProfilePage />,
     },
 
     // Admin Routes

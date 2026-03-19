@@ -240,6 +240,9 @@ const Navbar = () => {
                                         <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{user.username}</div>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
                                     </div>
+                                    <Link to="/profile" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-primary)', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
+                                        Trang cá nhân
+                                    </Link>
                                     <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
                                         Đăng xuất
                                     </button>
@@ -292,6 +295,7 @@ const Navbar = () => {
                                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{user.email}</span>
                                 </div>
                             </div>
+                            <button className="btn w-full" style={{ justifyContent: 'center', background: 'var(--bg-secondary)', color: 'var(--text-primary)', marginBottom: '0.5rem', border: '1px solid var(--border)' }} onClick={() => { navigate('/profile'); setIsMobileMenuOpen(false); }}>Trang cá nhân</button>
                             <button className="btn w-full" style={{ justifyContent: 'center', background: '#3f3f46', color: '#ef4444' }} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Đăng xuất</button>
                             <button className="btn w-full" style={{ justifyContent: 'center', background: '#ef4444', color: 'white', marginTop: '0.5rem' }} onClick={() => { handleDeleteAccount(); setIsMobileMenuOpen(false); }}>
                                 <Trash2 size={18} /> Xóa tài khoản
