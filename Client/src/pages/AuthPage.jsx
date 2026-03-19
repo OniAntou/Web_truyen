@@ -122,7 +122,7 @@ const cardStyle = {
 const titleStyle = { color: "var(--text-primary)", fontSize: "2rem", fontWeight: "800", marginBottom: "0.5rem" };
 const subTitleStyle = { color: "var(--text-secondary)", marginBottom: "2rem", fontSize: "0.9rem" };
 const formStyle = { display: "flex", flexDirection: "column", gap: "1rem" };
-const inputStyle = { padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "white", outline: "none" };
+const inputStyle = { padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "var(--text-primary)", outline: "none" };
 const buttonStyle = { padding: "1rem", borderRadius: "0.8rem", background: "var(--accent)", color: "white", border: "none", fontWeight: "700", cursor: "pointer", marginTop: "0.5rem" };
 const linkBtnStyle = { background: "none", border: "none", color: "var(--accent)", fontWeight: "bold", marginLeft: "0.5rem", cursor: "pointer", textDecoration: "underline" };
 
