@@ -4,7 +4,7 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView } = require('../Database/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const r2Module = require('./r2');
@@ -27,6 +27,18 @@ const upload = multer({
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ message: "Không tìm thấy token" });
+  
+  jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, user) => {
+    if (err) return res.status(403).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    req.user = user;
+    next();
+  });
+};
 
 
 
@@ -103,6 +115,49 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+// User Delete (Admin or Self)
+app.delete("/api/users/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User không tồn tại" });
+
+    // 1. Rollback views
+    const userViews = await ComicView.find({ user_id: user._id });
+    for (const view of userViews) {
+      await Comic.findByIdAndUpdate(view.comic_id, { $inc: { views: -1 } });
+    }
+    await ComicView.deleteMany({ user_id: user._id });
+
+    // 2. Rollback ratings
+    const userRatings = await Rating.find({ user_id: user._id });
+    for (const rating of userRatings) {
+      const comic = await Comic.findById(rating.comic_id);
+      if (comic) {
+        // Recalculate average rating for comic (omitting this user's rating)
+        const result = await Rating.aggregate([
+          { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
+          { $group: { _id: null, avgRating: { $avg: "$rating" } } }
+        ]);
+        const avg = result.length > 0 ? result[0].avgRating : 0;
+        const newAvg = Number(avg.toFixed(1));
+        const newCount = Math.max(0, (comic.rating_count || 1) - 1);
+        await Comic.updateOne(
+          { _id: comic._id },
+          { $set: { rating: newAvg, rating_count: newCount } }
+        );
+      }
+    }
+    await Rating.deleteMany({ user_id: user._id });
+
+    // 3. Delete user
+    await User.findByIdAndDelete(user._id);
+
+    res.json({ message: "Đã xoá user và hoàn tác các lượt view/rating liên quan" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // --- Cloudflare R2 / Upload ---
 app.get("/api/r2/status", (req, res) => {
@@ -625,8 +680,100 @@ app.delete("/api/comics/:id", async (req, res) => {
 
     // Also delete associated chapters
     await Chapter.deleteMany({ comic_id: comic._id });
+    await Rating.deleteMany({ comic_id: comic._id }); // cleanup ratings
+    await ComicView.deleteMany({ comic_id: comic._id }); // cleanup views
 
     res.json({ message: "Comic deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- RATING API ---
+// Fetch user's rating for a specific comic
+app.get("/api/comics/:id/user-rating", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const rating = await Rating.findOne({ user_id: req.user.id, comic_id: comic._id });
+    res.json({ rating: rating ? rating.rating : 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Submit a rating
+app.post("/api/comics/:id/rate", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating } = req.body;
+    
+    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Rating phải từ 1 đến 5" });
+    }
+
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    // Create or update the rating
+    const existingRating = await Rating.findOne({ user_id: req.user.id, comic_id: comic._id });
+    
+    let newRatingCount = comic.rating_count || 0;
+    if (existingRating) {
+      existingRating.rating = rating;
+      await existingRating.save();
+    } else {
+      await Rating.create({ user_id: req.user.id, comic_id: comic._id, rating });
+      newRatingCount += 1;
+    }
+
+    // Recalculate average rating
+    const result = await Rating.aggregate([
+      { $match: { comic_id: comic._id } },
+      { $group: { _id: null, avgRating: { $avg: "$rating" } } }
+    ]);
+    
+    const avg = result.length > 0 ? result[0].avgRating : rating;
+    const newAvg = Number(avg.toFixed(1));
+    
+    await Comic.updateOne(
+      { _id: comic._id },
+      { $set: { rating: newAvg, rating_count: newRatingCount } }
+    );
+
+    res.json({ message: "Đánh giá thành công", rating: newAvg, user_rating: rating, rating_count: newRatingCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- VIEW API ---
+// Ghi nhận một lượt xem mới cho người dùng
+app.post("/api/comics/:id/view", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const existingView = await ComicView.findOne({ user_id: req.user.id, comic_id: comic._id });
+    if (!existingView) {
+      await ComicView.create({ user_id: req.user.id, comic_id: comic._id });
+      await Comic.updateOne({ _id: comic._id }, { $inc: { views: 1 } });
+      comic.views = (comic.views || 0) + 1;
+    }
+    
+    res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

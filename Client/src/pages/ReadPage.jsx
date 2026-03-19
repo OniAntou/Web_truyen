@@ -45,6 +45,20 @@ const ReadPage = () => {
             });
     }, [comicId, chapterId]);
 
+    const viewedRef = React.useRef(null);
+
+    // Track comic view for authenticated users
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token && comicId && viewedRef.current !== comicId) {
+            viewedRef.current = comicId;
+            fetch(`http://localhost:5000/api/comics/${comicId}/view`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).catch(console.error);
+        }
+    }, [comicId]);
+
     const currentIndex = comic?.chapters?.findIndex(c => c._id === chapter?._id) ?? -1;
     const hasPrev = currentIndex > 0;
     const hasNext = comic?.chapters && currentIndex < comic.chapters.length - 1;

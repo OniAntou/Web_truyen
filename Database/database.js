@@ -21,6 +21,7 @@ const ComicSchema = new mongoose.Schema(
     cover_url: String, // Cloudflare URL
     description: String,
     rating: { type: Number, default: 0 },
+    rating_count: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
     created_at: { type: Date, default: Date.now },
@@ -99,6 +100,33 @@ const UserSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", UserSchema);
 
+// 5.2. Rating Collection
+const RatingSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    created_at: { type: Date, default: Date.now },
+  },
+  { collection: "ratings" },
+);
+
+const Rating = mongoose.model("Rating", RatingSchema);
+
+// 5.3. ComicView Collection
+const ComicViewSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
+    created_at: { type: Date, default: Date.now },
+  },
+  { collection: "comic_views" },
+);
+
+ComicViewSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
+
+const ComicView = mongoose.model("ComicView", ComicViewSchema);
+
 // 6. Genre Collection – Lưu thể loại truyện
 const GenreSchema = new mongoose.Schema(
   {
@@ -112,4 +140,4 @@ const GenreSchema = new mongoose.Schema(
 
 const Genre = mongoose.model("Genre", GenreSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User };
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView };
