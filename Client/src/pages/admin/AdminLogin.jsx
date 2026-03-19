@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, BookOpen } from 'lucide-react';
 
-const Login = () => {
+const AdminLogin = () => {
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -160,4 +161,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default AdminLogin;

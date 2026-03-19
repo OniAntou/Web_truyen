@@ -9,13 +9,32 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [searching, setSearching] = useState(false);
+    const [user, setUser] = useState(null);
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('theme') || 'dark';
     });
     const searchRef = useRef(null);
+    const profileRef = useRef(null);
     const debounceRef = useRef(null);
     const navigate = useNavigate();
+
+    // Re-check authentication context
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try { setUser(JSON.parse(storedUser)); } catch(e) {}
+        }
+    }, [navigate]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        setShowProfileDropdown(false);
+        navigate('/');
+    };
 
     // Apply theme on mount and change
     useEffect(() => {
@@ -36,6 +55,9 @@ const Navbar = () => {
         const handleClickOutside = (e) => {
             if (searchRef.current && !searchRef.current.contains(e.target)) {
                 setShowDropdown(false);
+            }
+            if (profileRef.current && !profileRef.current.contains(e.target)) {
+                setShowProfileDropdown(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -183,10 +205,32 @@ const Navbar = () => {
                         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    <button className="btn btn-primary">
-                        <User size={18} />
-                        <span>Login</span>
-                    </button>
+                    {user ? (
+                        <div className="nav-profile" ref={profileRef} style={{ position: 'relative' }}>
+                            <div 
+                                style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none' }}
+                                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                            >
+                                {user.username ? user.username.charAt(0).toUpperCase() : <User size={18} />}
+                            </div>
+                            {showProfileDropdown && (
+                                <div className="profile-dropdown" style={{ position: 'absolute', top: '120%', right: '0', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem', minWidth: '180px', zIndex: 50, boxShadow: 'var(--shadow-card)' }}>
+                                    <div style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)', marginBottom: '0.5rem' }}>
+                                        <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{user.username}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
+                                    </div>
+                                    <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
+                                        Đăng xuất
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <button className="btn btn-primary" onClick={() => navigate('/auth')}>
+                            <User size={18} />
+                            <span>Login</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -212,7 +256,22 @@ const Navbar = () => {
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
                     </div>
-                    <button className="btn btn-primary w-full" style={{ justifyContent: 'center' }}>Login</button>
+                    {user ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--bg-primary)', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+                                    {user.username ? user.username.charAt(0).toUpperCase() : <User size={18} />}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: '0.9rem' }}>{user.username}</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{user.email}</span>
+                                </div>
+                            </div>
+                            <button className="btn w-full" style={{ justifyContent: 'center', background: '#3f3f46', color: '#ef4444' }} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Đăng xuất</button>
+                        </div>
+                    ) : (
+                        <button className="btn btn-primary w-full" style={{ justifyContent: 'center', marginTop: '1rem' }} onClick={() => { navigate('/auth'); setIsMobileMenuOpen(false); }}>Login</button>
+                    )}
                 </div>
             )}
         </nav>

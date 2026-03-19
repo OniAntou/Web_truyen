@@ -4,7 +4,9 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload, AdminLogin, Genre } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User } = require('../Database/database');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const r2Module = require('./r2');
 const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED } = r2Module;
 
@@ -53,6 +55,54 @@ app.post("/api/admin/login", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+// --- USER AUTHENTICATION ---
+// User Register
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin" });
+    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email đã được sử dụng" });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = new User({ username, email, password: hashedPassword });
+    await newUser.save();
+    
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+    res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// User Login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Sai email hoặc mật khẩu" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Sai email hoặc mật khẩu" });
+    }
+    
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+    res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 // --- Cloudflare R2 / Upload ---
 app.get("/api/r2/status", (req, res) => {

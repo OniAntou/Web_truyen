@@ -6,12 +6,15 @@ import SearchPage from './pages/SearchPage';
 import PopularPage from './pages/PopularPage';
 import GenresPage from './pages/GenresPage';
 import LatestPage from './pages/LatestPage';
+import AuthPage from './pages/AuthPage';
+
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
 import ComicList from './pages/admin/ComicList';
 import ComicEditor from './pages/admin/ComicEditor';
 import ChapterManager from './pages/admin/ChapterManager';
-import Login from './pages/admin/Login';
+import AdminLogin from './pages/admin/AdminLogin';
+
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 export const router = createBrowserRouter([
@@ -43,10 +46,16 @@ export const router = createBrowserRouter([
         path: '/latest',
         element: <LatestPage />,
     },
+    {
+        path: '/auth',
+        element: <AuthPage />,
+    },
+
     // Admin Routes
     {
         path: '/admin/login',
-        element: <Login />,
+        element: <AdminLogin />,
+
     },
     {
         element: <ProtectedAdminRoute />,

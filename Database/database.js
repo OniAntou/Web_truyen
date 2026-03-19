@@ -86,6 +86,19 @@ const AdminLoginSchema = new mongoose.Schema(
 
 const AdminLogin = mongoose.model("AdminLogin", AdminLoginSchema);
 
+// 5.1. User Collection
+const UserSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    created_at: { type: Date, default: Date.now },
+  },
+  { collection: "users" },
+);
+
+const User = mongoose.model("User", UserSchema);
+
 // 6. Genre Collection – Lưu thể loại truyện
 const GenreSchema = new mongoose.Schema(
   {
@@ -99,4 +112,4 @@ const GenreSchema = new mongoose.Schema(
 
 const Genre = mongoose.model("Genre", GenreSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre };
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User };
