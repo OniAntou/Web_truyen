@@ -5,6 +5,7 @@ import Navbar from '../components/Layout/Navbar';
 import ReaderControls from '../components/Reader/ReaderControls';
 import LazyImage from '../components/LazyImage';
 import Footer from '../components/Layout/Footer';
+import { CommentSection } from '../components/Comic/ComicInfo';
 
 const ReadPage = () => {
     const { comicId, chapterId } = useParams();
@@ -157,6 +158,8 @@ const ReadPage = () => {
                     </div>
                 </div>
             </div>
+
+            <CommentSection comicId={comicId} chapterId={chapter._id || chapter.id} />
 
             <Footer />
         </div>

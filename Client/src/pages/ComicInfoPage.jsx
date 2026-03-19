@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
-import ComicInfo, { ChapterList } from '../components/Comic/ComicInfo';
+import ComicInfo, { ChapterList, CommentSection } from '../components/Comic/ComicInfo';
 
 const ComicInfoPage = () => {
     const { id } = useParams();
@@ -41,6 +41,7 @@ const ComicInfoPage = () => {
             <div>
                 <ComicInfo comic={comic} />
                 <ChapterList chapters={comic.chapters} comicId={comic.id || comic._id} />
+                <CommentSection comicId={comic.id || comic._id} />
             </div>
             <Footer />
         </div>

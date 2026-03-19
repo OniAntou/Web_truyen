@@ -115,6 +115,7 @@ const Navbar = () => {
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
                     <Link to="/latest">Latest</Link>
+                    {user && <Link to="/following" style={{ color: '#eab308' }}>Following</Link>}
                 </div>
 
                 {/* Actions */}
@@ -249,6 +250,7 @@ const Navbar = () => {
                     <Link to="/popular" onClick={() => setIsMobileMenuOpen(false)}>Popular</Link>
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
+                    {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
                     <div style={{ height: '1px', background: 'var(--border)' }}></div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Theme</span>

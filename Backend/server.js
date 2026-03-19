@@ -4,7 +4,7 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite } = require('../Database/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const r2Module = require('./r2');
@@ -82,11 +82,12 @@ app.post("/api/auth/register", async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ username, email, password: hashedPassword });
+    const avatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(username)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    const newUser = new User({ username, email, password: hashedPassword, avatar });
     await newUser.save();
     
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-    res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email } });
+    res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, avatar: newUser.avatar } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -109,7 +110,7 @@ app.post("/api/auth/login", async (req, res) => {
     }
     
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-    res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email } });
+    res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, avatar: user.avatar } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -149,6 +150,12 @@ app.delete("/api/users/:id", async (req, res) => {
       }
     }
     await Rating.deleteMany({ user_id: user._id });
+
+    // 2.5 Rollback comments
+    await Comment.deleteMany({ user_id: user._id });
+
+    // 2.6 Rollback favorites
+    await Favorite.deleteMany({ user_id: user._id });
 
     // 3. Delete user
     await User.findByIdAndDelete(user._id);
@@ -682,6 +689,8 @@ app.delete("/api/comics/:id", async (req, res) => {
     await Chapter.deleteMany({ comic_id: comic._id });
     await Rating.deleteMany({ comic_id: comic._id }); // cleanup ratings
     await ComicView.deleteMany({ comic_id: comic._id }); // cleanup views
+    await Comment.deleteMany({ comic_id: comic._id }); // cleanup comments
+    await Favorite.deleteMany({ comic_id: comic._id }); // cleanup favorites
 
     res.json({ message: "Comic deleted successfully" });
   } catch (err) {
@@ -774,6 +783,137 @@ app.post("/api/comics/:id/view", authenticateToken, async (req, res) => {
     }
     
     res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- COMMENT API ---
+// Fetch comments for a comic (or chapter)
+app.get("/api/comics/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { chapterId } = req.query;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    let filter = { comic_id: comic._id };
+    if (chapterId) {
+      filter.chapter_id = chapterId;
+    } else {
+      filter.chapter_id = { $exists: false };
+    }
+
+    const comments = await Comment.find(filter)
+      .populate('user_id', 'username avatar')
+      .sort({ created_at: -1 });
+      
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Post a comment
+app.post("/api/comics/:id/comments", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    
+    if (!content || !content.trim()) return res.status(400).json({ message: "Nội dung không được để trống" });
+
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const newComment = await Comment.create({
+      user_id: req.user.id,
+      comic_id: comic._id,
+      content: content.trim()
+    });
+
+    const populatedComment = await Comment.findById(newComment._id).populate('user_id', 'username avatar');
+    
+    res.json({ message: "Đăng bình luận thành công", comment: populatedComment });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- FAVORITE API ---
+// Check if user has favorited a comic
+app.get("/api/comics/:id/favorite", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const favorite = await Favorite.findOne({ user_id: req.user.id, comic_id: comic._id });
+    res.json({ isFavorited: !!favorite });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all favorites for a user
+app.get("/api/users/favorites", authenticateToken, async (req, res) => {
+  try {
+    const favorites = await Favorite.find({ user_id: req.user.id })
+      .populate('comic_id')
+      .sort({ created_at: -1 });
+    
+    const comics = favorites.map(f => f.comic_id).filter(c => c != null);
+
+    const results = await Promise.all(comics.map(async (c) => {
+      const coverUrl = await resolveR2Url(c.cover_url);
+      const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
+      const genreIds = Array.isArray(c.genres) ? c.genres : [];
+      const genreNames = genreIds.length > 0
+        ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
+        : [];
+      return {
+        ...c.toObject(),
+        cover_url: coverUrl || c.cover_url,
+        chapter_count: chapterCount,
+        genres: genreNames,
+      };
+    }));
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Toggle favorite status
+app.post("/api/comics/:id/favorite", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const existingFavorite = await Favorite.findOne({ user_id: req.user.id, comic_id: comic._id });
+    
+    if (existingFavorite) {
+      // Remove favorite
+      await Favorite.findByIdAndDelete(existingFavorite._id);
+      res.json({ message: "Đã hủy yêu thích", isFavorited: false });
+    } else {
+      // Add favorite
+      await Favorite.create({ user_id: req.user.id, comic_id: comic._id });
+      res.json({ message: "Đã thêm vào yêu thích", isFavorited: true });
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

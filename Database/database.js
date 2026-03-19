@@ -93,6 +93,7 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    avatar: { type: String, default: "" },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },
@@ -127,6 +128,34 @@ ComicViewSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const ComicView = mongoose.model("ComicView", ComicViewSchema);
 
+// 5.4. Comment Collection
+const CommentSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
+    chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: false },
+    content: { type: String, required: true },
+    created_at: { type: Date, default: Date.now }
+  },
+  { collection: "comments" },
+);
+
+const Comment = mongoose.model("Comment", CommentSchema);
+
+// 5.5. Favorite Collection
+const FavoriteSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
+    created_at: { type: Date, default: Date.now }
+  },
+  { collection: "favorites" },
+);
+
+FavoriteSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
+
+const Favorite = mongoose.model("Favorite", FavoriteSchema);
+
 // 6. Genre Collection – Lưu thể loại truyện
 const GenreSchema = new mongoose.Schema(
   {
@@ -140,4 +169,4 @@ const GenreSchema = new mongoose.Schema(
 
 const Genre = mongoose.model("Genre", GenreSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView };
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite };
