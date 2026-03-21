@@ -53,34 +53,24 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-indigo-900/20 rounded-full blur-3xl" />
-            </div>
-
-            <div className="relative w-full max-w-md">
-                {/* Logo */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30 mb-4">
-                        <BookOpen size={28} className="text-white" />
+        <div className="min-h-screen bg-black flex items-center justify-center px-4 font-sans selection:bg-white/20">
+            <div className="w-full max-w-[380px]">
+                {/* Header */}
+                <div className="flex flex-col items-center mb-10">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                        <BookOpen strokeWidth={1.5} size={22} className="text-black" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">
-                        Admin<span className="text-purple-500">Panel</span>
-                    </h1>
-                    <p className="text-gray-500 text-sm mt-1">SkyComic Management System</p>
+                    <h1 className="text-2xl font-medium text-white tracking-tight">SkyComic</h1>
+                    <p className="text-zinc-500 text-sm mt-1.5 font-medium tracking-wide uppercase">Admin Portal</p>
                 </div>
 
-                {/* Card */}
-                <div className="bg-[#111] border border-gray-800 rounded-2xl p-8 shadow-2xl">
-                    <h2 className="text-lg font-semibold text-white mb-6">Đăng nhập</h2>
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Form Wrapper */}
+                <div className="bg-zinc-900/40 rounded-[2rem] p-8 border border-white/[0.04] shadow-2xl backdrop-blur-3xl">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Username */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
-                                Tên đăng nhập
+                            <label className="block text-[0.7rem] font-semibold text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+                                Username
                             </label>
                             <input
                                 type="text"
@@ -88,16 +78,16 @@ const AdminLogin = () => {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 disabled={loading}
-                                placeholder="Nhập tên đăng nhập"
+                                placeholder="Enter admin username"
                                 autoComplete="username"
-                                className="w-full bg-[#1a1a1a] border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 disabled:opacity-50"
+                                className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
                             />
                         </div>
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-2">
-                                Mật khẩu
+                            <label className="block text-[0.7rem] font-semibold text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+                                Password
                             </label>
                             <div className="relative">
                                 <input
@@ -106,25 +96,25 @@ const AdminLogin = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     disabled={loading}
-                                    placeholder="Nhập mật khẩu"
+                                    placeholder="Enter your password"
                                     autoComplete="current-password"
-                                    className="w-full bg-[#1a1a1a] border border-gray-700 text-white placeholder-gray-600 rounded-xl px-4 py-3 pr-11 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 disabled:opacity-50"
+                                    className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
                                     tabIndex={-1}
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPassword ? <EyeOff strokeWidth={1.5} size={18} /> : <Eye strokeWidth={1.5} size={18} />}
                                 </button>
                             </div>
                         </div>
 
                         {/* Error */}
                         {error && (
-                            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
-                                <span className="shrink-0">⚠</span>
+                            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm animate-fade-in">
+                                <span className="shrink-0 text-red-500">⚠</span>
                                 <span>{error}</span>
                             </div>
                         )}
@@ -133,28 +123,28 @@ const AdminLogin = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-lg shadow-purple-500/20 text-sm cursor-pointer disabled:cursor-not-allowed"
+                            className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 disabled:bg-zinc-400 disabled:opacity-60 text-black font-semibold py-3.5 rounded-xl transition-all duration-300 mt-2 cursor-pointer disabled:cursor-not-allowed shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)]"
                         >
                             {loading ? (
                                 <>
-                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                    <svg className="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24" fill="none">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                                     </svg>
-                                    Đang đăng nhập...
+                                    <span className="text-sm tracking-wide">Signing in...</span>
                                 </>
                             ) : (
                                 <>
-                                    <LogIn size={17} />
-                                    Đăng nhập
+                                    <span className="text-sm tracking-widest mt-[1px]">SIGN IN</span>
+                                    <LogIn strokeWidth={2} size={16} />
                                 </>
                             )}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center text-gray-600 text-xs mt-6">
-                    © 2025 SkyComic · Admin System
+                <p className="text-center text-zinc-600 text-[0.65rem] uppercase tracking-widest mt-8 font-medium">
+                    © 2025 SkyComic Administration
                 </p>
             </div>
         </div>

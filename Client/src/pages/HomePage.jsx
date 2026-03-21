@@ -8,21 +8,26 @@ import LazyImage from '../components/LazyImage';
 
 const HomePage = () => {
     const [comics, setComics] = useState([]);
+    const [trending, setTrending] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch comics
-        fetch('http://localhost:5000/api/comics')
-            .then(res => res.json())
-            .then(data => {
-                setComics(Array.isArray(data) ? data : []);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Failed to fetch comics:', err);
-                setComics([]);
-                setLoading(false);
-            });
+        // Fetch all comics and trending comics concurrently
+        Promise.all([
+            fetch('http://localhost:5000/api/comics').then(res => res.json()),
+            fetch('http://localhost:5000/api/comics/trending?limit=10').then(res => res.json())
+        ])
+        .then(([comicsData, trendingData]) => {
+            setComics(Array.isArray(comicsData) ? comicsData : []);
+            setTrending(Array.isArray(trendingData) ? trendingData : []);
+            setLoading(false);
+        })
+        .catch(err => {
+            console.error('Failed to fetch data:', err);
+            setComics([]);
+            setTrending([]);
+            setLoading(false);
+        });
 
         // Test connection (Console only)
         fetch('http://localhost:5000/api/test')
@@ -31,9 +36,9 @@ const HomePage = () => {
             .catch(err => console.error('Failed to connect to server:', err));
     }, []);
 
-    const featuredComic = comics[0] || {};
-    const popularComics = comics;
-    const newComics = [...comics].reverse();
+    const featuredComics = trending.length > 0 ? trending.slice(0, 5) : comics.slice(0, 5);
+    const popularComics = [...comics].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 12);
+    const newComics = [...comics].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 12);
 
     if (loading) {
         return <div style={{ paddingTop: '8rem', textAlign: 'center', color: 'white' }}>Loading comics...</div>;
@@ -42,7 +47,7 @@ const HomePage = () => {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
             <Navbar />
-            {comics.length > 0 && <HeroSection featuredComic={featuredComic} />}
+            {featuredComics.length > 0 && <HeroSection featuredComics={featuredComics} />}
 
             {/* Trending Section wrapper */}
             <div className="container trending-section">
@@ -51,7 +56,7 @@ const HomePage = () => {
                         Trending Now
                     </h3>
                     <div className="trending-scroll">
-                        {comics.slice(0, 7).map(c => (
+                        {trending.slice(0, 7).map(c => (
                             <Link key={c._id || c.id} to={`/p/${c.id || c._id}`} className="trending-item">
                                 <LazyImage src={c.cover_url || c.cover} className="trending-img" alt={c.title} />
                                 <p style={{ fontWeight: 500, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -63,8 +68,8 @@ const HomePage = () => {
                 </div>
             </div>
 
-            <ComicGrid title="Popular Comics" comics={popularComics} />
-            <ComicGrid title="New Releases" comics={newComics} />
+            <ComicGrid title="Popular Comics" comics={popularComics} linkTo="/popular" />
+            <ComicGrid title="New Releases" comics={newComics} linkTo="/latest" />
             <Footer />
         </div>
     );

@@ -7,25 +7,25 @@ const AdminLayout = () => {
 
     const isActive = (path) => {
         return location.pathname === path
-            ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-            : 'text-gray-400 hover:bg-gray-800 hover:text-white hover:pl-5';
+            ? 'bg-white/10 text-white font-medium border border-white/10'
+            : 'text-zinc-500 hover:bg-white/5 hover:text-white transition-all';
     };
 
     return (
-        <div className="flex h-screen bg-[#0a0a0a] text-gray-100 font-sans overflow-hidden">
+        <div className="flex h-screen bg-black text-white font-sans overflow-hidden selection:bg-white/20">
             {/* Sidebar */}
-            <aside className="w-72 bg-[#111] border-r border-gray-800 flex flex-col relative z-20">
-                <div className="p-8 border-b border-gray-800 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-lg shadow-lg">
+            <aside className="w-72 bg-black border-r border-white/5 flex flex-col relative z-20">
+                <div className="p-8 border-b border-white/5 flex items-center gap-4">
+                    <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center font-bold text-black text-lg shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                         A
                     </div>
-                    <h1 className="text-xl font-bold tracking-tight text-white">
-                        Admin<span className="text-purple-500">Panel</span>
+                    <h1 className="text-xl font-medium tracking-tight text-white">
+                        Admin<span className="text-zinc-500 font-normal">Panel</span>
                     </h1>
                 </div>
 
                 <nav className="flex-1 px-4 py-8 space-y-2">
-                    <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Menu</p>
+                    <p className="px-4 text-[0.65rem] font-bold text-zinc-600 uppercase tracking-widest mb-4">Menu</p>
 
                     <Link
                         to="/admin"
@@ -44,13 +44,13 @@ const AdminLayout = () => {
                     </Link>
                 </nav>
 
-                <div className="p-4 border-t border-gray-800 space-y-2">
+                <div className="p-4 border-t border-white/5 space-y-2">
                     <Link
                         to="/"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition-all duration-300"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 hover:text-white transition-all duration-300"
                     >
-                        <BookOpen size={20} />
-                        <span className="font-medium">View Site</span>
+                        <BookOpen size={20} className="stroke-[1.5]" />
+                        <span className="font-medium text-sm tracking-wide">View Site</span>
                     </Link>
 
                     <button
@@ -58,20 +58,17 @@ const AdminLayout = () => {
                             localStorage.removeItem('admin');
                             window.location.href = '/admin/login';
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 text-left"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 text-left"
                     >
-                        <LogOut size={20} />
-                        <span className="font-medium">Logout</span>
+                        <LogOut size={20} className="stroke-[1.5]" />
+                        <span className="font-medium text-sm tracking-wide">Logout</span>
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-[#0a0a0a] relative">
-                {/* Background Decoration */}
-                <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-900/10 to-transparent pointer-events-none" />
-
-                <div className="container mx-auto px-8 py-10 relative z-10 max-w-7xl">
+            <main className="flex-1 overflow-y-auto bg-black relative">
+                <div className="container mx-auto px-10 pt-24 pb-12 relative z-10 max-w-7xl">
                     <Outlet />
                 </div>
             </main>

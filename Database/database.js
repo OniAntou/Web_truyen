@@ -23,6 +23,7 @@ const ComicSchema = new mongoose.Schema(
     rating: { type: Number, default: 0 },
     rating_count: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
+    weekly_views: { type: Number, default: 0 },
     genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
     created_at: { type: Date, default: Date.now },
   },

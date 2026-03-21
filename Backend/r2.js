@@ -3,7 +3,7 @@
  * Dùng @aws-sdk/client-s3 với endpoint R2.
  */
 require('dotenv').config();
-const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 const accountId = process.env.R2_ACCOUNT_ID;
@@ -82,10 +82,30 @@ async function resolveR2Url(stored) {
   return getFileUrl(stored);
 }
 
+/**
+ * Xoá file khỏi R2.
+ * @param {string} keyOrR2Key - key thuần (covers/...) hoặc "r2:covers/..."
+ */
+async function deleteFromR2(keyOrR2Key) {
+  if (!R2_ENABLED) return;
+  const key = typeof keyOrR2Key === 'string' && keyOrR2Key.startsWith('r2:')
+    ? keyOrR2Key.slice(3)
+    : keyOrR2Key;
+  if (!key) return;
+  
+  try {
+    const command = new DeleteObjectCommand({ Bucket: bucket, Key: key });
+    await s3Client.send(command);
+  } catch (err) {
+    console.error(`Lỗi khi xoá file trên R2 (${key}):`, err);
+  }
+}
+
 module.exports = {
   R2_ENABLED,
   uploadToR2,
   getFileUrl,
   resolveR2Url,
+  deleteFromR2,
   bucket,
 };

@@ -116,20 +116,20 @@ const ComicEditor = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6 text-white">{isEditing ? 'Edit Comic' : 'New Comic'}</h2>
+        <div className="max-w-3xl mx-auto mt-12 md:mt-16">
+            <h2 className="text-3xl font-medium mb-10 text-white tracking-tight">{isEditing ? 'Edit Comic' : 'New Comic'}</h2>
 
-            <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-zinc-900/30 p-10 rounded-[2rem] shadow-2xl border border-white/5 space-y-8 backdrop-blur-2xl">
 
                 {/* Title */}
                 <div>
-                    <label className="block text-gray-400 mb-2 font-medium">Title</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Title</label>
                     <input
                         type="text"
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         required
                     />
                 </div>
@@ -137,23 +137,23 @@ const ComicEditor = () => {
                 {/* Author & Artist */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-gray-400 mb-2 font-medium">Author</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Author</label>
                         <input
                             type="text"
                             name="author"
                             value={formData.author}
                             onChange={handleChange}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-400 mb-2 font-medium">Artist</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Artist</label>
                         <input
                             type="text"
                             name="artist"
                             value={formData.artist}
                             onChange={handleChange}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         />
                     </div>
                 </div>
@@ -161,12 +161,12 @@ const ComicEditor = () => {
                 {/* Status & Genres */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-gray-400 mb-2 font-medium">Status</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Status</label>
                         <select
                             name="status"
                             value={formData.status}
                             onChange={handleChange}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         >
                             <option value="Ongoing">Ongoing</option>
                             <option value="Completed">Completed</option>
@@ -174,13 +174,13 @@ const ComicEditor = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-gray-400 mb-2 font-medium">Genres (comma separated)</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Genres (comma separated)</label>
                         <input
                             type="text"
                             name="genres"
                             value={formData.genres}
                             onChange={handleChange}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                             placeholder="Action, Fantasy..."
                         />
                     </div>
@@ -188,12 +188,12 @@ const ComicEditor = () => {
 
                 {/* Cover Image Upload */}
                 <div>
-                    <label className="block text-gray-400 mb-2 font-medium">Cover Image</label>
-                    <div className="flex flex-col space-y-3">
+                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
+                    <div className="flex flex-col space-y-4">
                         {/* Preview */}
                         {previewUrl && (
-                            <div className="w-full h-64 bg-gray-900 rounded-lg overflow-hidden border border-gray-700 flex items-center justify-center">
-                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain" />
+                            <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
+                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
                             </div>
                         )}
 
@@ -201,41 +201,41 @@ const ComicEditor = () => {
                             type="file"
                             accept="image/*"
                             onChange={handleFileChange}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 transition-all duration-300 cursor-pointer"
                         />
-                        <p className="text-gray-500 text-sm">Upload an image to replace the current cover.</p>
+                        <p className="text-zinc-500 text-[0.7rem] tracking-wide ml-1">Upload an image to replace the current cover.</p>
                     </div>
                 </div>
 
                 {/* Legacy Cover URL (Optional fallback) */}
                 <div>
-                    <label className="block text-gray-400 mb-2 font-medium">Cover URL (Or use upload above)</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Cover URL (Or use upload above)</label>
                     <input
                         type="text"
                         name="cover_url"
                         value={formData.cover_url}
                         onChange={handleChange}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         placeholder="http://..."
                     />
                 </div>
 
                 {/* Description */}
                 <div>
-                    <label className="block text-gray-400 mb-2 font-medium">Description</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Description</label>
                     <textarea
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors h-32"
+                        className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 h-36 resize-y"
                     />
                 </div>
 
                 {/* Submit */}
-                <div className="flex justify-end pt-4">
+                <div className="pt-6">
                     <button
                         type="submit"
-                        className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform active:scale-95 transition-all duration-200"
+                        className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 text-black font-semibold py-4 rounded-2xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)] text-sm tracking-widest uppercase cursor-pointer"
                     >
                         {isEditing ? 'Update Comic' : 'Create Comic'}
                     </button>

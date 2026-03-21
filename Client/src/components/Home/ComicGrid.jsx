@@ -39,7 +39,7 @@ const ComicCard = ({ comic }) => {
     );
 };
 
-const ComicGrid = ({ title, comics }) => {
+const ComicGrid = ({ title, comics, linkTo = "/popular" }) => {
     return (
         <section className="section">
             <div className="container">
@@ -47,7 +47,7 @@ const ComicGrid = ({ title, comics }) => {
                     <h2 className="section-title">
                         {title}
                     </h2>
-                    <Link to="/popular" className="view-all">View All</Link>
+                    <Link to={linkTo} className="view-all">View All</Link>
                 </div>
 
                 <div className="comic-grid">

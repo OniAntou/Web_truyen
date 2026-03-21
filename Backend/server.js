@@ -7,8 +7,20 @@ const multer = require('multer');
 const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite } = require('../Database/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cron = require('node-cron');
 const r2Module = require('./r2');
-const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED } = r2Module;
+const { uploadToR2, getFileUrl, resolveR2Url, R2_ENABLED, deleteFromR2 } = r2Module;
+
+// --- CRON JOBS ---
+// Reset weekly_views to 0 every Monday at 00:00
+cron.schedule('0 0 * * 1', async () => {
+  try {
+    const result = await Comic.updateMany({}, { $set: { weekly_views: 0 } });
+    console.log(`[Cron] Reset weekly views for ${result.modifiedCount} comics.`);
+  } catch (err) {
+    console.error(`[Cron Error] Failed to reset weekly views:`, err);
+  }
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -625,6 +637,36 @@ app.get("/api/comics", async (req, res) => {
   }
 });
 
+// GET trending comics (sorted by weekly_views)
+app.get("/api/comics/trending", async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    // Sort by weekly_views descending
+    let comics = await Comic.find({}).sort({ weekly_views: -1 }).limit(parseInt(limit)).populate('genres', 'name slug');
+    
+    // Fallback if weekly_views is all 0 or not enough data:
+    // It will naturally sort by insertion order or other defaults, which is fine since the query guarantees limit.
+
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
+
+    const results = await Promise.all(
+      comics.map(async (c) => {
+        const coverUrl = await resolveR2Url(c.cover_url);
+        return {
+          ...c.toObject(),
+          cover_url: coverUrl || c.cover_url,
+          chapter_count: chapterCounts[c._id.toString()] || 0,
+        };
+      })
+    );
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET partial comic by ID (supporting both MongoDB _id and legacy numeric id)
 app.get("/api/comics/:id", async (req, res) => {
   try {
@@ -777,8 +819,30 @@ app.delete("/api/comics/:id", async (req, res) => {
 
     if (!comic) return res.status(404).json({ message: "Comic not found" });
 
-    // Also delete associated chapters
+    // 1. Delete cover from R2 (if it's an R2 URL)
+    if (comic.cover_url && comic.cover_url.startsWith('r2:')) {
+      await deleteFromR2(comic.cover_url);
+    }
+
+    // 2. Find all chapters for this comic
+    const chapters = await Chapter.find({ comic_id: comic._id });
+    const chapterIds = chapters.map(ch => ch._id);
+
+    // 3. Find all pages for these chapters
+    const pages = await Pages.find({ chapter_id: { $in: chapterIds } });
+    
+    // 4. Delete all page images from R2
+    const r2Pages = pages.filter(p => p.image_url && p.image_url.startsWith('r2:'));
+    await Promise.all(r2Pages.map(p => deleteFromR2(p.image_url)));
+
+    // 5. Delete all from Upload collection
+    await Upload.deleteMany({ comic_id: comic._id });
+
+    // 6. Delete pages and chapters from DB
+    await Pages.deleteMany({ chapter_id: { $in: chapterIds } });
     await Chapter.deleteMany({ comic_id: comic._id });
+
+    // 7. Cleanup remaining references
     await Rating.deleteMany({ comic_id: comic._id }); // cleanup ratings
     await ComicView.deleteMany({ comic_id: comic._id }); // cleanup views
     await Comment.deleteMany({ comic_id: comic._id }); // cleanup comments
@@ -870,11 +934,12 @@ app.post("/api/comics/:id/view", authenticateToken, async (req, res) => {
     const existingView = await ComicView.findOne({ user_id: req.user.id, comic_id: comic._id });
     if (!existingView) {
       await ComicView.create({ user_id: req.user.id, comic_id: comic._id });
-      await Comic.updateOne({ _id: comic._id }, { $inc: { views: 1 } });
+      await Comic.updateOne({ _id: comic._id }, { $inc: { views: 1, weekly_views: 1 } });
       comic.views = (comic.views || 0) + 1;
+      comic.weekly_views = (comic.weekly_views || 0) + 1;
     }
     
-    res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views });
+    res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views, weekly_views: comic.weekly_views });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -1024,9 +1089,24 @@ app.post("/api/chapters", async (req, res) => {
 // DELETE a chapter
 app.delete("/api/chapters/:id", async (req, res) => {
   try {
-    const chapter = await Chapter.findByIdAndDelete(req.params.id);
+    const chapterId = req.params.id;
+    const chapter = await Chapter.findByIdAndDelete(chapterId);
     if (!chapter) return res.status(404).json({ message: "Chapter not found" });
-    res.json({ message: "Chapter deleted" });
+
+    // Find all pages for this chapter
+    const pages = await Pages.find({ chapter_id: chapterId });
+    
+    // Delete page images from R2
+    const r2Pages = pages.filter(p => p.image_url && p.image_url.startsWith('r2:'));
+    await Promise.all(r2Pages.map(p => deleteFromR2(p.image_url)));
+
+    // Delete pages from DB
+    await Pages.deleteMany({ chapter_id: chapterId });
+    
+    // Delete from Uploads tracking
+    await Upload.deleteMany({ chapter_id: chapterId });
+
+    res.json({ message: "Chapter and its pages deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -1040,8 +1120,54 @@ app.post('/api/chapters/bulk-delete', async (req, res) => {
       return res.status(400).json({ message: 'Invalid payload: chapterIds must be an array' });
     }
 
+    // Find all pages for these chapters
+    const pages = await Pages.find({ chapter_id: { $in: chapterIds } });
+    
+    // Delete page images from R2
+    const r2Pages = pages.filter(p => p.image_url && p.image_url.startsWith('r2:'));
+    await Promise.all(r2Pages.map(p => deleteFromR2(p.image_url)));
+
+    // Delete pages from DB
+    await Pages.deleteMany({ chapter_id: { $in: chapterIds } });
+    
+    // Delete from Uploads tracking
+    await Upload.deleteMany({ chapter_id: { $in: chapterIds } });
+
+    // Delete chapters
     const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
-    res.json({ message: 'Chapters deleted', count: result.deletedCount });
+    
+    res.json({ message: 'Chapters and their pages deleted', count: result.deletedCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// DELETE a specific page from a chapter
+app.delete("/api/chapters/:chapterId/pages/:pageId", async (req, res) => {
+  try {
+    const { chapterId, pageId } = req.params;
+    
+    const page = await Pages.findOne({ _id: pageId, chapter_id: chapterId });
+    if (!page) return res.status(404).json({ message: "Page not found" });
+
+    // Delete from R2
+    if (page.image_url && page.image_url.startsWith('r2:')) {
+      await deleteFromR2(page.image_url);
+    }
+
+    // Delete from Uploads tracking
+    await Upload.deleteMany({ key: page.image_url });
+
+    // Delete from DB
+    await Pages.findByIdAndDelete(pageId);
+
+    // Re-adjust page numbers for subsequent pages
+    await Pages.updateMany(
+      { chapter_id: chapterId, page_number: { $gt: page.page_number } },
+      { $inc: { page_number: -1 } }
+    );
+
+    res.json({ message: "Page deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

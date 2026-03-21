@@ -45,58 +45,58 @@ const ComicList = () => {
     );
 
     if (loading) return (
-        <div className="flex items-center justify-center h-64 text-gray-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mr-3"></div>
+        <div className="flex items-center justify-center h-64 text-zinc-500">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mr-4"></div>
             Loading library...
         </div>
     );
 
     return (
-        <div>
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div className="mt-12 md:mt-16">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold text-white">Comics Library</h2>
-                    <p className="text-gray-400 mt-1">Manage your collection of {comics.length} comics</p>
+                    <h2 className="text-3xl font-medium text-white tracking-tight">Comics Library</h2>
+                    <p className="text-zinc-500 mt-2 text-sm tracking-wide">Manage your collection of {comics.length} comics</p>
                 </div>
 
-                <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="relative group w-full md:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-500 transition-colors" size={18} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-white transition-colors" size={16} strokeWidth={2} />
                         <input
                             type="text"
                             placeholder="Search comics..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-[#1e1e1e] border border-gray-800 rounded-xl py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder-gray-600"
+                            className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all placeholder-zinc-600"
                         />
                     </div>
 
                     <Link
                         to="/admin/comics/new"
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/20 font-semibold flex items-center gap-2 whitespace-nowrap"
+                        className="bg-white hover:bg-zinc-200 text-black px-6 py-3 rounded-2xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] font-semibold flex items-center gap-2 whitespace-nowrap tracking-wide text-sm"
                     >
-                        <Plus size={18} />
+                        <Plus size={18} strokeWidth={2.5} />
                         Add Comic
                     </Link>
                 </div>
             </div>
 
-            <div className="bg-[#1e1e1e] rounded-2xl shadow-xl border border-gray-800 overflow-hidden">
+            <div className="bg-zinc-900/30 rounded-[2rem] border border-white/5 overflow-hidden backdrop-blur-2xl shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-[#111] text-gray-400 border-b border-gray-800 uppercase text-xs tracking-wider">
-                                <th className="px-6 py-5 font-semibold">Cover</th>
-                                <th className="px-6 py-5 font-semibold">Comic Info</th>
-                                <th className="px-6 py-5 font-semibold">Status</th>
-                                <th className="px-6 py-5 font-semibold text-right">Actions</th>
+                            <tr className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.65rem] tracking-widest">
+                                <th className="px-6 py-5 font-bold">Cover</th>
+                                <th className="px-6 py-5 font-bold">Comic Info</th>
+                                <th className="px-6 py-5 font-bold">Status</th>
+                                <th className="px-6 py-5 font-bold text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-800 text-gray-300">
+                        <tbody className="divide-y divide-white/5 text-zinc-300">
                             {filteredComics.length > 0 ? filteredComics.map((comic) => (
-                                <tr key={comic._id || comic.id} className="hover:bg-gray-800/50 transition-colors duration-150 group">
-                                    <td className="px-6 py-4 w-20">
-                                        <div className="relative h-16 w-12 rounded overflow-hidden shadow-md border border-gray-700 group-hover:border-gray-600 transition-colors">
+                                <tr key={comic._id || comic.id} className="hover:bg-white/5 transition-colors duration-300 group">
+                                    <td className="px-6 py-5 w-24">
+                                        <div className="relative h-[4.5rem] w-12 rounded-lg overflow-hidden border border-white/10 group-hover:border-white/20 transition-colors shadow-lg">
                                             <img
                                                 src={comic.cover_url}
                                                 alt={comic.title}
@@ -104,51 +104,51 @@ const ComicList = () => {
                                             />
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="font-semibold text-white text-base mb-1">{comic.title}</div>
-                                        <div className="text-xs text-gray-500 flex gap-2">
+                                    <td className="px-6 py-5">
+                                        <div className="font-semibold text-white text-[0.95rem] tracking-tight mb-1.5">{comic.title}</div>
+                                        <div className="text-[0.7rem] text-zinc-500 font-medium tracking-wide flex items-center gap-2 uppercase">
                                             <span>{comic.author}</span>
-                                            <span className="text-gray-700">•</span>
-                                            <span className="bg-gray-800 px-1.5 rounded text-gray-400 border border-gray-700">{comic.chapter_count || 0} Ch</span>
+                                            <span className="text-zinc-700">•</span>
+                                            <span className="bg-white/5 px-2 py-0.5 rounded-md border border-white/5">{comic.chapter_count || 0} CH</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${comic.status === 'Ongoing' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                comic.status === 'Completed' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                    'bg-gray-700 text-gray-300 border-gray-600'
+                                    <td className="px-6 py-5">
+                                        <span className={`px-3 py-1.5 rounded-lg text-[0.65rem] uppercase tracking-widest font-bold border ${comic.status === 'Ongoing' ? 'bg-white/5 text-green-400 border-green-500/20' :
+                                                comic.status === 'Completed' ? 'bg-white/5 text-blue-400 border-blue-500/20' :
+                                                    'bg-white/5 text-zinc-400 border-white/10'
                                             }`}>
                                             {comic.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="px-6 py-5 text-right">
+                                        <div className="flex items-center justify-end gap-1.5">
                                             <Link
                                                 to={`/admin/comics/${comic._id || comic.id}/chapters`}
-                                                className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors tooltip"
+                                                className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 tooltip"
                                                 title="Manage Chapters"
                                             >
-                                                <List size={18} />
+                                                <List size={18} strokeWidth={1.5} />
                                             </Link>
                                             <Link
                                                 to={`/admin/comics/edit/${comic._id || comic.id}`}
-                                                className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-colors"
+                                                className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300"
                                                 title="Edit"
                                             >
-                                                <Edit2 size={18} />
+                                                <Edit2 size={18} strokeWidth={1.5} />
                                             </Link>
                                             <button
                                                 onClick={() => handleDelete(comic._id || comic.id)}
-                                                className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                className="p-2.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300"
                                                 title="Delete"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={18} strokeWidth={1.5} />
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan="4" className="px-6 py-16 text-center text-zinc-500 text-sm tracking-wide">
                                         No comics found matching your search.
                                     </td>
                                 </tr>
