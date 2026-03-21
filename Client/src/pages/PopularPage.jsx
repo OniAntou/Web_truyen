@@ -81,7 +81,6 @@ const PopularPage = () => {
     const sortOptions = [
         { value: 'views', label: 'Xem Nhiều Nhất', icon: <Eye size={14} /> },
         { value: 'rating', label: 'Đánh Giá Cao', icon: <Star size={14} /> },
-        { value: 'newest', label: 'Mới Cập Nhật', icon: <TrendingUp size={14} /> },
     ];
 
     return (
