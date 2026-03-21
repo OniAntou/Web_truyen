@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Eye } from 'lucide-react';
+import { Play, Eye, Star } from 'lucide-react';
 import LazyImage from '../LazyImage';
 
 const HeroSection = ({ featuredComics }) => {
@@ -35,13 +35,13 @@ const HeroSection = ({ featuredComics }) => {
         const rotateX = ((y - centerY) / centerY) * -12; 
         const rotateY = ((x - centerX) / centerX) * 12;
 
-        frameRef.current.style.transform = `perspective(1000px) scale(1.05) translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        frameRef.current.style.transform = `perspective(1200px) scale(1.02) translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     };
 
     const handleMouseLeave = () => {
         if (!frameRef.current) return;
-        frameRef.current.style.transform = `perspective(1000px) scale(1) translateY(0) rotateX(0deg) rotateY(0deg)`;
-        frameRef.current.style.transition = 'all 0.5s ease-out';
+        frameRef.current.style.transform = `perspective(1200px) scale(1) translateY(0) rotateX(0deg) rotateY(0deg)`;
+        frameRef.current.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
     };
 
     const handleMouseEnter = () => {
@@ -50,82 +50,81 @@ const HeroSection = ({ featuredComics }) => {
     };
 
     return (
-        <div className="hero">
-            {/* Content */}
-            <div className="container hero-content">
-                <div className="hero-layout">
-                    <div className="hero-text-box">
-                        <span className="featured-badge">Truyện Đề Xuất</span>
-                        {/* Add fade-in animation key to force re-render animation when currentComic changes */}
-                        <div key={currentComic._id || currentComic.id} className="animate-fade-in">
-                            <h1 className="hero-title">{currentComic.title}</h1>
-                            <p className="hero-desc">{currentComic.description}</p>
+        <div className="relative w-full h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden pt-20">
+            {/* Cinematic Blurred Background Image */}
+            <div className="absolute inset-0 z-0">
+                <LazyImage src={currentComic.cover_url || currentComic.cover} className="w-full h-full object-cover blur-3xl opacity-20 scale-110 transition-opacity duration-1000" alt="Background" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent mix-blend-multiply"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)] via-transparent to-[var(--bg-primary)] mix-blend-overlay"></div>
+            </div>
 
-                            <div className="hero-actions">
-                                <Link
-                                    to={`/p/${currentComic.id || currentComic._id}`}
-                                className="btn btn-primary"
-                            >
-                                <Play fill="currentColor" size={20} />
-                                Đọc Ngay
-                            </Link>
-                        </div>
+            <div className="container mx-auto px-6 max-w-7xl relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center h-full">
+                {/* Text Content */}
+                <div className="space-y-8 animate-fade-in" key={currentComic._id || currentComic.id}>
+                    <div className="inline-block px-4 py-1.5 rounded-full text-[0.65rem] font-bold tracking-widest uppercase border backdrop-blur-md transition-colors" style={{ background: 'var(--bg-secondary)', color: 'var(--accent)', borderColor: 'var(--accent)' }}>
+                        Truyện Đề Xuất
+                    </div>
+                    
+                    <h1 className="text-5xl lg:text-7xl font-light tracking-tighter leading-[1.1] line-clamp-2" style={{ color: 'var(--text-primary)' }}>
+                        {currentComic.title}
+                    </h1>
+                    
+                    <p className="text-base lg:text-lg leading-relaxed line-clamp-3 max-w-lg" style={{ color: 'var(--text-secondary)' }}>
+                        {currentComic.description || 'Hoà mình vào chặng đường phiêu lưu cực kỳ kỳ bí và hấp dẫn. Trải nghiệm cảm giác độc nhất vô nhị chỉ có tại nền tảng của chúng tôi.'}
+                    </p>
 
-                            <div className="hero-meta">
-                                <span style={{ display: 'flex', alignItems: 'center' }}>
-                                    <span className="status-dot"></span>
-                                    {currentComic.status}
-                                </span>
-                                <span>•</span>
-                                <span>{currentComic.author}</span>
-                                <span>•</span>
-                                <span style={{ color: '#eab308' }}>★ {currentComic.rating}</span>
-                                <span>•</span>
-                                <span style={{ color: '#a855f7', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <Eye size={16} /> {currentComic.weekly_views || 0}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Slideshow Indicators */}
-                        {featuredComics.length > 1 && (
-                            <div className="hero-indicators flex gap-2 mt-6">
-                                {featuredComics.map((_, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setCurrentIndex(idx)}
-                                        className={`h-1.5 w-6 rounded-full transition-colors ${
-                                            idx === currentIndex ? 'bg-purple-500' : 'bg-gray-600 hover:bg-gray-400'
-                                        }`}
-                                        aria-label={`Go to slide ${idx + 1}`}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                    <div className="flex flex-wrap items-center gap-4 text-xs font-semibold tracking-wider uppercase mb-8" style={{ color: 'var(--text-secondary)' }}>
+                        <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full" style={{ background: currentComic.status === 'Ongoing' ? '#22c55e' : '#a8a29e' }}></span>
+                            {currentComic.status || 'Ongoing'}
+                        </span>
+                        <span className="opacity-30">•</span>
+                        <span>{currentComic.author || 'Đang cập nhật'}</span>
+                        <span className="opacity-30">•</span>
+                        <span className="flex items-center gap-1.5 text-yellow-500">
+                            <Star size={14} fill="currentColor" /> {currentComic.rating || '5.0'}
+                        </span>
+                        <span className="opacity-30">•</span>
+                        <span className="flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                            <Eye size={14} /> {currentComic.weekly_views || 0}
+                        </span>
                     </div>
 
-                    {/* Cover Image on the right */}
-                    <div className="hero-cover-wrapper">
-                        <Link 
-                            to={`/p/${currentComic.id || currentComic._id}`} 
-                            key={currentComic._id || currentComic.id} 
-                            className="block animate-fade-in"
-                        >
-                            <div 
-                                className="hero-cover-frame"
-                                ref={frameRef}
-                                onMouseMove={handleMouseMove}
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                                style={{ transformStyle: 'preserve-3d' }}
-                            >
-                                <LazyImage
-                                    src={currentComic.cover_url || currentComic.cover}
-                                    alt={currentComic.title}
-                                    className="hero-cover-img"
-                                />
-                            </div>
+                    <div className="flex items-center gap-4 mt-8 pt-2">
+                        <Link to={`/p/${currentComic.id || currentComic._id}`} className="px-8 py-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-xs tracking-widest uppercase border border-white/10" style={{ background: 'var(--accent)', color: 'white' }}>
+                            <Play fill="currentColor" size={16} />
+                            Đọc Ngay Bây Giờ
                         </Link>
+                    </div>
+
+                    {/* Slideshow Indicators */}
+                    <div className="flex gap-2 mt-12">
+                        {featuredComics.map((_, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setCurrentIndex(idx)}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8' : 'w-2 opacity-30 hover:opacity-100'}`}
+                                style={{ background: idx === currentIndex ? 'var(--accent)' : 'var(--text-primary)' }}
+                                aria-label={`Go to slide ${idx + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* 3D Cover */}
+                <div className="hidden lg:flex items-center justify-center relative perspective-1000 h-full w-full">
+                    <div 
+                        ref={frameRef} 
+                        className="relative w-3/4 max-w-md aspect-[2/3] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-[var(--border)] transition-all bg-[var(--bg-secondary)]" 
+                        onMouseMove={handleMouseMove} 
+                        onMouseLeave={handleMouseLeave} 
+                        onMouseEnter={handleMouseEnter}
+                        style={{ transformStyle: 'preserve-3d', boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8)' }}
+                    >
+                        <LazyImage src={currentComic.cover_url || currentComic.cover} className="w-full h-full object-cover" alt={currentComic.title} />
+                        {/* Elegant reflection/shimmer overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent mix-blend-overlay pointer-events-none rounded-[2rem]"></div>
+                        <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none"></div>
                     </div>
                 </div>
             </div>
