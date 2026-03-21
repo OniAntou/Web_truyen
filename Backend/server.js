@@ -331,6 +331,52 @@ app.post(
   },
 );
 
+// GET pages of a chapter (with resolved URLs)
+app.get("/api/chapters/:chapterId/pages", async (req, res) => {
+  try {
+    const chapter = await Chapter.findById(req.params.chapterId);
+    if (!chapter) return res.status(404).json({ message: "Chapter không tồn tại" });
+
+    const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 });
+    const pagesWithUrls = await Promise.all(
+      pages.map(async (p) => ({
+        _id: p._id,
+        page_number: p.page_number,
+        image_url: (await resolveR2Url(p.image_url)) || p.image_url,
+      }))
+    );
+    res.json(pagesWithUrls);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PUT reorder pages of a chapter
+app.put("/api/chapters/:chapterId/reorder-pages", async (req, res) => {
+  try {
+    const { order } = req.body; // array of { pageId, page_number }
+    if (!order || !Array.isArray(order)) {
+      return res.status(400).json({ message: "Cần gửi mảng order: [{ pageId, page_number }]" });
+    }
+
+    const chapter = await Chapter.findById(req.params.chapterId);
+    if (!chapter) return res.status(404).json({ message: "Chapter không tồn tại" });
+
+    // Bulk update page numbers
+    const bulkOps = order.map(({ pageId, page_number }) => ({
+      updateOne: {
+        filter: { _id: pageId, chapter_id: chapter._id },
+        update: { $set: { page_number } },
+      },
+    }));
+
+    await Pages.bulkWrite(bulkOps);
+    res.json({ message: "Đã cập nhật thứ tự trang thành công" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET dashboard stats
 app.get("/api/stats", async (req, res) => {
   try {
@@ -367,6 +413,18 @@ app.get("/api/stats", async (req, res) => {
   }
 });
 
+// Helper for chapter counts to prevent N+1 queries
+async function getChapterCounts(comicIds) {
+  if (!comicIds || comicIds.length === 0) return {};
+  const aggs = await Chapter.aggregate([
+    { $match: { comic_id: { $in: comicIds } } },
+    { $group: { _id: "$comic_id", count: { $sum: 1 } } }
+  ]);
+  const counts = {};
+  aggs.forEach(agg => counts[agg._id.toString()] = agg.count);
+  return counts;
+}
+
 // GET all genres with comic counts, and optionally comics for a specific genre
 app.get('/api/genres', async (req, res) => {
   try {
@@ -393,7 +451,7 @@ app.get('/api/genres', async (req, res) => {
       });
 
       if (genreDoc) {
-        let filtered = await Comic.find({ genres: genreDoc._id });
+        let filtered = await Comic.find({ genres: genreDoc._id }).populate('genres', 'name slug');
 
         if (sort === 'rating') {
           filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -403,19 +461,15 @@ app.get('/api/genres', async (req, res) => {
           filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
         }
 
+        const comicIds = filtered.map(c => c._id);
+        const chapterCounts = await getChapterCounts(comicIds);
+
         comics = await Promise.all(filtered.map(async (c) => {
           const coverUrl = await resolveR2Url(c.cover_url);
-          const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-          // Populate genre names
-          const genreIds = Array.isArray(c.genres) ? c.genres : [];
-          const genreNames = genreIds.length > 0
-            ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
-            : [];
           return {
             ...c.toObject(),
             cover_url: coverUrl || c.cover_url,
-            chapter_count: chapterCount,
-            genres: genreNames,
+            chapter_count: chapterCounts[c._id.toString()] || 0,
           };
         }));
       }
@@ -448,22 +502,20 @@ app.get('/api/comics/latest', async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const total = await Comic.countDocuments(filter);
     const comics = await Comic.find(filter)
+      .populate('genres', 'name slug')
       .sort({ created_at: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
+
     const results = await Promise.all(comics.map(async (c) => {
       const coverUrl = await resolveR2Url(c.cover_url);
-      const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-      const genreIds = Array.isArray(c.genres) ? c.genres : [];
-      const genreNames = genreIds.length > 0
-        ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
-        : [];
       return {
         ...c.toObject(),
         cover_url: coverUrl || c.cover_url,
-        chapter_count: chapterCount,
-        genres: genreNames,
+        chapter_count: chapterCounts[c._id.toString()] || 0,
       };
     }));
 
@@ -503,7 +555,7 @@ app.get("/api/comics/popular", async (req, res) => {
       }
     }
 
-    let comics = await Comic.find(filter);
+    let comics = await Comic.find(filter).populate('genres', 'name slug');
 
     // Sort
     if (sort === "rating") {
@@ -519,20 +571,17 @@ app.get("/api/comics/popular", async (req, res) => {
       comics = comics.slice(0, parseInt(limit));
     }
 
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
+
     // Resolve cover URLs
     const results = await Promise.all(
       comics.map(async (c) => {
         const coverUrl = await resolveR2Url(c.cover_url);
-        const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-        const genreIds = Array.isArray(c.genres) ? c.genres : [];
-        const genreNames = genreIds.length > 0
-          ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
-          : [];
         return {
           ...c.toObject(),
           cover_url: coverUrl || c.cover_url,
-          chapter_count: chapterCount,
-          genres: genreNames,
+          chapter_count: chapterCounts[c._id.toString()] || 0,
         };
       }),
     );
@@ -556,20 +605,17 @@ app.get("/api/comics", async (req, res) => {
       query = { title: { $regex: q, $options: "i" } };
     }
 
-    const comics = await Comic.find(query);
+    const comics = await Comic.find(query).populate('genres', 'name slug');
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
+
     const results = await Promise.all(
       comics.map(async (c) => {
         const coverUrl = await resolveR2Url(c.cover_url);
-        const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-        const genreIds = Array.isArray(c.genres) ? c.genres : [];
-        const genreNames = genreIds.length > 0
-          ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
-          : [];
         return {
           ...c.toObject(),
           cover_url: coverUrl || c.cover_url,
-          chapter_count: chapterCount,
-          genres: genreNames,
+          chapter_count: chapterCounts[c._id.toString()] || 0,
         };
       }),
     );
@@ -606,24 +652,11 @@ app.get("/api/comics/:id", async (req, res) => {
       return `${day}/${month}/${year}`;
     };
 
-    const chaptersWithPages = await Promise.all(
-      chapters.map(async (ch) => {
-        const pages = await Pages.find({ chapter_id: ch._id }).sort({
-          page_number: 1,
-        });
-        const pagesWithUrls = await Promise.all(
-          pages.map(async (p) => ({
-            ...p.toObject(),
-            image_url: (await resolveR2Url(p.image_url)) || p.image_url,
-          })),
-        );
-
-        // Calculate exact date from created_at
-        const relativeDate = ch.created_at ? formatExactDate(ch.created_at) : (ch.date || 'Unknown');
-
-        return { ...ch.toObject(), pages: pagesWithUrls, date: relativeDate };
-      }),
-    );
+    const chaptersWithoutPages = chapters.map(ch => {
+      // Calculate exact date from created_at
+      const relativeDate = ch.created_at ? formatExactDate(ch.created_at) : (ch.date || 'Unknown');
+      return { ...ch.toObject(), date: relativeDate };
+    });
 
     const coverUrl = await resolveR2Url(comic.cover_url);
     const genreIds = Array.isArray(comic.genres) ? comic.genres : [];
@@ -633,7 +666,7 @@ app.get("/api/comics/:id", async (req, res) => {
     const out = {
       ...comic.toObject(),
       cover_url: coverUrl || comic.cover_url,
-      chapters: chaptersWithPages,
+      chapters: chaptersWithoutPages,
       genres: genreNames,
     };
     res.json(out);
@@ -926,23 +959,22 @@ app.get("/api/comics/:id/favorite", authenticateToken, async (req, res) => {
 app.get("/api/users/favorites", authenticateToken, async (req, res) => {
   try {
     const favorites = await Favorite.find({ user_id: req.user.id })
-      .populate('comic_id')
+      .populate({
+        path: 'comic_id',
+        populate: { path: 'genres', select: 'name slug' }
+      })
       .sort({ created_at: -1 });
-    
+
     const comics = favorites.map(f => f.comic_id).filter(c => c != null);
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
 
     const results = await Promise.all(comics.map(async (c) => {
       const coverUrl = await resolveR2Url(c.cover_url);
-      const chapterCount = await Chapter.countDocuments({ comic_id: c._id });
-      const genreIds = Array.isArray(c.genres) ? c.genres : [];
-      const genreNames = genreIds.length > 0
-        ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
-        : [];
       return {
         ...c.toObject(),
         cover_url: coverUrl || c.cover_url,
-        chapter_count: chapterCount,
-        genres: genreNames,
+        chapter_count: chapterCounts[c._id.toString()] || 0,
       };
     }));
 

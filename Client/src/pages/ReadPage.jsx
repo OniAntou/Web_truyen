@@ -30,14 +30,26 @@ const ReadPage = () => {
                 if (data.chapters) {
                     const found = data.chapters.find(c => c._id === chapterId || c.id === chapterId);
                     if (found) {
-                        setChapter(found);
+                        // Fetch pages specifically for this chapter
+                        fetch(`http://localhost:5000/api/chapters/${found._id}/pages`)
+                            .then(res => res.json())
+                            .then(pages => {
+                                setChapter({ ...found, pages });
+                                setLoading(false);
+                            })
+                            .catch(err => {
+                                console.error('Error fetching pages:', err);
+                                setError('Failed to load chapter pages');
+                                setLoading(false);
+                            });
                     } else {
                         setError('Chapter not found');
+                        setLoading(false);
                     }
                 } else {
                     setError('No chapters found');
+                    setLoading(false);
                 }
-                setLoading(false);
             })
             .catch(err => {
                 console.error(err);
