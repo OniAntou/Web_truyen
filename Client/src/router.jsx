@@ -9,6 +9,7 @@ import LatestPage from './pages/LatestPage';
 import AuthPage from './pages/AuthPage';
 import FollowingPage from './pages/FollowingPage';
 import ProfilePage from './pages/ProfilePage';
+import CreatorApplication from './pages/CreatorApplication';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
     {
         path: '/profile',
         element: <ProfilePage />,
+    },
+    {
+        path: '/become-creator',
+        element: <CreatorApplication />,
     },
 
     // Admin Routes

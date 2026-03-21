@@ -139,8 +139,11 @@ const Navbar = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="nav-actions">
-                    <div className="nav-search-container" ref={searchRef}>
+                <div className="nav-actions flex items-center">
+                    <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
+                        Creator
+                    </Link>
+                    <div className="nav-search-container flex-shrink-0" ref={searchRef}>
                         <div className="nav-search-box">
                             <Search size={18} className="nav-search-icon" />
                             <input 
@@ -277,6 +280,7 @@ const Navbar = () => {
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
                     {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
+                    <Link to="/become-creator" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#a855f7', fontWeight: 'bold' }}>Become Creator</Link>
                     <div style={{ height: '1px', background: 'var(--border)' }}></div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Theme</span>
