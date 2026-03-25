@@ -11,10 +11,42 @@ const CreatorApplication = () => {
         reason: '',
     });
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const token = localStorage.getItem('token');
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setTimeout(() => setSubmitted(true), 800);
+        if (!token) {
+            setError('Vui lòng đăng nhập trước khi nộp đơn.');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch('http://localhost:5000/api/applications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                setSubmitted(true);
+            } else {
+                setError(data.message || 'Có lỗi xảy ra.');
+            }
+        } catch (err) {
+            setError('Lỗi kết nối máy chủ.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -60,7 +92,18 @@ const CreatorApplication = () => {
                     </div>
 
                     {/* Right Column: Clean Form */}
+                    {!token ? (
+                        <div className="p-8 md:p-12 rounded-[2rem] shadow-2xl relative text-center" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                            <h3 className="text-2xl font-medium text-white mb-4">Bạn chưa đăng nhập!</h3>
+                            <p className="text-zinc-400 mb-8">Vui lòng đăng nhập vào tài khoản của bạn để có thể nộp đơn xin cấp quyền Tác giả.</p>
+                            <Link to="/auth" className="inline-block px-8 py-4 rounded-xl font-bold bg-[var(--accent)] text-white hover:opacity-90 transition-all">
+                                Đi đến Đăng Nhập
+                            </Link>
+                        </div>
+                    ) : (
                     <form onSubmit={handleSubmit} className="space-y-8 p-8 md:p-12 rounded-[2rem] shadow-2xl relative" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                        {error && <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm">{error}</div>}
+                        
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-widest mb-3 ml-1" style={{ color: 'var(--text-secondary)' }}>Bút danh / Tên Nhóm <span className="text-red-500">*</span></label>
                             <input
@@ -99,11 +142,12 @@ const CreatorApplication = () => {
                             />
                         </div>
 
-                        <button type="submit" className="w-full py-5 md:py-6 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:opacity-90 mt-4 text-sm tracking-widest uppercase" style={{ background: 'var(--accent)', color: 'white' }}>
-                            <span>Nộp Đơn Ứng Tuyển</span>
-                            <Send size={18} strokeWidth={2.5} />
+                        <button type="submit" disabled={loading} className="w-full py-5 md:py-6 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:opacity-90 mt-4 text-sm tracking-widest uppercase disabled:opacity-50 disabled:hover:scale-100" style={{ background: 'var(--accent)', color: 'white' }}>
+                            <span>{loading ? 'Đang gửi...' : 'Nộp Đơn Ứng Tuyển'}</span>
+                            {!loading && <Send size={18} strokeWidth={2.5} />}
                         </button>
                     </form>
+                    )}
                 </div>
             </div>
             <Footer />

@@ -10,6 +10,7 @@ import AuthPage from './pages/AuthPage';
 import FollowingPage from './pages/FollowingPage';
 import ProfilePage from './pages/ProfilePage';
 import CreatorApplication from './pages/CreatorApplication';
+import CreatorStudio from './pages/CreatorStudio';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -17,8 +18,10 @@ import ComicList from './pages/admin/ComicList';
 import ComicEditor from './pages/admin/ComicEditor';
 import ChapterManager from './pages/admin/ChapterManager';
 import AdminLogin from './pages/admin/AdminLogin';
+import ApplicationManager from './pages/admin/ApplicationManager';
 
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import ProtectedCreatorRoute from './components/ProtectedCreatorRoute';
 
 export const router = createBrowserRouter([
     {
@@ -65,6 +68,15 @@ export const router = createBrowserRouter([
         path: '/become-creator',
         element: <CreatorApplication />,
     },
+    {
+        element: <ProtectedCreatorRoute />,
+        children: [
+            { path: '/studio', element: <CreatorStudio /> },
+            { path: '/studio/comics/new', element: <ComicEditor /> },
+            { path: '/studio/comics/edit/:id', element: <ComicEditor /> },
+            { path: '/studio/comics/:id/chapters', element: <ChapterManager /> },
+        ]
+    },    
 
     // Admin Routes
     {
@@ -84,6 +96,7 @@ export const router = createBrowserRouter([
                     { path: 'comics/new', element: <ComicEditor /> },
                     { path: 'comics/edit/:id', element: <ComicEditor /> },
                     { path: 'comics/:id/chapters', element: <ChapterManager /> },
+                    { path: 'applications', element: <ApplicationManager /> },
                 ]
             }
         ]

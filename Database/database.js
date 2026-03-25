@@ -25,6 +25,7 @@ const ComicSchema = new mongoose.Schema(
     views: { type: Number, default: 0 },
     weekly_views: { type: Number, default: 0 },
     genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
+    uploader_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "comic" },
@@ -95,6 +96,7 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     avatar: { type: String, default: "" },
+    role: { type: String, enum: ['user', 'creator', 'admin'], default: 'user' },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },
@@ -170,4 +172,19 @@ const GenreSchema = new mongoose.Schema(
 
 const Genre = mongoose.model("Genre", GenreSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite };
+// 7. Application Collection - Creator application requests
+const ApplicationSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    penName: { type: String, required: true },
+    portfolio: { type: String, default: "" },
+    reason: { type: String, required: true },
+    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+    created_at: { type: Date, default: Date.now },
+  },
+  { collection: "applications" },
+);
+
+const Application = mongoose.model("Application", ApplicationSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application };

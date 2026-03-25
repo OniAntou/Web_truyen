@@ -569,7 +569,7 @@ const ChapterManager = () => {
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
                 <div className="flex items-center gap-4 w-full md:w-auto">
-                    <Link to="/admin/comics" className="text-zinc-500 hover:text-white transition-colors flex items-center justify-center p-2 rounded-xl border border-zinc-800 hover:border-white/20 bg-zinc-900/30">
+                    <Link to={window.location.pathname.startsWith('/studio') ? '/studio' : '/admin/comics'} className="text-zinc-500 hover:text-white transition-colors flex items-center justify-center p-2 rounded-xl border border-zinc-800 hover:border-white/20 bg-zinc-900/30">
                         &larr;
                     </Link>
                     <div>

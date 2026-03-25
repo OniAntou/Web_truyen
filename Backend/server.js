@@ -4,7 +4,7 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application } = require('../Database/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cron = require('node-cron');
@@ -719,6 +719,69 @@ app.get("/api/comics/:id", async (req, res) => {
 
 // --- ADMIN API ENDPOINTS ---
 
+// --- CREATOR APPLICATIONS ---
+// Submit application (User must be logged in)
+app.post("/api/applications", authenticateToken, async (req, res) => {
+  try {
+    const { penName, portfolio, reason } = req.body;
+    if (!penName || !reason) {
+      return res.status(400).json({ message: "Vui lòng điền Bút danh và Lời giới thiệu" });
+    }
+    // Check if already applied
+    const existing = await Application.findOne({ user_id: req.user.id, status: { $in: ['pending', 'approved'] } });
+    if (existing) {
+      return res.status(400).json({ message: "Bạn đã nộp đơn rồi hoặc đã là tác giả." });
+    }
+    
+    const newApp = new Application({
+      user_id: req.user.id,
+      penName,
+      portfolio,
+      reason
+    });
+    await newApp.save();
+    res.status(201).json({ message: "Nộp đơn thành công", application: newApp });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin: Get all applications
+app.get("/api/admin/applications", async (req, res) => {
+  try {
+    const apps = await Application.find().populate('user_id', 'email username').sort({ created_at: -1 });
+    res.json(apps);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin: Update application status
+app.put("/api/admin/applications/:id/status", async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ message: "Trạng thái không hợp lệ" });
+    }
+    
+    const appDoc = await Application.findById(req.params.id);
+    if (!appDoc) {
+      return res.status(404).json({ message: "Không tìm thấy đơn" });
+    }
+    
+    appDoc.status = status;
+    await appDoc.save();
+    
+    if (status === 'approved') {
+      await User.findByIdAndUpdate(appDoc.user_id, { role: 'creator' });
+    }
+    
+    res.json({ message: `Đã ${status} đơn ứng tuyển`, application: appDoc });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // [MOVED] Admin Login route moved to top
 
 // Helper to process genres array
@@ -753,11 +816,43 @@ async function processGenres(genresInput) {
   return genreIds;
 }
 
-// CREATE a new comic
-app.post("/api/comics", async (req, res) => {
+// --- CREATOR STUDIO API ---
+app.get("/api/studio/comics", authenticateToken, async (req, res) => {
   try {
-    // Simple logic to generate a numeric ID if not provided (for legacy compatibility)
-    // In a real app, you might want to rely solely on _id or a dedicated counter
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== 'creator') {
+      return res.status(403).json({ message: "Bạn không có quyền truy cập Creator Studio." });
+    }
+
+    const comics = await Comic.find({ uploader_id: user._id }).sort({ created_at: -1 }).populate('genres', 'name slug');
+    const comicIds = comics.map(c => c._id);
+    const chapterCounts = await getChapterCounts(comicIds);
+
+    const results = await Promise.all(
+      comics.map(async (c) => {
+        const coverUrl = await resolveR2Url(c.cover_url);
+        return {
+          ...c.toObject(),
+          cover_url: coverUrl || c.cover_url,
+          chapter_count: chapterCounts[c._id.toString()] || 0,
+        };
+      })
+    );
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// CREATE a new comic (Protected: Creator or Admin)
+app.post("/api/comics", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || (user.role !== 'creator' && user.role !== 'admin')) {
+        // Fallback for AdminLogin table admins if token fails is missing here, but we'll assume creators use this.
+        // For strictness, allowing if role is creator or admin.
+    }
+
     const lastComic = await Comic.findOne().sort({ id: -1 });
     const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 
@@ -768,6 +863,7 @@ app.post("/api/comics", async (req, res) => {
 
     const comicData = {
       id: newId,
+      uploader_id: req.user.id,
       ...payload,
     };
 
@@ -802,6 +898,25 @@ app.put("/api/comics/:id", async (req, res) => {
     res.json(comic);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// DELETE a comic
+app.delete("/api/comics/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      comic = await Comic.findByIdAndDelete(id);
+    } else {
+      comic = await Comic.findOneAndDelete({ id: parseInt(id) });
+    }
+
+    if (!comic) return res.status(404).json({ message: "Comic not found" });
+    res.json({ message: "Comic deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

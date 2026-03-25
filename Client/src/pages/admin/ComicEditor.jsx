@@ -71,9 +71,16 @@ const ComicEditor = () => {
                 : 'http://localhost:5000/api/comics';
             const method = isEditing ? 'PUT' : 'POST';
 
+            const token = localStorage.getItem('token');
+            const adminData = localStorage.getItem('admin');
+            const authHeader = token ? `Bearer ${token}` : ''; // Ideally admins get a token too, but we fallback
+
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(authHeader && { 'Authorization': authHeader })
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -107,7 +114,8 @@ const ComicEditor = () => {
                 }
             }
 
-            navigate('/admin/comics');
+            const returnPath = window.location.pathname.startsWith('/studio') ? '/studio' : '/admin/comics';
+            navigate(returnPath);
 
         } catch (error) {
             console.error('Error saving comic:', error);
