@@ -51,12 +51,6 @@ const HeroSection = ({ featuredComics }) => {
 
     return (
         <div className="relative w-full h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden pt-20">
-            {/* Cinematic Blurred Background Image */}
-            <div className="absolute inset-0 z-0">
-                <LazyImage src={currentComic.cover_url || currentComic.cover} className="w-full h-full object-cover blur-3xl opacity-20 scale-110 transition-opacity duration-1000" alt="Background" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent mix-blend-multiply"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)] via-transparent to-[var(--bg-primary)] mix-blend-overlay"></div>
-            </div>
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center h-full">
                 {/* Text Content */}

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import HeroSection from '../components/Home/HeroSection';
@@ -10,6 +11,23 @@ const HomePage = () => {
     const [comics, setComics] = useState([]);
     const [trending, setTrending] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Scroll ref for navigation
+    const scrollRef = useRef(null);
+
+    const scroll = (direction) => {
+        if (!scrollRef.current) return;
+        
+        const scrollAmount = 400;
+        const targetScroll = direction === 'left' 
+            ? scrollRef.current.scrollLeft - scrollAmount 
+            : scrollRef.current.scrollLeft + scrollAmount;
+            
+        scrollRef.current.scrollTo({ 
+            left: targetScroll, 
+            behavior: 'smooth' 
+        });
+    };
 
     useEffect(() => {
         // Fetch all comics and trending comics concurrently
@@ -61,20 +79,42 @@ const HomePage = () => {
                         </h3>
                     </div>
                     
-                    <div className="flex-1 overflow-x-auto hide-scrollbar relative z-10">
-                        <div className="flex gap-5 pb-2">
-                            {trending.slice(0, 7).map(c => (
-                                <Link key={c._id || c.id} to={`/p/${c.id || c._id}`} className="group shrink-0 w-28 md:w-36 flex flex-col gap-3">
-                                    <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden ring-1 ring-[var(--border)] relative bg-[var(--bg-primary)]">
-                                        <LazyImage src={c.cover_url || c.cover} className="w-full h-full object-cover transition-transform duration-500 group-hover:-translate-y-1" alt={c.title} />
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                                    </div>
-                                    <p className="font-semibold text-xs md:text-[0.9rem] line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>
-                                        {c.title}
-                                    </p>
-                                </Link>
-                            ))}
+                    <div className="flex-1 relative overflow-hidden group/nav">
+                        <div 
+                            ref={scrollRef}
+                            className="w-full overflow-x-auto hide-scrollbar relative z-10"
+                            style={{ scrollBehavior: 'smooth' }}
+                        >
+                            <div className="flex gap-5 pb-2">
+                                {trending.slice(0, 7).map(c => (
+                                    <Link key={c._id || c.id} to={`/p/${c.id || c._id}`} className="group shrink-0 w-28 md:w-36 flex flex-col gap-3">
+                                        <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden ring-1 ring-[var(--border)] relative bg-[var(--bg-primary)]">
+                                            <LazyImage src={c.cover_url || c.cover} className="w-full h-full object-cover transition-transform duration-500 group-hover:-translate-y-1" alt={c.title} />
+                                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                                        </div>
+                                        <p className="font-semibold text-xs md:text-[0.9rem] line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>
+                                            {c.title}
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
+
+                        {/* Navigation Buttons inside the flex-1 container but absolute */}
+                        <button 
+                            onClick={() => scroll('left')} 
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/80 text-white backdrop-blur-md border border-white/20 opacity-100 md:opacity-0 md:group-hover/nav:opacity-100 transition-all hover:bg-[var(--accent)] hover:scale-110 cursor-pointer flex items-center justify-center shadow-2xl"
+                            aria-label="Scroll Left"
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
+                        <button 
+                            onClick={() => scroll('right')} 
+                            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/80 text-white backdrop-blur-md border border-white/20 opacity-100 md:opacity-0 md:group-hover/nav:opacity-100 transition-all hover:bg-[var(--accent)] hover:scale-110 cursor-pointer flex items-center justify-center shadow-2xl"
+                            aria-label="Scroll Right"
+                        >
+                            <ChevronRight size={24} />
+                        </button>
                     </div>
                 </div>
             </div>
