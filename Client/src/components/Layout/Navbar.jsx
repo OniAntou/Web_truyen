@@ -140,9 +140,15 @@ const Navbar = () => {
 
                 {/* Actions */}
                 <div className="nav-actions flex items-center">
-                    <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
-                        Creator
-                    </Link>
+                    {(user?.role === 'creator' || user?.role === 'admin') ? (
+                        <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-[var(--accent)] hover:bg-orange-600 text-white rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
+                            Studio
+                        </Link>
+                    ) : (
+                        <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
+                            Creator
+                        </Link>
+                    )}
                     <div className="nav-search-container flex-shrink-0" ref={searchRef}>
                         <div className="nav-search-box">
                             <Search size={18} className="nav-search-icon" />
@@ -246,6 +252,16 @@ const Navbar = () => {
                                     <Link to="/profile" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-primary)', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
                                         Trang cá nhân
                                     </Link>
+                                    {user?.role === 'admin' && (
+                                        <Link to="/admin" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#3b82f6', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
+                                            Admin Panel
+                                        </Link>
+                                    )}
+                                    {(user?.role === 'creator' || user?.role === 'admin') && (
+                                        <Link to="/studio" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--accent)', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
+                                            Creator Studio
+                                        </Link>
+                                    )}
                                     <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
                                         Đăng xuất
                                     </button>
@@ -280,7 +296,11 @@ const Navbar = () => {
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
                     {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
-                    <Link to="/become-creator" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#a855f7', fontWeight: 'bold' }}>Become Creator</Link>
+                    {(user?.role === 'creator' || user?.role === 'admin') ? (
+                        <Link to="/studio" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Creator Studio</Link>
+                    ) : (
+                        <Link to="/become-creator" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#a855f7', fontWeight: 'bold' }}>Become Creator</Link>
+                    )}
                     <div style={{ height: '1px', background: 'var(--border)' }}></div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Theme</span>

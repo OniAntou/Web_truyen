@@ -14,6 +14,8 @@ const ReadPage = () => {
     const [chapter, setChapter] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -58,7 +60,87 @@ const ReadPage = () => {
             });
     }, [comicId, chapterId]);
 
+    // Track current page based on scroll position
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!chapter || !chapter.pages) return;
+            
+            const pageElements = document.querySelectorAll('.reader-page-img');
+            const scrollTop = window.scrollY + window.innerHeight / 2; // Middle of viewport
+            
+            let newCurrentPage = 0;
+            pageElements.forEach((element, index) => {
+                const rect = element.getBoundingClientRect();
+                const elementTop = rect.top + window.scrollY;
+                
+                if (elementTop <= scrollTop) {
+                    newCurrentPage = index + 1;
+                }
+            });
+            
+            if (newCurrentPage !== currentPage) {
+                setCurrentPage(newCurrentPage);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial check
+        
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [chapter, currentPage]);
+
     const viewedRef = React.useRef(null);
+
+    // Mark chapter as read immediately when user opens it
+    useEffect(() => {
+        if (token && comic && chapter) {
+            console.log('ReadPage: Chapter loaded, marking as read:', chapter.title);
+            // Mark chapter as read as soon as user opens it
+            updateReadingProgress(1);
+        }
+    }, [chapter?._id]); // Only run when chapter changes
+
+    // Track reading progress
+    const updateReadingProgress = async (pageNum) => {
+        if (!token || !comic || !chapter) return;
+        
+        try {
+            console.log('Updating reading progress:', { chapter_id: chapter._id, page_number: pageNum });
+            await fetch(`http://localhost:5000/api/comics/${comicId}/reading-progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    chapter_id: chapter._id,
+                    page_number: pageNum
+                })
+            });
+            console.log('Reading progress updated successfully');
+        } catch (err) {
+            console.error('Error updating reading progress:', err);
+        }
+    };
+
+    // Mark chapter as completed when user reaches the last page
+    const markChapterAsCompleted = async () => {
+        if (!token || !comic || !chapter) return;
+        
+        const totalPages = chapter.pages ? chapter.pages.length : 0;
+        if (totalPages > 0 && currentPage >= totalPages) {
+            // Update progress to mark chapter as fully read
+            await updateReadingProgress(totalPages);
+        }
+    };
+
+    // Update progress when page changes
+    useEffect(() => {
+        if (currentPage > 0) {
+            updateReadingProgress(currentPage);
+            markChapterAsCompleted();
+        }
+    }, [currentPage]);
 
     // Track comic view for authenticated users
     useEffect(() => {

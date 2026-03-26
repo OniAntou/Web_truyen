@@ -4,7 +4,7 @@ dotenv.config(); // Load env vars immediately
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application } = require('../Database/database');
+const { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress } = require('../Database/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cron = require('node-cron');
@@ -99,7 +99,7 @@ app.post("/api/auth/register", async (req, res) => {
     await newUser.save();
     
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-    res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, avatar: newUser.avatar } });
+    res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, avatar: newUser.avatar, role: newUser.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -122,7 +122,7 @@ app.post("/api/auth/login", async (req, res) => {
     }
     
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-    res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, avatar: user.avatar } });
+    res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, avatar: user.avatar, role: user.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -1283,6 +1283,192 @@ app.delete("/api/chapters/:chapterId/pages/:pageId", async (req, res) => {
     );
 
     res.json({ message: "Page deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- READING PROGRESS API ---
+// Get user's reading progress for a comic
+app.get("/api/comics/:id/reading-progress", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    const progress = await ReadingProgress.findOne({ 
+      user_id: req.user.id, 
+      comic_id: comic._id 
+    }).populate('chapter_id', 'title chapter_number');
+
+    if (!progress) {
+      return res.json({ hasProgress: false });
+    }
+
+    res.json({ 
+      hasProgress: true,
+      chapter_id: progress.chapter_id._id,
+      chapter_number: progress.chapter_id.chapter_number,
+      chapter_title: progress.chapter_id.title,
+      page_number: progress.page_number,
+      updated_at: progress.updated_at
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Update user's reading progress
+app.post("/api/comics/:id/reading-progress", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { chapter_id, page_number = 1 } = req.body;
+    
+    if (!chapter_id) {
+      return res.status(400).json({ message: "Thiếu chapter_id" });
+    }
+
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    // Verify chapter belongs to this comic
+    const chapter = await Chapter.findOne({ _id: chapter_id, comic_id: comic._id });
+    if (!chapter) {
+      return res.status(404).json({ message: "Chapter không tồn tại hoặc không thuộc comic này" });
+    }
+
+    const existingProgress = await ReadingProgress.findOne({ 
+      user_id: req.user.id, 
+      comic_id: comic._id 
+    });
+
+    if (existingProgress) {
+      // Update existing progress
+      existingProgress.chapter_id = chapter_id;
+      existingProgress.page_number = page_number;
+      existingProgress.updated_at = new Date();
+      await existingProgress.save();
+    } else {
+      // Create new progress
+      await ReadingProgress.create({
+        user_id: req.user.id,
+        comic_id: comic._id,
+        chapter_id: chapter_id,
+        page_number: page_number
+      });
+    }
+
+    res.json({ message: "Reading progress updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all reading progress for a user (for "Continue Reading" section)
+app.get("/api/users/reading-progress", authenticateToken, async (req, res) => {
+  try {
+    const progresses = await ReadingProgress.find({ user_id: req.user.id })
+      .populate({
+        path: 'comic_id',
+        populate: { path: 'genres', select: 'name slug' }
+      })
+      .populate('chapter_id', 'title chapter_number')
+      .sort({ updated_at: -1 })
+      .limit(10);
+
+    const results = await Promise.all(progresses.map(async (progress) => {
+      const coverUrl = await resolveR2Url(progress.comic_id.cover_url);
+      return {
+        comic_id: progress.comic_id._id,
+        comic_title: progress.comic_id.title,
+        comic_cover: coverUrl || progress.comic_id.cover_url,
+        chapter_id: progress.chapter_id._id,
+        chapter_number: progress.chapter_id.chapter_number,
+        chapter_title: progress.chapter_id.title,
+        page_number: progress.page_number,
+        updated_at: progress.updated_at,
+        genres: progress.comic_id.genres
+      };
+    }));
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get read status for all chapters of a comic
+app.get("/api/comics/:id/chapters/read-status", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let comic;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) comic = await Comic.findById(id);
+    else comic = await Comic.findOne({ id: parseInt(id) });
+    
+    if (!comic) return res.status(404).json({ message: "Comic không tồn tại" });
+
+    // Get all chapters for this comic
+    const chapters = await Chapter.find({ comic_id: comic._id })
+      .sort({ chapter_number: 1 })
+      .select('_id chapter_number title');
+
+    // Get all reading progress for this user and comic
+    const progresses = await ReadingProgress.find({ 
+      user_id: req.user.id, 
+      comic_id: comic._id 
+    }).select('chapter_id page_number');
+
+    // Get page counts for all chapters to determine if they're fully read
+    const chapterIds = chapters.map(ch => ch._id);
+    const pageCounts = await Promise.all(
+      chapterIds.map(async (chapterId) => {
+        const count = await Pages.countDocuments({ chapter_id: chapterId });
+        return { chapterId, count };
+      })
+    );
+
+    const pageCountMap = {};
+    pageCounts.forEach(({ chapterId, count }) => {
+      pageCountMap[chapterId.toString()] = count;
+    });
+
+    // Create a map of chapter_id -> progress info
+    const progressMap = {};
+    progresses.forEach(progress => {
+      const chapterId = progress.chapter_id.toString();
+      const totalPages = pageCountMap[chapterId] || 1;
+      
+      progressMap[chapterId] = {
+        hasProgress: true,
+        current_page: progress.page_number,
+        isRead: progress.page_number > 0, // Consider chapter read if user has viewed at least 1 page
+        totalPages: totalPages
+      };
+    });
+
+    // Combine chapters with their read status
+    const chaptersWithStatus = chapters.map(chapter => {
+      const chapterId = chapter._id.toString();
+      const progress = progressMap[chapterId];
+      
+      return {
+        _id: chapter._id,
+        chapter_number: chapter.chapter_number,
+        title: chapter.title,
+        isRead: progress ? progress.isRead : false,
+        currentPage: progress ? progress.current_page : 0,
+        totalPages: progress ? progress.totalPages : (pageCountMap[chapterId] || 0),
+        hasProgress: !!progress
+      };
+    });
+
+    res.json(chaptersWithStatus);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

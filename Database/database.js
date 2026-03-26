@@ -187,4 +187,21 @@ const ApplicationSchema = new mongoose.Schema(
 
 const Application = mongoose.model("Application", ApplicationSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application };
+// 8. ReadingProgress Collection - Track user's reading progress
+const ReadingProgressSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
+    chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: true },
+    page_number: { type: Number, default: 1 }, // Page number where user stopped
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now }
+  },
+  { collection: "reading_progress" }
+);
+
+ReadingProgressSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
+
+const ReadingProgress = mongoose.model("ReadingProgress", ReadingProgressSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress };

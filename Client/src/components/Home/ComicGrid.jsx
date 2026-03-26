@@ -27,8 +27,17 @@ const ComicCard = ({ comic }) => {
                     </div>
                 </div>
             </div>
-            <div className="px-1">
-                <h3 className="font-bold text-[0.95rem] leading-tight line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>{comic.title}</h3>
+            <div className="px-1" style={{ paddingBottom: '2px' }}>
+                <h3 className="font-bold text-[0.95rem] transition-colors group-hover:text-[var(--accent)]" style={{ 
+                    color: 'var(--text-primary)',
+                    lineHeight: '1.6',
+                    overflow: 'visible',
+                    minHeight: '1.4em',
+                    paddingBottom: '4px',
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale'
+                }}>{comic.title}</h3>
                 {comic.genres && comic.genres.length > 0 && (
                     <p className="text-[0.65rem] uppercase font-semibold tracking-widest mt-1.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
                         {comic.genres.map(g => g.name || g).join(' • ')}

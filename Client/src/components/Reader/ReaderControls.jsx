@@ -4,9 +4,41 @@ import { Link } from "react-router-dom";
 
 const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext }) => {
   const [showChapters, setShowChapters] = useState(false);
+  const [chaptersWithStatus, setChaptersWithStatus] = useState([]);
+  const [loadingStatus, setLoadingStatus] = useState(true);
   const activeChapterRef = useRef(null);
+  const token = localStorage.getItem('token');
 
   const currentChapter = chapters?.find(ch => (ch._id || ch.id) === currentChapterId);
+
+  // Fetch chapter read status when modal opens
+  useEffect(() => {
+    if (showChapters && token && comicId && chapters) {
+      fetch(`http://localhost:5000/api/comics/${comicId}/chapters/read-status`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        setChaptersWithStatus(data);
+        setLoadingStatus(false);
+      })
+      .catch(err => {
+        console.error('Error fetching chapter read status:', err);
+        setLoadingStatus(false);
+      });
+    }
+  }, [showChapters, comicId, chapters, token]);
+
+  // Merge chapters with status info
+  const displayChapters = chapters ? chapters.map(chapter => {
+    const statusInfo = chaptersWithStatus.find(s => s._id === chapter._id || s._id === chapter.id);
+    return {
+      ...chapter,
+      isRead: statusInfo ? statusInfo.isRead : false,
+      hasProgress: statusInfo ? statusInfo.hasProgress : false,
+      currentPage: statusInfo ? statusInfo.currentPage : 0
+    };
+  }) : [];
 
   // Auto scroll to active chapter when modal opens
   useEffect(() => {
@@ -63,9 +95,11 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
             </div>
 
             <div className="overflow-y-auto p-3 flex-1 custom-scrollbar">
-              {chapters && chapters.length > 0 ? (
+              {loadingStatus ? (
+                <div className="py-10 text-center text-gray-500 italic">Loading chapter status...</div>
+              ) : displayChapters && displayChapters.length > 0 ? (
                 <div className="flex flex-col gap-1.5">
-                  {[...chapters].reverse().map((ch) => {
+                  {[...displayChapters].reverse().map((ch) => {
                     const isActive = ch._id === currentChapterId || ch.id === currentChapterId;
                     return (
                       <Link
@@ -73,13 +107,20 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
                         to={`/read/${comicId}/${ch._id || ch.id}`}
                         onClick={() => setShowChapters(false)}
                         ref={isActive ? activeChapterRef : null}
-                        className={`px-4 py-3 rounded-lg transition-all flex justify-between items-center cursor-pointer ${isActive
-                          ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30 font-medium'
-                          : 'text-gray-300 hover:bg-gray-800 hover:text-white border border-transparent'
-                          }`}
+                        className={`px-4 py-3 rounded-lg transition-all flex justify-between items-center cursor-pointer ${
+                          isActive
+                            ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30 font-medium'
+                            : ch.isRead
+                            ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-300 border border-transparent'
+                            : 'text-gray-300 hover:bg-gray-800 hover:text-white border border-transparent'
+                        }`}
                       >
-                        <span>Chapter {ch.chapter_number} {ch.title ? `: ${ch.title}` : ''}</span>
-                        {isActive && <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full font-semibold">Current</span>}
+                        <div className="flex items-center gap-2">
+                          <span>Chapter {ch.chapter_number} {ch.title ? `: ${ch.title}` : ''}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isActive && <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full font-semibold">Current</span>}
+                        </div>
                       </Link>
                     );
                   })}

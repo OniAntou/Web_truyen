@@ -88,7 +88,7 @@ const CreatorStudio = () => {
                     </Link>
                 </nav>
 
-                <div className="p-4 border-t border-white/5 space-y-2">
+                <div className="p-4 border-t border-white/5">
                     <Link
                         to="/"
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 hover:text-white transition-all duration-300"
@@ -96,14 +96,6 @@ const CreatorStudio = () => {
                         <Home size={20} className="stroke-[1.5]" />
                         <span className="font-medium text-sm tracking-wide">View Site</span>
                     </Link>
-
-                    <button
-                        onClick={() => navigate('/')}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 hover:text-white transition-all duration-300 text-left"
-                    >
-                        <LogOut size={20} className="stroke-[1.5]" />
-                        <span className="font-medium text-sm tracking-wide">Exit Studio</span>
-                    </button>
                 </div>
             </aside>
 
