@@ -28,12 +28,9 @@ const ComicCard = ({ comic }) => {
                 </div>
             </div>
             <div className="px-1" style={{ paddingBottom: '2px' }}>
-                <h3 className="font-bold text-[0.95rem] transition-colors group-hover:text-[var(--accent)]" style={{ 
+                <h3 className="font-bold text-[0.95rem] line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ 
                     color: 'var(--text-primary)',
-                    lineHeight: '1.6',
-                    overflow: 'visible',
-                    minHeight: '1.4em',
-                    paddingBottom: '4px',
+                    lineHeight: '1.4',
                     textRendering: 'optimizeLegibility',
                     WebkitFontSmoothing: 'antialiased',
                     MozOsxFontSmoothing: 'grayscale'
