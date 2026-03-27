@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
 import { formatViews } from '../../utils/format';
-import LazyImage from '../LazyImage';
+import LazyImage from '../ui/LazyImage';
+import { comicService } from '../../api/comicService';
 
 const ComicInfo = ({ comic }) => {
     const [userRating, setUserRating] = useState(0);
@@ -17,31 +18,23 @@ const ComicInfo = ({ comic }) => {
     
     useEffect(() => {
         if (token && comic) {
+            const id = comic.id || comic._id;
             // Fetch user rating
-            fetch(`http://localhost:5000/api/comics/${comic.id || comic._id}/user-rating`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.json())
+            comicService.getUserRating(id, token)
             .then(data => {
                 if (data.rating) setUserRating(data.rating);
             })
             .catch(console.error);
 
             // Fetch favorite status
-            fetch(`http://localhost:5000/api/comics/${comic.id || comic._id}/favorite`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.json())
+            comicService.getFavoriteStatus(id, token)
             .then(data => {
                 if (data.isFavorited !== undefined) setIsFavorited(data.isFavorited);
             })
             .catch(console.error);
 
             // Fetch reading progress
-            fetch(`http://localhost:5000/api/comics/${comic.id || comic._id}/reading-progress`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(res => res.json())
+            comicService.getReadingProgress(id, token)
             .then(data => {
                 if (data.hasProgress) {
                     setReadingProgress(data);
@@ -62,23 +55,12 @@ const ComicInfo = ({ comic }) => {
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/comics/${comic.id || comic._id}/rate`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ rating: value })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setUserRating(data.user_rating);
-                setAvgRating(data.rating);
-            } else {
-                alert(data.message || 'Lỗi khi đánh giá');
-            }
+            const data = await comicService.rate(comic.id || comic._id, value, token);
+            setUserRating(data.user_rating);
+            setAvgRating(data.rating);
         } catch (err) {
             console.error(err);
+            alert(err || 'Lỗi khi đánh giá');
         } finally {
             setIsSubmitting(false);
         }
@@ -89,18 +71,11 @@ const ComicInfo = ({ comic }) => {
         if (isTogglingFavorite) return;
         setIsTogglingFavorite(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/comics/${comic.id || comic._id}/favorite`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setIsFavorited(data.isFavorited);
-            } else {
-                alert(data.message || 'Lỗi khi thao tác');
-            }
+            const data = await comicService.toggleFavorite(comic.id || comic._id, token);
+            setIsFavorited(data.isFavorited);
         } catch (err) {
             console.error(err);
+            alert(err || 'Lỗi khi thao tác');
         } finally {
             setIsTogglingFavorite(false);
         }
@@ -199,190 +174,6 @@ const ComicInfo = ({ comic }) => {
                             <Share2 size={20} />
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export const ChapterList = ({ chapters, comicId }) => {
-    const [readChapters, setReadChapters] = useState(new Set());
-    const [isDarkTheme, setIsDarkTheme] = useState(true);
-
-    useEffect(() => {
-        // Load read chapters from localStorage
-        const stored = localStorage.getItem(`read-chapters-${comicId}`);
-        if (stored) {
-            setReadChapters(new Set(JSON.parse(stored)));
-        }
-
-        // Check current theme
-        const checkTheme = () => {
-            setIsDarkTheme(document.documentElement.getAttribute('data-theme') !== 'light');
-        };
-        
-        checkTheme();
-        
-        // Listen for theme changes
-        const observer = new MutationObserver(checkTheme);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-        
-        return () => observer.disconnect();
-    }, [comicId]);
-
-    const handleChapterClick = (chapterId) => {
-        // Mark chapter as read
-        const newReadChapters = new Set(readChapters);
-        newReadChapters.add(chapterId);
-        setReadChapters(newReadChapters);
-        
-        // Save to localStorage
-        localStorage.setItem(`read-chapters-${comicId}`, JSON.stringify([...newReadChapters]));
-    };
-
-    return (
-        <div className="container" style={{ marginTop: '3rem', paddingBottom: '2rem' }}>
-            <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Chapters</h3>
-            <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
-                <div className="chapter-list-grid">
-                    {chapters.map(chapter => {
-                        const chapterId = chapter._id || chapter.id;
-                        const isRead = readChapters.has(chapterId);
-                        
-                        return (
-                            <Link
-                                key={chapterId}
-                                to={`/read/${comicId}/${chapterId}`}
-                                className={`chapter-item ${isRead ? 'chapter-read' : 'chapter-unread'}`}
-                                style={{
-                                    background: isRead 
-                                        ? isDarkTheme 
-                                            ? 'rgba(255, 255, 255, 0.08)' 
-                                            : 'rgba(0, 0, 0, 0.08)'
-                                        : 'transparent',
-                                    border: isRead 
-                                        ? isDarkTheme 
-                                            ? '1px solid rgba(255, 255, 255, 0.15)' 
-                                            : '1px solid rgba(0, 0, 0, 0.15)'
-                                        : isDarkTheme 
-                                            ? '1px solid rgba(255, 255, 255, 0.05)' 
-                                            : '1px solid rgba(0, 0, 0, 0.05)'
-                                }}
-                                onClick={() => handleChapterClick(chapterId)}
-                            >
-                                <span className="chapter-title">{chapter.title}</span>
-                                <span className="chapter-date">{chapter.date}</span>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    )
-}
-export const CommentSection = ({ comicId, chapterId }) => {
-    const [comments, setComments] = React.useState([]);
-    const [newComment, setNewComment] = React.useState("");
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const token = localStorage.getItem('token');
-
-    const fetchComments = () => {
-        const url = `http://localhost:5000/api/comics/${comicId}/comments${chapterId ? `?chapterId=${chapterId}` : ''}`;
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setComments(data);
-            })
-            .catch(console.error);
-    };
-
-    React.useEffect(() => {
-        if (comicId) fetchComments();
-    }, [comicId, chapterId]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
-        if (!token) return alert('Vui lòng đăng nhập để bình luận');
-        
-        setIsSubmitting(true);
-        try {
-            const res = await fetch(`http://localhost:5000/api/comics/${comicId}/comments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ content: newComment, chapterId })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setNewComment("");
-                fetchComments(); // Reload comments
-            } else {
-                alert(data.message || 'Lỗi khi gửi bình luận');
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    return (
-        <div className="container" style={{ marginTop: '1rem', paddingBottom: '3rem' }}>
-            <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Bình luận</h3>
-            <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
-                {token ? (
-                    <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-                        <textarea 
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Nhập bình luận của bạn..."
-                            style={{ 
-                                width: '100%', minHeight: '80px', padding: '1rem', 
-                                borderRadius: '0.5rem', background: 'var(--bg-primary)', 
-                                border: '1px solid var(--border)', color: 'var(--text-primary)',
-                                marginBottom: '1rem',
-                                resize: 'vertical',
-                                outline: 'none'
-                            }}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()}>
-                                {isSubmitting ? 'Đang gửi...' : 'Gửi bình luận'}
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <div style={{ padding: '1rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '0.5rem', marginBottom: '2rem', border: '1px solid var(--border)' }}>
-                        <p style={{ color: 'var(--text-secondary)' }}>Vui lòng <Link to="/auth" style={{ color: '#eab308', textDecoration: 'none' }}>đăng nhập</Link> để tham gia bình luận.</p>
-                    </div>
-                )}
-
-                <div className="comments-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {comments.length > 0 ? comments.map(c => (
-                        <div key={c._id} style={{ padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '0.75rem', border: '1px solid var(--border)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                    {c.user_id?.avatar ? (
-                                        <img src={c.user_id.avatar} alt="avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                                            {c.user_id?.username ? c.user_id.username.charAt(0).toUpperCase() : 'U'}
-                                        </div>
-                                    )}
-                                    <strong style={{ color: '#eab308', fontSize: '1.1rem' }}>{c.user_id?.username || 'Người dùng ẩn danh'}</strong>
-                                </div>
-                                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                    {new Date(c.created_at).toLocaleString('vi-VN')}
-                                </span>
-                            </div>
-                            <p style={{ margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{c.content}</p>
-                        </div>
-                    )) : (
-                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0' }}>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-                    )}
                 </div>
             </div>
         </div>

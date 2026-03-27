@@ -4,7 +4,8 @@ import { Star, Eye, Clock, Filter, ChevronDown, ChevronLeft, ChevronRight, BookO
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
+import { comicService } from '../api/comicService';
 
 const LatestComicCard = ({ comic }) => {
     const timeAgo = (date) => {
@@ -89,12 +90,7 @@ const LatestPage = () => {
     const fetchLatestComics = async (page) => {
         setLoading(true);
         try {
-            let url = `http://localhost:5000/api/comics/latest?page=${page}&limit=18`;
-            if (selectedGenre) {
-                url += `&genre=${encodeURIComponent(selectedGenre)}`;
-            }
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await comicService.getLatest(page, 18, selectedGenre);
             setComics(data.comics || []);
             if (data.genres) setGenres(data.genres);
             if (data.pagination) setPagination(data.pagination);

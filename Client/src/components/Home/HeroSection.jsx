@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Eye, Star } from 'lucide-react';
-import LazyImage from '../LazyImage';
+import LazyImage from '../ui/LazyImage';
 
 const HeroSection = ({ featuredComics }) => {
     const [currentIndex, setCurrentIndex] = useState(0);

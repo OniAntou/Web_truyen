@@ -2,7 +2,10 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
-import ComicInfo, { ChapterList, CommentSection } from '../components/Comic/ComicInfo';
+import ComicInfo from '../components/Comic/ComicInfo';
+import ChapterList from '../components/Comic/ChapterList';
+import CommentSection from '../components/Comic/CommentSection';
+import { comicService } from '../api/comicService';
 
 const ComicInfoPage = () => {
     const { id } = useParams();
@@ -12,11 +15,7 @@ const ComicInfoPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
 
-        fetch(`http://localhost:5000/api/comics/${id}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Comic not found');
-                return res.json();
-            })
+        comicService.getById(id)
             .then(data => {
                 setComic(data);
                 setLoading(false);

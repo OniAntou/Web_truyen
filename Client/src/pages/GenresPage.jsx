@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye, BookOpen, Search, X, Layers } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
+import { comicService } from '../api/comicService';
 
 const GenreCard = ({ genre, isSelected, onClick }) => {
     return (
@@ -82,41 +83,42 @@ const SkeletonCard = () => (
 const GenresPage = () => {
     const [genres, setGenres] = useState([]);
     const [comics, setComics] = useState([]);
-    const [selectedGenre, setSelectedGenre] = useState(null);
     const [loading, setLoading] = useState(true);
     const [comicsLoading, setComicsLoading] = useState(false);
+    const [selectedGenre, setSelectedGenre] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/genres')
-            .then(res => res.json())
-            .then(data => {
-                setGenres(data.genres || []);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Error fetching genres:', err);
-                setLoading(false);
-            });
+        fetchGenres();
     }, []);
 
     useEffect(() => {
-        if (!selectedGenre) {
-            setComics([]);
-            return;
-        }
-        setComicsLoading(true);
-        fetch(`http://localhost:5000/api/genres?genre=${encodeURIComponent(selectedGenre)}`)
-            .then(res => res.json())
-            .then(data => {
-                setComics(data.comics || []);
-                setComicsLoading(false);
-            })
-            .catch(err => {
-                console.error('Error fetching genre comics:', err);
-                setComicsLoading(false);
-            });
+        fetchComicsByGenre();
     }, [selectedGenre]);
+
+    const fetchGenres = async () => {
+        setLoading(true);
+        try {
+            const data = await comicService.getGenres();
+            setGenres(data.genres || []);
+        } catch (error) {
+            console.error('Error fetching genres:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchComicsByGenre = async () => {
+        setLoadingComics(true);
+        try {
+            const data = await comicService.getAll(selectedGenre === 'All' ? '' : selectedGenre);
+            setComics(data.comics || []);
+        } catch (error) {
+            console.error('Error fetching comics:', error);
+        } finally {
+            setLoadingComics(false);
+        }
+    };
 
     const filteredGenres = genres.filter(g =>
         g.name.toLowerCase().includes(searchQuery.toLowerCase())

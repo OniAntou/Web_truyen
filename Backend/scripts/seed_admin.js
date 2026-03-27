@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Admin } = require('../Database/database'); // Adjust path as needed
+const { AdminLogin } = require('../../Database/database'); // Adjust path as needed
 
 const dbURI = 'mongodb://localhost:27017/skycomic';
 
@@ -8,11 +8,11 @@ mongoose.connect(dbURI)
         console.log('✅ Connected to MongoDB');
 
         // Check if admin exists
-        const existing = await Admin.findOne({ username: 'admin' });
+        const existing = await AdminLogin.findOne({ username: 'admin' });
         if (existing) {
             console.log('Admin user already exists.');
         } else {
-            const newAdmin = new Admin({
+            const newAdmin = new AdminLogin({
                 username: 'admin',
                 password: '123' // Plain text as requested/implemented for now
             });

@@ -3,9 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import ReaderControls from '../components/Reader/ReaderControls';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
 import Footer from '../components/Layout/Footer';
-import { CommentSection } from '../components/Comic/ComicInfo';
+import CommentSection from '../components/Comic/CommentSection';
+import { comicService } from '../api/comicService';
+import { chapterService } from '../api/chapterService';
 
 const ReadPage = () => {
     const { comicId, chapterId } = useParams();
@@ -22,19 +24,14 @@ const ReadPage = () => {
         setLoading(true);
         setError(null);
 
-        fetch(`http://localhost:5000/api/comics/${comicId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Comic not found');
-                return res.json();
-            })
+        comicService.getById(comicId)
             .then(data => {
                 setComic(data);
                 if (data.chapters) {
                     const found = data.chapters.find(c => c._id === chapterId || c.id === chapterId);
                     if (found) {
                         // Fetch pages specifically for this chapter
-                        fetch(`http://localhost:5000/api/chapters/${found._id}/pages`)
-                            .then(res => res.json())
+                        chapterService.getPages(found._id)
                             .then(pages => {
                                 setChapter({ ...found, pages });
                                 setLoading(false);
@@ -106,17 +103,7 @@ const ReadPage = () => {
         
         try {
             console.log('Updating reading progress:', { chapter_id: chapter._id, page_number: pageNum });
-            await fetch(`http://localhost:5000/api/comics/${comicId}/reading-progress`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    chapter_id: chapter._id,
-                    page_number: pageNum
-                })
-            });
+            await comicService.updateReadingProgress(comicId, chapter._id, pageNum, token);
             console.log('Reading progress updated successfully');
         } catch (err) {
             console.error('Error updating reading progress:', err);
@@ -147,10 +134,7 @@ const ReadPage = () => {
         const token = localStorage.getItem('token');
         if (token && comicId && viewedRef.current !== comicId) {
             viewedRef.current = comicId;
-            fetch(`http://localhost:5000/api/comics/${comicId}/view`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            }).catch(console.error);
+            comicService.updateView(comicId, token).catch(console.error);
         }
     }, [comicId]);
 

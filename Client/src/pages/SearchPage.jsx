@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import ComicGrid from '../components/Home/ComicGrid';
+import { comicService } from '../api/comicService';
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
@@ -22,8 +23,7 @@ const SearchPage = () => {
     const fetchSearchResults = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/comics?q=${encodeURIComponent(query)}`);
-            const data = await response.json();
+            const data = await comicService.getAll(query);
             setComics(data);
         } catch (error) {
             console.error('Error fetching search results:', error);

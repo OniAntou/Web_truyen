@@ -4,7 +4,8 @@ import { Star, Eye, TrendingUp, Filter, ChevronDown, Flame } from 'lucide-react'
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { formatViews } from '../utils/format';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
+import { comicService } from '../api/comicService';
 
 const PopularComicCard = ({ comic }) => {
     return (
@@ -63,12 +64,7 @@ const PopularPage = () => {
     const fetchPopularComics = async () => {
         setLoading(true);
         try {
-            let url = `http://localhost:5000/api/comics/popular?sort=${sortBy}`;
-            if (selectedGenre) {
-                url += `&genre=${encodeURIComponent(selectedGenre)}`;
-            }
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await comicService.getPopular(sortBy, selectedGenre);
             setComics(data.comics || []);
             if (data.genres) setGenres(data.genres);
         } catch (error) {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Layout/Navbar";
 import Footer from "../components/Layout/Footer";
+import { authService } from "../api/authService";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,20 +19,15 @@ const AuthPage = () => {
     setError("");
     setLoading(true);
     try {
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-      const body = isLogin ? { email, password } : { username, email, password };
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Đã xảy ra lỗi");
+      const data = isLogin 
+        ? await authService.login(email, password)
+        : await authService.register(username, email, password);
+        
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || err);
     } finally {
       setLoading(false);
     }

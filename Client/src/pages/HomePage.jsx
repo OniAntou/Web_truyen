@@ -5,7 +5,8 @@ import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
+import { comicService } from '../api/comicService';
 
 const HomePage = () => {
     const [comics, setComics] = useState([]);
@@ -32,8 +33,8 @@ const HomePage = () => {
     useEffect(() => {
         // Fetch all comics and trending comics concurrently
         Promise.all([
-            fetch('http://localhost:5000/api/comics').then(res => res.json()),
-            fetch('http://localhost:5000/api/comics/trending?limit=10').then(res => res.json())
+            comicService.getAll(),
+            comicService.getTrending(10)
         ])
         .then(([comicsData, trendingData]) => {
             setComics(Array.isArray(comicsData) ? comicsData : []);
@@ -48,8 +49,7 @@ const HomePage = () => {
         });
 
         // Test connection (Console only)
-        fetch('http://localhost:5000/api/test')
-            .then(res => res.json())
+        comicService.testConnection()
             .then(data => console.log('Backend connected:', data))
             .catch(err => console.error('Failed to connect to server:', err));
     }, []);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye } from 'lucide-react';
 import { formatViews } from '../../utils/format';
-import LazyImage from '../LazyImage';
+import LazyImage from '../ui/LazyImage';
 
 const ComicCard = ({ comic }) => {
     return (

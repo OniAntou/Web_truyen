@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, BookOpen, Clock, Edit, Eye, Star, LogOut, Home, LayoutDashboard, Trash2 } from 'lucide-react';
-import LazyImage from '../components/LazyImage';
+import LazyImage from '../components/ui/LazyImage';
 
 const CreatorStudio = () => {
     const [comics, setComics] = useState([]);

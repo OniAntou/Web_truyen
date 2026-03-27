@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { comicService } from "../../api/comicService";
 
 const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext }) => {
   const [showChapters, setShowChapters] = useState(false);
@@ -14,10 +15,7 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
   // Fetch chapter read status when modal opens
   useEffect(() => {
     if (showChapters && token && comicId && chapters) {
-      fetch(`http://localhost:5000/api/comics/${comicId}/chapters/read-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => res.json())
+      comicService.getChaptersReadStatus(comicId, token)
       .then(data => {
         setChaptersWithStatus(data);
         setLoadingStatus(false);

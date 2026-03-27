@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, User, Star, Sun, Moon, Trash2 } from 'lucide-react';
-import LazyImage from '../LazyImage';
+import LazyImage from '../ui/LazyImage';
+import { comicService } from '../../api/comicService';
+import { userService } from '../../api/userService';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -39,19 +41,13 @@ const Navbar = () => {
     const handleDeleteAccount = async () => {
         if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác.")) {
             try {
-                const res = await fetch(`http://localhost:5000/api/users/me`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert(data.message || 'Xóa tài khoản thành công!');
-                    handleLogout();
-                } else {
-                    alert(data.message || 'Lỗi khi xóa tài khoản');
-                }
+                const token = localStorage.getItem('token');
+                const data = await userService.deleteAccount(token);
+                alert(data.message || 'Xóa tài khoản thành công!');
+                handleLogout();
             } catch (err) {
                 console.error("Lỗi:", err);
+                alert(err || 'Lỗi khi xóa tài khoản');
             }
         }
     };
@@ -98,8 +94,7 @@ const Navbar = () => {
         debounceRef.current = setTimeout(async () => {
             setSearching(true);
             try {
-                const res = await fetch(`http://localhost:5000/api/comics?q=${encodeURIComponent(value)}`);
-                const data = await res.json();
+                const data = await comicService.getAll(value);
                 setSearchResults(data.slice(0, 5));
                 setShowDropdown(true);
             } catch (err) {

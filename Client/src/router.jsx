@@ -7,8 +7,8 @@ import PopularPage from './pages/PopularPage';
 import GenresPage from './pages/GenresPage';
 import LatestPage from './pages/LatestPage';
 import AuthPage from './pages/AuthPage';
-import FollowingPage from './pages/FollowingPage';
-import ProfilePage from './pages/ProfilePage';
+import FollowingPage from './pages/user/FollowingPage';
+import ProfilePage from './pages/user/ProfilePage';
 import CreatorApplication from './pages/CreatorApplication';
 import CreatorStudio from './pages/CreatorStudio';
 
@@ -20,8 +20,8 @@ import ChapterManager from './pages/admin/ChapterManager';
 import AdminLogin from './pages/admin/AdminLogin';
 import ApplicationManager from './pages/admin/ApplicationManager';
 
-import ProtectedAdminRoute from './components/ProtectedAdminRoute';
-import ProtectedCreatorRoute from './components/ProtectedCreatorRoute';
+import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute';
+import ProtectedCreatorRoute from './components/auth/ProtectedCreatorRoute';
 
 export const router = createBrowserRouter([
     {

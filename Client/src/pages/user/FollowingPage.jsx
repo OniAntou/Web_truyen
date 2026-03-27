@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
-import ComicGrid from '../components/Home/ComicGrid';
+import Navbar from '../../components/Layout/Navbar';
+import Footer from '../../components/Layout/Footer';
+import ComicGrid from '../../components/Home/ComicGrid';
 import { BookMarked } from 'lucide-react';
 
 const FollowingPage = () => {

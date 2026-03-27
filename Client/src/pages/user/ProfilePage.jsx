@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+import Navbar from '../../components/Layout/Navbar';
+import Footer from '../../components/Layout/Footer';
 import { User, Mail, Calendar, Shield } from 'lucide-react';
 
 const ProfilePage = () => {
