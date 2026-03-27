@@ -7,3 +7,12 @@ export const formatViews = (num) => {
   if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
   return num.toString();
 };
+
+export const translateStatus = (status) => {
+  const map = {
+    'Ongoing': 'Đang tiến hành',
+    'Completed': 'Hoàn thành',
+    'Hiatus': 'Tạm ngưng',
+  };
+  return map[status] || status;
+};

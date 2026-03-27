@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, BookOpen, Clock, Edit, Eye, Star, LogOut, Home, LayoutDashboard, Trash2 } from 'lucide-react';
 import LazyImage from '../components/ui/LazyImage';
+import { API_BASE_URL } from '../constants/api';
 
 const CreatorStudio = () => {
     const [comics, setComics] = useState([]);
@@ -17,7 +18,7 @@ const CreatorStudio = () => {
         }
 
         // Add a check in a real app to ensure role === 'creator' from context
-        fetch('http://localhost:5000/api/studio/comics', {
+        fetch(`${API_BASE_URL}/studio/comics`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -47,7 +48,7 @@ const CreatorStudio = () => {
         
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:5000/api/comics/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

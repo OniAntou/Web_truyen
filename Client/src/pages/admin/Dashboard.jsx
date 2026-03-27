@@ -1,5 +1,6 @@
 import React from 'react';
 import { Library, Eye, Activity, Users } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
 
 const StatCard = ({ title, value, icon: Icon, color, subtext }) => (
     <div className="bg-zinc-900/30 p-6 rounded-[2rem] border border-white/5 hover:bg-zinc-900/50 transition-all duration-300 hover:-translate-y-1 shadow-2xl relative overflow-hidden group backdrop-blur-2xl">
@@ -23,7 +24,7 @@ const Dashboard = () => {
     const [systemStatus, setSystemStatus] = React.useState('Checking...');
 
     React.useEffect(() => {
-        fetch('http://localhost:5000/api/stats')
+        fetch(`${API_BASE_URL}/stats`)
             .then(res => res.json())
             .then(data => {
                 setStats(data);

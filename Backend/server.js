@@ -16,6 +16,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,6 +54,9 @@ app.use('/api/applications', applicationRoutes);
 // Some routes in interactionRoutes were originally at /api/users/
 // I'll add redirect or mirror them here if needed, but it's better to update frontend if possible.
 // However, the task is to refactor, so I should try to keep the API contract.
+
+// Centralized Error Handler (must be last middleware)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} (REFACTORED)`);

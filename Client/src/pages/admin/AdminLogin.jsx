@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, BookOpen } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
 
 const AdminLogin = () => {
 
@@ -30,7 +31,7 @@ const AdminLogin = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/admin/login', {
+            const response = await fetch(`${API_BASE_URL}/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),

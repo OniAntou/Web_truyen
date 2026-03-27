@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
 import { User, Mail, Calendar, Shield } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
@@ -17,20 +18,29 @@ const ProfilePage = () => {
             return;
         }
 
-        fetch('http://localhost:5000/api/users/me', {
+        fetch(`${API_BASE_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => {
+            if (res.status === 401 || res.status === 403) {
+                // Token is invalid or expired — clear and redirect
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/auth');
+                return null;
+            }
             if (!res.ok) throw new Error('Không thể tải thông tin user');
             return res.json();
         })
         .then(data => {
-            setProfile(data);
-            setLoading(false);
+            if (data) {
+                setProfile(data);
+                setLoading(false);
+            }
         })
         .catch(err => {
-            console.error(err);
-            navigate('/auth');
+            console.error('ProfilePage error:', err);
+            setLoading(false);
         });
     }, [navigate]);
 

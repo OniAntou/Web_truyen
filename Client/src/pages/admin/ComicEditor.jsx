@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../../constants/api';
 
 const ComicEditor = () => {
     const { id } = useParams();
@@ -20,7 +21,7 @@ const ComicEditor = () => {
 
     const fetchComic = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/comics/${id}`);
+            const response = await fetch(`${API_BASE_URL}/comics/${id}`);
             const data = await response.json();
             setFormData({
                 ...data,
@@ -67,8 +68,8 @@ const ComicEditor = () => {
         try {
             // 1. Create or Update Comic first
             const url = isEditing
-                ? `http://localhost:5000/api/comics/${id}`
-                : 'http://localhost:5000/api/comics';
+                ? `${API_BASE_URL}/comics/${id}`
+                : `${API_BASE_URL}/comics`;
             const method = isEditing ? 'PUT' : 'POST';
 
             const token = localStorage.getItem('token');
@@ -101,7 +102,7 @@ const ComicEditor = () => {
                 const uploadFormData = new FormData();
                 uploadFormData.append('cover', coverFile);
 
-                const uploadResponse = await fetch(`http://localhost:5000/api/upload/cover/${comicIdToUpload}`, {
+                const uploadResponse = await fetch(`${API_BASE_URL}/upload/cover/${comicIdToUpload}`, {
                     method: 'POST',
                     body: uploadFormData
                 });

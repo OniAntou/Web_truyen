@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
+import { API_BASE_URL } from '../constants/api';
 
 const CreatorApplication = () => {
     const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const CreatorApplication = () => {
         setError('');
 
         try {
-            const res = await fetch('http://localhost:5000/api/applications', {
+            const res = await fetch(`${API_BASE_URL}/applications`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

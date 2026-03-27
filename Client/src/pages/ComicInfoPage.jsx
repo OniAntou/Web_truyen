@@ -27,11 +27,11 @@ const ComicInfoPage = () => {
     }, [id]);
 
     if (loading) {
-        return <div style={{ paddingTop: '8rem', textAlign: 'center' }}>Loading...</div>;
+        return <div style={{ paddingTop: '8rem', textAlign: 'center' }}>Đang tải...</div>;
     }
 
     if (!comic) {
-        return <div style={{ paddingTop: '8rem', textAlign: 'center' }}>Comic not found</div>;
+        return <div style={{ paddingTop: '8rem', textAlign: 'center' }}>Không tìm thấy truyện</div>;
     }
 
     return (

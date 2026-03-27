@@ -4,6 +4,7 @@ import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
 import ComicGrid from '../../components/Home/ComicGrid';
 import { BookMarked } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
 
 const FollowingPage = () => {
     const [comics, setComics] = useState([]);
@@ -20,7 +21,7 @@ const FollowingPage = () => {
             return;
         }
 
-        fetch('http://localhost:5000/api/users/favorites', {
+        fetch(`${API_BASE_URL}/users/favorites`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => {

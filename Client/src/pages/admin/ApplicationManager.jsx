@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserCheck, UserX, Clock, Search, ExternalLink, HelpCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
 
 const ApplicationManager = () => {
     const [applications, setApplications] = useState([]);
@@ -7,7 +8,7 @@ const ApplicationManager = () => {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        fetch('http://localhost:5000/api/admin/applications')
+        fetch(`${API_BASE_URL}/admin/applications`)
             .then(res => res.json())
             .then(data => {
                 const formatted = data.map(app => ({
@@ -30,7 +31,7 @@ const ApplicationManager = () => {
 
     const handleApprove = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/applications/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/admin/applications/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'approved' })
@@ -45,7 +46,7 @@ const ApplicationManager = () => {
 
     const handleReject = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/applications/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/admin/applications/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'rejected' })

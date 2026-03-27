@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, List, Search } from 'lucide-react';
+import { API_BASE_URL } from '../../constants/api';
+import { translateStatus } from '../../utils/format';
 
 const ComicList = () => {
     const [comics, setComics] = useState([]);
@@ -9,7 +11,7 @@ const ComicList = () => {
 
     const fetchComics = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/comics');
+            const response = await fetch(`${API_BASE_URL}/comics`);
             const data = await response.json();
             setComics(data);
             setLoading(false);
@@ -27,7 +29,7 @@ const ComicList = () => {
         if (!window.confirm('Are you sure you want to delete this comic?')) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/comics/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
             });
             if (response.ok) {
@@ -117,7 +119,7 @@ const ComicList = () => {
                                                 comic.status === 'Completed' ? 'bg-white/5 text-blue-400 border-blue-500/20' :
                                                     'bg-white/5 text-zinc-400 border-white/10'
                                             }`}>
-                                            {comic.status}
+                                            {translateStatus(comic.status)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-5 text-right">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Eye, Star } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
+import { translateStatus } from '../../utils/format';
 
 const HeroSection = ({ featuredComics }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -70,7 +71,7 @@ const HeroSection = ({ featuredComics }) => {
                     <div className="flex flex-wrap items-center gap-4 text-xs font-semibold tracking-wider uppercase mb-8" style={{ color: 'var(--text-secondary)' }}>
                         <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full" style={{ background: currentComic.status === 'Ongoing' ? '#22c55e' : '#a8a29e' }}></span>
-                            {currentComic.status || 'Ongoing'}
+                            {translateStatus(currentComic.status || 'Ongoing')}
                         </span>
                         <span className="opacity-30">•</span>
                         <span>{currentComic.author || 'Đang cập nhật'}</span>

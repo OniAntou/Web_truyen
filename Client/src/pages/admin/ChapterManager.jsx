@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { API_BASE_URL } from '../../constants/api';
 
 // ─── Reusable ImagePreviewGrid with drag-and-drop reorder ───
 const ImagePreviewGrid = ({ images, setImages, showRemove = true, onRemove }) => {
@@ -201,7 +202,7 @@ const ChapterManager = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/comics/${id}`);
+            const response = await fetch(`${API_BASE_URL}/comics/${id}`);
             const data = await response.json();
             setChapters(data.chapters || []);
             setComicTitle(data.title);
@@ -237,7 +238,7 @@ const ChapterManager = () => {
         e.preventDefault();
         try {
             // 1. Get Comic ID (ensure MongoDB _id)
-            const comicRes = await fetch(`http://localhost:5000/api/comics/${id}`);
+            const comicRes = await fetch(`${API_BASE_URL}/comics/${id}`);
             const comicData = await comicRes.json();
 
             const payload = {
@@ -248,7 +249,7 @@ const ChapterManager = () => {
             };
 
             // 2. Create Chapter
-            const response = await fetch('http://localhost:5000/api/chapters', {
+            const response = await fetch(`${API_BASE_URL}/chapters`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -289,7 +290,7 @@ const ChapterManager = () => {
                 formData.append('pages', fileList[i]);
             }
 
-            const res = await fetch(`http://localhost:5000/api/upload/chapter/${chapterId}`, {
+            const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
                 method: 'POST',
                 body: formData
             });
@@ -307,7 +308,7 @@ const ChapterManager = () => {
     const handleDelete = async (chapterId) => {
         if (!confirm('Delete this chapter?')) return;
         try {
-            const response = await fetch(`http://localhost:5000/api/chapters/${chapterId}`, {
+            const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
                 method: 'DELETE',
             });
             if (response.ok) {
@@ -328,7 +329,7 @@ const ChapterManager = () => {
         if (!confirm(`Delete ${selectedChapters.size} chapters?`)) return;
 
         try {
-            const response = await fetch('http://localhost:5000/api/chapters/bulk-delete', {
+            const response = await fetch(`${API_BASE_URL}/chapters/bulk-delete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chapterIds: Array.from(selectedChapters) })
@@ -381,7 +382,7 @@ const ChapterManager = () => {
         setReorderLoading(true);
         setReorderModalOpen(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/chapters/${chapterId}/pages`);
+            const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`);
             const pages = await res.json();
             setReorderPages(pages.map(p => ({
                 _id: p._id,
@@ -405,7 +406,7 @@ const ChapterManager = () => {
                 pageId: p._id,
                 page_number: idx + 1,
             }));
-            const res = await fetch(`http://localhost:5000/api/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
+            const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ order }),
@@ -440,7 +441,7 @@ const ChapterManager = () => {
         if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn trang ${idx + 1} này không?\nHành động này sẽ xóa file gốc trên Cloudflare R2 và không thể hoàn tác.`)) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/api/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
+            const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
                 method: 'DELETE'
             });
             if (res.ok) {

@@ -38,7 +38,7 @@ const ChapterList = ({ chapters, comicId }) => {
 
     return (
         <div className="container" style={{ marginTop: '3rem', paddingBottom: '2rem' }}>
-            <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Chapters</h3>
+            <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Danh Sách Chương</h3>
             <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
                 <div className="chapter-list-grid">
                     {chapters.map(chapter => {

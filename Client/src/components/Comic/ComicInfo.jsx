@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
-import { formatViews } from '../../utils/format';
+import { formatViews, translateStatus } from '../../utils/format';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 
@@ -123,9 +123,9 @@ const ComicInfo = ({ comic }) => {
                             <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>{Number(avgRating).toFixed(1)}</span>
                         </span>
                         <span className="flex items-center gap-4" style={{ color: '#22c55e' }}>
-                            {comic.status}
+                            {translateStatus(comic.status)}
                         </span>
-                        <span>{formatViews(comic.views)} views</span>
+                        <span>{formatViews(comic.views)} lượt xem</span>
                     </div>
 
                     <p className="info-desc">{comic.description}</p>
@@ -148,12 +148,12 @@ const ComicInfo = ({ comic }) => {
                             onClick={(e) => {
                                 if (!comic.chapters || comic.chapters.length === 0) {
                                     e.preventDefault();
-                                    alert('No chapters available');
+                                    alert('Chưa có chương nào');
                                 }
                             }}
                         >
                             <BookOpen size={20} />
-                            Read First Chapter
+                            Đọc Từ Đầu
                         </Link>
 
                         {readingProgress && !loadingProgress && (
@@ -163,12 +163,12 @@ const ComicInfo = ({ comic }) => {
                                 style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none' }}
                             >
                                 <BookOpen size={20} />
-                                Continue Reading - Chapter {readingProgress.chapter_number}
+                                Đọc Tiếp - Chương {readingProgress.chapter_number}
                             </Link>
                         )}
                         <button className="btn btn-glass" onClick={handleFavorite} style={{ color: isFavorited ? '#ef4444' : 'inherit' }}>
                             <Heart size={20} fill={isFavorited ? "#ef4444" : "none"} color={isFavorited ? "#ef4444" : "currentColor"} />
-                            {isFavorited ? "Đã thích" : "Favorite"}
+                            {isFavorited ? "Đã thích" : "Yêu thích"}
                         </button>
                         <button className="btn btn-glass">
                             <Share2 size={20} />
