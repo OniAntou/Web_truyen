@@ -8,7 +8,7 @@ const ApplicationManager = () => {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        fetch(`${API_BASE_URL}/admin/applications`)
+        fetch(`${API_BASE_URL}/applications/admin`)
             .then(res => res.json())
             .then(data => {
                 const formatted = data.map(app => ({
@@ -31,7 +31,7 @@ const ApplicationManager = () => {
 
     const handleApprove = async (id) => {
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/applications/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'approved' })
@@ -46,7 +46,7 @@ const ApplicationManager = () => {
 
     const handleReject = async (id) => {
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/applications/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'rejected' })

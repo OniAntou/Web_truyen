@@ -16,6 +16,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -46,9 +47,10 @@ app.use('/api/comics', interactionRoutes); // Mounting same prefix to include in
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/genres', genreRoutes);
 app.use('/api/studio', studioRoutes);
-app.use('/api', uploadRoutes); 
+app.use('/api/upload', uploadRoutes); 
 app.use('/api/stats', statsRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Compatibility / Special cases
 // Some routes in interactionRoutes were originally at /api/users/

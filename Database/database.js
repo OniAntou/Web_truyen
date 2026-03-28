@@ -97,6 +97,7 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     avatar: { type: String, default: "" },
     role: { type: String, enum: ['user', 'creator', 'admin'], default: 'user' },
+    coins: { type: Number, default: 0 },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },
@@ -204,4 +205,22 @@ ReadingProgressSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const ReadingProgress = mongoose.model("ReadingProgress", ReadingProgressSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress };
+// 9. Payment Collection - Track VNPay transactions
+const PaymentSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    amount: { type: Number, required: true },
+    description: { type: String },
+    order_id: { type: String, required: true, unique: true }, // vnp_TxnRef
+    vnp_transaction_no: { type: String }, // vnp_TransactionNo
+    status: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
+    vnp_response_code: { type: String },
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now }
+  },
+  { collection: "payments" }
+);
+
+const Payment = mongoose.model("Payment", PaymentSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment };

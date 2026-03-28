@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
-import { User, Mail, Calendar, Shield } from 'lucide-react';
+import { User, Mail, Calendar, Shield, Coins, Plus } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 
 const ProfilePage = () => {
@@ -93,6 +93,25 @@ const ProfilePage = () => {
                             <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                 {new Date(profile.created_at).toLocaleDateString('vi-VN')}
                             </div>
+                        </div>
+
+                        {/* Balance Section */}
+                        <div style={{ padding: '1.5rem', background: 'var(--bg-primary)', borderRadius: '0.75rem', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gridColumn: '1 / -1' }}>
+                            <div>
+                                <div style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <Coins size={18} /> Số dư Linh Thạch
+                                </div>
+                                <div style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.5rem' }}>
+                                    {profile.coins?.toLocaleString() || 0}
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => navigate('/payment/topup')}
+                                className="nav-button accent"
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', height: 'auto' }}
+                            >
+                                <Plus size={18} /> Nạp Linh Thạch
+                            </button>
                         </div>
                     </div>
                 </div>

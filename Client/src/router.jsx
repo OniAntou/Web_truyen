@@ -11,6 +11,8 @@ import FollowingPage from './pages/user/FollowingPage';
 import ProfilePage from './pages/user/ProfilePage';
 import CreatorApplication from './pages/CreatorApplication';
 import CreatorStudio from './pages/CreatorStudio';
+import TopUpPage from './pages/user/TopUpPage';
+import PaymentReturnPage from './pages/user/PaymentReturnPage';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -63,6 +65,14 @@ export const router = createBrowserRouter([
     {
         path: '/profile',
         element: <ProfilePage />,
+    },
+    {
+        path: '/payment/topup',
+        element: <TopUpPage />,
+    },
+    {
+        path: '/payment/vnpay_return',
+        element: <PaymentReturnPage />,
     },
     {
         path: '/become-creator',
