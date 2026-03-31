@@ -338,13 +338,14 @@ const ReadPage = () => {
             <div className="reader-container reader-container-spacing">
                 {pages.length > 0 ? (
                     pages.map((page, index) => (
-                        <div key={index}>
-                            <LazyImage
-                                src={page.image_url}
-                                alt={`Page ${index + 1}`}
-                                className="reader-page-img"
-                            />
-                        </div>
+                        <LazyImage
+                            key={index}
+                            src={page.image_url}
+                            alt={`Page ${index + 1}`}
+                            className="reader-page-img"
+                            aspectRatio={2 / 3}
+                            releaseAspectRatioOnLoad
+                        />
                     ))
                 ) : (
                     <div style={{ padding: '4rem', textAlign: 'center', color: 'gray' }}>

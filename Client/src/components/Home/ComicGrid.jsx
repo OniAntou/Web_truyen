@@ -11,7 +11,7 @@ const ComicCard = ({ comic }) => {
                 <LazyImage
                     src={comic.cover_url || comic.cover}
                     alt={comic.title}
-                    className="w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
                 
                 {/* Floating Tag Badge */}

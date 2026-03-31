@@ -89,7 +89,7 @@ const HomePage = () => {
                                 {trending.slice(0, 7).map(c => (
                                     <Link key={c._id || c.id} to={`/p/${c.id || c._id}`} className="group shrink-0 w-28 md:w-36 flex flex-col gap-3">
                                         <div className="aspect-[2/3] w-full rounded-2xl overflow-hidden ring-1 ring-[var(--border)] relative bg-[var(--bg-primary)]">
-                                            <LazyImage src={c.cover_url || c.cover} className="w-full h-full object-cover transition-transform duration-500 group-hover:-translate-y-1" alt={c.title} />
+                                            <LazyImage src={c.cover_url || c.cover} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={c.title} />
                                             <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
                                         </div>
                                         <p className="font-semibold text-xs md:text-[0.9rem] line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>
