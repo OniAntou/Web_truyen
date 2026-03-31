@@ -62,7 +62,7 @@ const ComicEditor = () => {
         e.preventDefault();
         const payload = {
             ...formData,
-            genres: formData.genres.split(',').map(g => g.trim()).filter(g => g)
+            genres: (formData.genres || '').split(',').map(g => g.trim()).filter(g => g)
         };
 
         try {
@@ -104,6 +104,9 @@ const ComicEditor = () => {
 
                 const uploadResponse = await fetch(`${API_BASE_URL}/upload/cover/${comicIdToUpload}`, {
                     method: 'POST',
+                    headers: {
+                        ...(authHeader && { 'Authorization': authHeader })
+                    },
                     body: uploadFormData
                 });
 

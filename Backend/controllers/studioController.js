@@ -5,12 +5,11 @@ const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
 const getStudioComics = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user || user.role !== 'creator') {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
     throw new AppError("Bạn không có quyền truy cập Creator Studio.", 403);
   }
 
-  const comics = await Comic.find({ uploader_id: user._id }).sort({ created_at: -1 }).populate('genres', 'name slug');
+  const comics = await Comic.find({ uploader_id: req.user.id }).sort({ created_at: -1 }).populate('genres', 'name slug');
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
 

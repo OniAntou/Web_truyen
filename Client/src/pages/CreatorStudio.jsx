@@ -104,24 +104,26 @@ const CreatorStudio = () => {
             <main className="flex-1 overflow-y-auto bg-black relative">
                 <div className="container mx-auto px-10 pb-12 relative z-10 max-w-7xl animate-fade-in" style={{ paddingTop: '8rem' }}>
                     
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-                        <div>
-                            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-white mb-2">
-                                Comic <span className="font-bold">Library</span>
-                            </h1>
-                            <p className="text-zinc-400">Quản lý và cập nhật những tác phẩm do chính tay bạn sáng tác hoặc dịch thuật.</p>
-                        </div>
+                    {!error && (
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+                            <div>
+                                <h1 className="text-4xl md:text-5xl font-light tracking-tight text-white mb-2">
+                                    Comic <span className="font-bold">Library</span>
+                                </h1>
+                                <p className="text-zinc-400">Quản lý và cập nhật những tác phẩm do chính tay bạn sáng tác hoặc dịch thuật.</p>
+                            </div>
 
-                    <div className="shrink-0 flex gap-4">
-                        <Link 
-                            to="/studio/comics/new" // Ideally this routes to a creator-specific editor or we reuse the admin one
-                            className="px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-sm tracking-widest uppercase"
-                            style={{ background: 'var(--accent)', color: 'white' }}
-                        >
-                            <Plus size={18} /> Đăng Truyện Mới
-                        </Link>
+                        <div className="shrink-0 flex gap-4">
+                            <Link 
+                                to="/studio/comics/new" // Ideally this routes to a creator-specific editor or we reuse the admin one
+                                className="px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-sm tracking-widest uppercase"
+                                style={{ background: 'var(--accent)', color: 'white' }}
+                            >
+                                <Plus size={18} /> Đăng Truyện Mới
+                            </Link>
+                        </div>
                     </div>
-                </div>
+                    )}
 
                 {error ? (
                     <div className="p-12 text-center rounded-[2rem] border border-red-500/20 bg-red-500/10">

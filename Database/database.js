@@ -40,6 +40,8 @@ const ChapterSchema = new mongoose.Schema(
     chapter_number: Number,
     title: String,
     date: String, // For display strings like "2 days ago"
+    price: { type: Number, default: 0 },
+    early_access_end_date: { type: Date },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "chapter" },
@@ -95,9 +97,10 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    avatar: { type: String, default: "" },
     role: { type: String, enum: ['user', 'creator', 'admin'], default: 'user' },
     coins: { type: Number, default: 0 },
+    is_vip: { type: Boolean, default: false },
+    vip_expiry: { type: Date },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },
@@ -223,4 +226,19 @@ const PaymentSchema = new mongoose.Schema(
 
 const Payment = mongoose.model("Payment", PaymentSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment };
+// 10. ChapterUnlock Collection - Track early access purchases
+const ChapterUnlockSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: true },
+    price: { type: Number, required: true },
+    created_at: { type: Date, default: Date.now }
+  },
+  { collection: "chapter_unlocks" }
+);
+
+ChapterUnlockSchema.index({ user_id: 1, chapter_id: 1 }, { unique: true });
+
+const ChapterUnlock = mongoose.model("ChapterUnlock", ChapterUnlockSchema);
+
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment, ChapterUnlock };

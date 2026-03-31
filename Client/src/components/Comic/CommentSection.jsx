@@ -74,13 +74,9 @@ const CommentSection = ({ comicId, chapterId }) => {
                         <div key={c._id} style={{ padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '0.75rem', border: '1px solid var(--border)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                    {c.user_id?.avatar ? (
-                                        <img src={c.user_id.avatar} alt="avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>
                                             {c.user_id?.username ? c.user_id.username.charAt(0).toUpperCase() : 'U'}
-                                        </div>
-                                    )}
+                                    </div>
                                     <strong style={{ color: '#eab308', fontSize: '1.1rem' }}>{c.user_id?.username || 'Người dùng ẩn danh'}</strong>
                                 </div>
                                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>

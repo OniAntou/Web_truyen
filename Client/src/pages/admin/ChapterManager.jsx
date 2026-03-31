@@ -181,6 +181,8 @@ const ChapterManager = () => {
     const [newChapter, setNewChapter] = useState({
         chapter_number: '',
         title: '',
+        price: '',
+        early_access_end_date: ''
     });
     const [files, setFiles] = useState([]); // array of { file, preview }
     const [uploading, setUploading] = useState(false);
@@ -245,13 +247,19 @@ const ChapterManager = () => {
                 comic_id: comicData._id,
                 chapter_number: Number(newChapter.chapter_number),
                 title: newChapter.title || `Chapter ${newChapter.chapter_number}`,
+                price: Number(newChapter.price) || 0,
+                early_access_end_date: newChapter.early_access_end_date || null,
                 date: new Date().toISOString().split('T')[0]
             };
 
             // 2. Create Chapter
+            const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/chapters`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -267,7 +275,7 @@ const ChapterManager = () => {
 
                 // Cleanup previews
                 files.forEach(img => URL.revokeObjectURL(img.preview));
-                setNewChapter({ chapter_number: '', title: '' });
+                setNewChapter({ chapter_number: '', title: '', price: '', early_access_end_date: '' });
                 setFiles([]);
                 if (document.getElementById('new-chapter-files')) {
                     document.getElementById('new-chapter-files').value = '';
@@ -290,8 +298,12 @@ const ChapterManager = () => {
                 formData.append('pages', fileList[i]);
             }
 
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
 
@@ -308,8 +320,10 @@ const ChapterManager = () => {
     const handleDelete = async (chapterId) => {
         if (!confirm('Delete this chapter?')) return;
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
                 method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
                 setChapters(chapters.filter(c => c._id !== chapterId));
@@ -329,9 +343,13 @@ const ChapterManager = () => {
         if (!confirm(`Delete ${selectedChapters.size} chapters?`)) return;
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/chapters/bulk-delete`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify({ chapterIds: Array.from(selectedChapters) })
             });
 
@@ -406,9 +424,13 @@ const ChapterManager = () => {
                 pageId: p._id,
                 page_number: idx + 1,
             }));
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ order }),
             });
             if (res.ok) {
@@ -441,8 +463,10 @@ const ChapterManager = () => {
         if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn trang ${idx + 1} này không?\nHành động này sẽ xóa file gốc trên Cloudflare R2 và không thể hoàn tác.`)) return;
 
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
                 const updated = [...reorderPages];
@@ -485,7 +509,7 @@ const ChapterManager = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto mt-12 md:mt-16">
+        <div className="max-w-7xl w-[95%] lg:w-full mx-auto pb-20 mt-12 md:mt-16">
             {/* Preview Modal for new chapter images */}
             <PreviewModal
                 isOpen={previewModalOpen}
@@ -619,17 +643,54 @@ const ChapterManager = () => {
                                 className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-600 transition-all"
                             />
                         </div>
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Giá Mở Khóa (Xu)</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        value={newChapter.price}
+                                        onChange={(e) => setNewChapter({ ...newChapter, price: e.target.value })}
+                                        placeholder="Ví dụ: 10"
+                                        min="0"
+                                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-600 transition-all pr-12"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold pointer-events-none">Xu</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Thu Phí Đến Ngày</label>
+                                <input
+                                    type="date"
+                                    value={newChapter.early_access_end_date}
+                                    onChange={(e) => setNewChapter({ ...newChapter, early_access_end_date: e.target.value })}
+                                    className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none transition-all [color-scheme:dark]"
+                                />
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Pages (Images)</label>
-                            <input
-                                id="new-chapter-files"
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-zinc-300 text-sm focus:border-white/20 outline-none file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 transition-all cursor-pointer"
-                            />
-                            <p className="text-xs font-medium tracking-wide text-zinc-500 mt-2 ml-1">Chọn tải lên nhiều ảnh cùng lúc.</p>
+                            <label
+                                htmlFor="new-chapter-files"
+                                className="w-full flex items-center gap-4 bg-black/40 border-2 border-dashed border-white/10 hover:border-white/30 rounded-2xl p-2.5 text-zinc-400 text-sm transition-all cursor-pointer group"
+                            >
+                                <div className="bg-white group-hover:bg-zinc-200 text-black px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors shadow-sm">
+                                    Chọn Ảnh
+                                </div>
+                                <span className="font-medium truncate pr-2 text-xs">
+                                    {files.length > 0 ? `Đã chọn ${files.length} tập tin` : "Chưa có ảnh nào..."}
+                                </span>
+                                <input
+                                    id="new-chapter-files"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                />
+                            </label>
+                            <p className="text-[0.65rem] font-medium tracking-wide text-zinc-500 mt-2 ml-1">Tải lên hàng loạt ảnh truyện.</p>
                         </div>
 
                         {/* Preview button — opens popup */}
@@ -637,18 +698,18 @@ const ChapterManager = () => {
                             <button
                                 type="button"
                                 onClick={() => setPreviewModalOpen(true)}
-                                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors text-sm font-semibold tracking-wide"
+                                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors text-sm font-semibold tracking-wide"
                             >
-                                🖼️ Xem & sắp xếp {files.length} ảnh
+                                🖼️ Xem & Sắp xếp ({files.length} ảnh)
                             </button>
                         )}
 
                         <button
                             type="submit"
                             disabled={uploading}
-                            className={`w-full flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm py-4 rounded-2xl transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] mt-4 ${uploading
+                            className={`w-full flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm py-4 rounded-2xl transition-all mt-6 ${uploading
                                     ? 'bg-zinc-800 cursor-not-allowed text-zinc-500 shadow-none'
-                                    : 'bg-white hover:bg-zinc-200 text-black'
+                                    : 'bg-white hover:bg-zinc-200 text-black shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]'
                                 }`}
                         >
                             {uploading ? 'Processing...' : 'Add Chapter'}
@@ -657,67 +718,81 @@ const ChapterManager = () => {
                 </div>
 
                 {/* Chapter List */}
-                <div className="md:col-span-2 bg-zinc-900/30 rounded-[2rem] shadow-2xl border border-white/5 overflow-hidden backdrop-blur-2xl">
-                    <table className="w-full text-left">
-                        <thead className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.65rem] tracking-widest">
-                            <tr>
-                                <th className="px-6 py-5">
-                                    <input
-                                        type="checkbox"
-                                        checked={chapters.length > 0 && selectedChapters.size === chapters.length}
-                                        onChange={toggleSelectAll}
-                                        className="rounded border-white/10 bg-black/40 text-black focus:ring-white/20 accent-white"
-                                    />
-                                </th>
-                                <th className="px-6 py-5 font-bold">#</th>
-                                <th className="px-6 py-5 font-bold">Title</th>
-                                <th className="px-6 py-5 font-bold text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5 text-zinc-300">
-                            {chapters.map((chapter) => (
-                                <tr key={chapter._id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-                                    <td className="px-6 py-4">
+                <div className="md:col-span-2 bg-zinc-900/30 rounded-[2rem] shadow-2xl border border-white/5 overflow-hidden backdrop-blur-2xl flex flex-col">
+                    <div className="w-full">
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.65rem] tracking-widest leading-relaxed">
+                                <tr>
+                                    <th className="px-6 py-5 w-16">
                                         <input
                                             type="checkbox"
-                                            checked={selectedChapters.has(chapter._id)}
-                                            onChange={() => toggleSelect(chapter._id)}
+                                            checked={chapters.length > 0 && selectedChapters.size === chapters.length}
+                                            onChange={toggleSelectAll}
                                             className="rounded border-white/10 bg-black/40 text-black focus:ring-white/20 accent-white"
                                         />
-                                    </td>
-                                    <td className="px-6 py-4 font-semibold text-white tracking-wide">{chapter.chapter_number}</td>
-                                    <td className="px-6 py-4 text-sm font-medium">{chapter.title}</td>
-                                    <td className="px-6 py-4 text-right flex justify-end gap-2">
-                                        <button
-                                            onClick={() => handleReorderClick(chapter._id)}
-                                            className="text-zinc-400 hover:text-white border border-white/10 hover:border-white/30 hover:bg-white/10 rounded-xl px-3 py-1.5 text-xs transition-colors font-medium tracking-wide"
-                                        >
-                                            Quản lý ảnh
-                                        </button>
-                                        <button
-                                            onClick={() => handleUploadClick(chapter._id)}
-                                            className="text-zinc-400 hover:text-white border border-white/10 hover:border-white/30 hover:bg-white/10 rounded-xl px-3 py-1.5 text-xs transition-colors font-medium tracking-wide"
-                                        >
-                                            Upload
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(chapter._id)}
-                                            className="text-zinc-400 hover:text-red-400 border border-white/10 hover:border-red-500/30 hover:bg-red-500/10 rounded-xl px-3 py-1.5 text-xs transition-colors font-medium tracking-wide"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                                    </th>
+                                    <th className="px-6 py-5 font-bold w-20">#</th>
+                                    <th className="px-6 py-5 font-bold">Title</th>
+                                    <th className="px-6 py-5 font-bold">Fast Pass</th>
+                                    <th className="px-6 py-5 font-bold text-right">Action</th>
                                 </tr>
-                            ))}
-                            {chapters.length === 0 && (
-                                <tr>
-                                    <td colSpan="4" className="px-6 py-16 text-center text-zinc-500 text-sm tracking-wide">
-                                        No chapters found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5 text-zinc-300">
+                                {chapters.map((chapter) => (
+                                    <tr key={chapter._id} className="hover:bg-white/5 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedChapters.has(chapter._id)}
+                                                onChange={() => toggleSelect(chapter._id)}
+                                                className="rounded border-white/10 bg-black/40 text-black focus:ring-white/20 accent-white"
+                                            />
+                                        </td>
+                                        <td className="px-6 py-4 font-semibold text-white tracking-wide whitespace-nowrap">{chapter.chapter_number}</td>
+                                        <td className="px-6 py-4 text-sm font-medium pr-4">{chapter.title || `Chapter ${chapter.chapter_number}`}</td>
+                                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                                            {chapter.price > 0 && chapter.early_access_end_date && new Date(chapter.early_access_end_date) > new Date() ? (
+                                                <span className="bg-yellow-500/10 text-yellow-500 px-3 py-1.5 rounded-xl text-xs font-bold border border-yellow-500/20 whitespace-nowrap inline-flex items-center shadow-sm">
+                                                    {chapter.price} Xu — tới {new Date(chapter.early_access_end_date).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            ) : (
+                                                <span className="text-zinc-500 text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 inline-flex shadow-sm">Miễn phí</span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-2 text-right">
+                                                <button
+                                                    onClick={() => handleReorderClick(chapter._id)}
+                                                    className="text-zinc-400 hover:text-white border border-white/10 bg-black/20 hover:bg-white/10 rounded-xl px-3.5 py-2 text-xs transition-colors font-medium tracking-wide whitespace-nowrap shadow-sm"
+                                                >
+                                                    Quản lý ảnh
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUploadClick(chapter._id)}
+                                                    className="text-white bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/30 rounded-xl px-4 py-2 text-xs transition-colors font-semibold tracking-wide whitespace-nowrap shadow-sm"
+                                                >
+                                                    Upload
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(chapter._id)}
+                                                    className="text-red-400 hover:text-red-300 border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500/40 rounded-xl px-3.5 py-2 text-xs transition-colors font-medium tracking-wide whitespace-nowrap shadow-sm"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {chapters.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="px-6 py-20 text-center text-zinc-500 text-sm tracking-wide">
+                                            No chapters found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

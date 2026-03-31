@@ -96,8 +96,60 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.json({ message: "Đã xoá user và hoàn tác các lượt view/rating liên quan" });
 });
 
+const upgradeVip = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) throw new AppError("User không tồn tại", 404);
+
+  const VIP_PRICE = 50000;
+  if (user.coins < VIP_PRICE) {
+    throw new AppError("Bạn không đủ Coins để nâng cấp VIP.", 400);
+  }
+
+  user.coins -= VIP_PRICE;
+  user.is_vip = true;
+
+  const now = new Date();
+  if (user.vip_expiry && user.vip_expiry > now) {
+    user.vip_expiry = new Date(user.vip_expiry.getTime() + 30 * 24 * 60 * 60 * 1000);
+  } else {
+    user.vip_expiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  }
+
+  await user.save();
+
+  res.json({ message: "Nâng cấp VIP thành công!", user: { coins: user.coins, is_vip: user.is_vip, vip_expiry: user.vip_expiry } });
+});
+
+const updateMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) throw new AppError("User không tồn tại", 404);
+
+  const { username, email } = req.body;
+
+  if (username !== undefined) {
+    const trimmed = username.trim();
+    if (!trimmed || trimmed.length < 2) throw new AppError("Username phải có ít nhất 2 ký tự", 400);
+    user.username = trimmed;
+  }
+
+  if (email !== undefined) {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) throw new AppError("Email không được để trống", 400);
+    // Check if email is already used by another user
+    const existing = await User.findOne({ email: trimmed, _id: { $ne: user._id } });
+    if (existing) throw new AppError("Email này đã được sử dụng", 409);
+    user.email = trimmed;
+  }
+
+  await user.save();
+  const { password, ...safeUser } = user.toObject();
+  res.json(safeUser);
+});
+
 module.exports = {
   getMe,
+  updateMe,
   deleteMe,
-  deleteUser
+  deleteUser,
+  upgradeVip
 };

@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 
 const ChapterList = ({ chapters, comicId }) => {
     const [readChapters, setReadChapters] = useState(new Set());
     const [isDarkTheme, setIsDarkTheme] = useState(true);
 
     useEffect(() => {
-        // Load read chapters from localStorage
-        const stored = localStorage.getItem(`read-chapters-${comicId}`);
+        // Load read chapters from localStorage with user context
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        const userId = user?.id || user?._id || 'guest';
+        const storageKey = `read-chapters-${userId}-${comicId}`;
+        
+        const stored = localStorage.getItem(storageKey);
         if (stored) {
             setReadChapters(new Set(JSON.parse(stored)));
         }
@@ -26,14 +31,20 @@ const ChapterList = ({ chapters, comicId }) => {
         return () => observer.disconnect();
     }, [comicId]);
 
-    const handleChapterClick = (chapterId) => {
-        // Mark chapter as read
+    const handleChapterClick = (chapter) => {
+        // Don't mark locked chapters as read — user can't actually read them
+        if (chapter.is_locked) return;
+
+        const chapterId = chapter._id || chapter.id;
         const newReadChapters = new Set(readChapters);
         newReadChapters.add(chapterId);
         setReadChapters(newReadChapters);
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        const userId = user?.id || user?._id || 'guest';
+        const storageKey = `read-chapters-${userId}-${comicId}`;
         
         // Save to localStorage
-        localStorage.setItem(`read-chapters-${comicId}`, JSON.stringify([...newReadChapters]));
+        localStorage.setItem(storageKey, JSON.stringify([...newReadChapters]));
     };
 
     return (
@@ -64,9 +75,17 @@ const ChapterList = ({ chapters, comicId }) => {
                                             ? '1px solid rgba(255, 255, 255, 0.05)' 
                                             : '1px solid rgba(0, 0, 0, 0.05)'
                                 }}
-                                onClick={() => handleChapterClick(chapterId)}
+                                onClick={() => handleChapterClick(chapter)}
                             >
-                                <span className="chapter-title">{chapter.title}</span>
+                                <span className="chapter-title flex items-center gap-2">
+                                    {chapter.title}
+                                    {chapter.is_locked && (
+                                        <span className="flex items-center text-[0.65rem] font-bold text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 ml-2">
+                                            <Lock size={10} className="mr-1" />
+                                            {chapter.price || 0} Xu
+                                        </span>
+                                    )}
+                                </span>
                                 <span className="chapter-date">{chapter.date}</span>
                             </Link>
                         );

@@ -38,19 +38,7 @@ const Navbar = () => {
         navigate('/');
     };
 
-    const handleDeleteAccount = async () => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác.")) {
-            try {
-                const token = localStorage.getItem('token');
-                const data = await userService.deleteAccount(token);
-                alert(data.message || 'Xóa tài khoản thành công!');
-                handleLogout();
-            } catch (err) {
-                console.error("Lỗi:", err);
-                alert(err || 'Lỗi khi xóa tài khoản');
-            }
-        }
-    };
+
 
     // Apply theme on mount and change
     useEffect(() => {
@@ -260,9 +248,7 @@ const Navbar = () => {
                                     <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
                                         Đăng xuất
                                     </button>
-                                    <button onClick={handleDeleteAccount} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
-                                        <Trash2 size={16} /> Xóa tài khoản
-                                    </button>
+
                                 </div>
                             )}
                         </div>
@@ -316,9 +302,7 @@ const Navbar = () => {
                             </div>
                             <button className="btn w-full" style={{ justifyContent: 'center', background: 'var(--bg-secondary)', color: 'var(--text-primary)', marginBottom: '0.5rem', border: '1px solid var(--border)' }} onClick={() => { navigate('/profile'); setIsMobileMenuOpen(false); }}>Trang cá nhân</button>
                             <button className="btn w-full" style={{ justifyContent: 'center', background: '#3f3f46', color: '#ef4444' }} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Đăng xuất</button>
-                            <button className="btn w-full" style={{ justifyContent: 'center', background: '#ef4444', color: 'white', marginTop: '0.5rem' }} onClick={() => { handleDeleteAccount(); setIsMobileMenuOpen(false); }}>
-                                <Trash2 size={18} /> Xóa tài khoản
-                            </button>
+
                         </div>
                     ) : (
                         <button className="btn btn-primary w-full" style={{ justifyContent: 'center', marginTop: '1rem' }} onClick={() => { navigate('/auth'); setIsMobileMenuOpen(false); }}>Login</button>

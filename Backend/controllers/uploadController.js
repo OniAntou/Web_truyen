@@ -50,21 +50,25 @@ const uploadChapterPages = asyncHandler(async (req, res) => {
   const comicId = chapter.comic_id;
   if (!req.files?.length) throw new AppError("Cần gửi ít nhất một ảnh (field: pages)", 400);
   const created = [];
+  const existingPages = await Pages.find({ chapter_id: chapter._id }).sort('-page_number');
+  const maxPageNumber = existingPages.length > 0 ? existingPages[0].page_number : 0;
+
   for (let i = 0; i < req.files.length; i++) {
     const f = req.files[i];
+    const pageNum = maxPageNumber + i + 1;
     const ext = (f.originalname || "").split(".").pop() || "jpg";
-    const key = `chapters/${chapterId}/${i + 1}.${ext}`;
+    const key = `chapters/${chapterId}/${pageNum}-${Date.now()}.${ext}`;
     const { key: r2Key } = await uploadToR2(key, f.buffer, f.mimetype);
     await Upload.create({
       key: r2Key,
       type: "page",
       comic_id: comicId,
       chapter_id: chapter._id,
-      page_number: i + 1,
+      page_number: pageNum,
     });
     const page = await Pages.create({
       chapter_id: chapter._id,
-      page_number: i + 1,
+      page_number: pageNum,
       image_url: r2Key,
     });
     created.push(page);

@@ -9,11 +9,16 @@ const adminLogin = asyncHandler(async (req, res) => {
   if (!username || !password) {
     throw new AppError("Vui lòng nhập username và password", 400);
   }
-  const admin = await AdminLogin.findOne({ username, password });
+  const admin = await AdminLogin.findOne({ username });
   if (!admin) {
     throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
   }
-  res.json({ message: "Đăng nhập thành công", admin: { username: admin.username } });
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) {
+    throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
+  }
+  const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  res.json({ message: "Đăng nhập thành công", admin: { username: admin.username }, token });
 });
 
 const register = asyncHandler(async (req, res) => {
@@ -27,12 +32,11 @@ const register = asyncHandler(async (req, res) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const avatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(username)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-  const newUser = new User({ username, email, password: hashedPassword, avatar });
+  const newUser = new User({ username, email, password: hashedPassword });
   await newUser.save();
   
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-  res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, avatar: newUser.avatar, role: newUser.role } });
+  const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, role: newUser.role } });
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -49,8 +53,8 @@ const login = asyncHandler(async (req, res) => {
     throw new AppError("Sai email hoặc mật khẩu", 401);
   }
   
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-  res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, avatar: user.avatar, role: user.role } });
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, role: user.role } });
 });
 
 module.exports = {

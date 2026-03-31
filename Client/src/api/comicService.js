@@ -6,7 +6,11 @@ export const comicService = {
         return apiClient(endpoint);
     },
     getTrending: (limit = 10) => apiClient(`/comics/trending?limit=${limit}`),
-    getById: (id) => apiClient(`/comics/${id}`),
+    getById: (id) => {
+        const token = localStorage.getItem('token');
+        const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+        return apiClient(`/comics/${id}`, options);
+    },
     getUserRating: (id, token) => apiClient(`/comics/${id}/user-rating`, {
         headers: { 'Authorization': `Bearer ${token}` }
     }),

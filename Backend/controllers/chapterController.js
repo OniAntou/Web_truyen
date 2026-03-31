@@ -1,4 +1,4 @@
-const { Chapter, Pages, Upload } = require('../../Database/database');
+const { Chapter, Pages, Upload, User, ChapterUnlock } = require('../../Database/database');
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
@@ -6,6 +6,33 @@ const AppError = require('../utils/AppError');
 const getChapterPages = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
+
+  // Check Early Access Lock
+  if (chapter.early_access_end_date && new Date(chapter.early_access_end_date) > new Date()) {
+    let hasAccess = false;
+    if (req.user) {
+      if (req.user.role === 'admin' || req.user.role === 'creator') {
+        hasAccess = true;
+      } else {
+        const fullUser = await User.findById(req.user.id);
+        if (fullUser && fullUser.is_vip && fullUser.vip_expiry && new Date(fullUser.vip_expiry) > new Date()) {
+          hasAccess = true;
+        } else {
+          const unlocked = await ChapterUnlock.findOne({ user_id: req.user.id, chapter_id: chapter._id });
+          if (unlocked) hasAccess = true;
+        }
+      }
+    }
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        is_locked: true,
+        price: chapter.price || 0,
+        early_access_end_date: chapter.early_access_end_date,
+        message: "Chapter is locked. Requires VIP or " + (chapter.price || 0) + " coins."
+      });
+    }
+  }
 
   const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 });
   const pagesWithUrls = await Promise.all(
@@ -18,7 +45,45 @@ const getChapterPages = asyncHandler(async (req, res) => {
   res.json(pagesWithUrls);
 });
 
+const unlockChapter = asyncHandler(async (req, res) => {
+  const chapter = await Chapter.findById(req.params.chapterId);
+  if (!chapter) throw new AppError("Chapter không tồn tại", 404);
+
+  if (!chapter.price || chapter.price <= 0 || (chapter.early_access_end_date && new Date(chapter.early_access_end_date) <= new Date())) {
+    return res.json({ message: "Chương này không yêu cầu mở khóa." });
+  }
+
+  const user = await User.findById(req.user.id);
+
+  if (user.is_vip && user.vip_expiry && new Date(user.vip_expiry) > new Date()) {
+    return res.json({ message: "Bạn là VIP nên có thể đọc miễn phí chương này." });
+  }
+  
+  const existingUnlock = await ChapterUnlock.findOne({ user_id: user._id, chapter_id: chapter._id });
+  if (existingUnlock) {
+    return res.json({ message: "Bạn đã mở khóa chương này rồi." });
+  }
+
+  if (user.coins < chapter.price) {
+    throw new AppError("Bạn không đủ Coins để mở khóa. Vui lòng nạp thêm.", 403);
+  }
+
+  user.coins -= chapter.price;
+  await user.save();
+
+  await ChapterUnlock.create({
+    user_id: user._id,
+    chapter_id: chapter._id,
+    price: chapter.price
+  });
+
+  res.json({ message: "Mở khóa chương thành công!", coins: user.coins });
+});
+
 const reorderPages = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền chỉnh sửa chương.", 403);
+  }
   const { order } = req.body;
   if (!order || !Array.isArray(order)) {
     throw new AppError("Cần gửi mảng order: [{ pageId, page_number }]", 400);
@@ -39,12 +104,18 @@ const reorderPages = asyncHandler(async (req, res) => {
 });
 
 const createChapter = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền tạo chương mới.", 403);
+  }
   const newChapter = new Chapter(req.body);
   await newChapter.save();
   res.status(201).json(newChapter);
 });
 
 const deleteChapter = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền xóa chương.", 403);
+  }
   const chapterId = req.params.id;
   const chapter = await Chapter.findByIdAndDelete(chapterId);
   if (!chapter) throw new AppError("Chapter not found", 404);
@@ -60,6 +131,9 @@ const deleteChapter = asyncHandler(async (req, res) => {
 });
 
 const bulkDeleteChapters = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền xóa nhiều chương.", 403);
+  }
   const { chapterIds } = req.body;
   if (!chapterIds || !Array.isArray(chapterIds)) {
     throw new AppError('Invalid payload: chapterIds must be an array', 400);
@@ -77,6 +151,9 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
 });
 
 const deletePage = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền xóa trang truyện.", 403);
+  }
   const { chapterId, pageId } = req.params;
   const page = await Pages.findOne({ _id: pageId, chapter_id: chapterId });
   if (!page) throw new AppError("Page not found", 404);
@@ -98,6 +175,7 @@ const deletePage = asyncHandler(async (req, res) => {
 
 module.exports = {
   getChapterPages,
+  unlockChapter,
   reorderPages,
   createChapter,
   deleteChapter,

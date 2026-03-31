@@ -166,9 +166,35 @@ const getComicById = asyncHandler(async (req, res) => {
     return `${day}/${month}/${year}`;
   };
 
+  let userDoc = null;
+  let unlockedChapters = new Set();
+  if (req.user) {
+    const { User, ChapterUnlock } = require('../../Database/database');
+    userDoc = await User.findById(req.user.id);
+    if (!userDoc || !userDoc.is_vip || !userDoc.vip_expiry || new Date(userDoc.vip_expiry) <= new Date()) {
+      const unlocks = await ChapterUnlock.find({ user_id: req.user.id });
+      unlocks.forEach(u => unlockedChapters.add(u.chapter_id.toString()));
+    }
+  }
+
   const chaptersWithoutPages = chapters.map(ch => {
     const relativeDate = ch.created_at ? formatExactDate(ch.created_at) : (ch.date || 'Unknown');
-    return { ...ch.toObject(), date: relativeDate };
+    let is_locked = false;
+
+    if (ch.early_access_end_date && new Date(ch.early_access_end_date) > new Date()) {
+      is_locked = true;
+      if (req.user) {
+        if (req.user.role === 'admin' || req.user.role === 'creator') {
+          is_locked = false;
+        } else if (userDoc && userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) {
+          is_locked = false;
+        } else if (unlockedChapters.has(ch._id.toString())) {
+          is_locked = false;
+        }
+      }
+    }
+
+    return { ...ch.toObject(), date: relativeDate, is_locked, price: ch.price || 0 };
   });
 
   const coverUrl = await resolveR2Url(comic.cover_url);
@@ -186,6 +212,9 @@ const getComicById = asyncHandler(async (req, res) => {
 });
 
 const createComic = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền đăng truyện.", 403);
+  }
   const lastComic = await Comic.findOne().sort({ id: -1 });
   const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 
@@ -206,9 +235,17 @@ const createComic = asyncHandler(async (req, res) => {
 });
 
 const updateComic = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền chỉnh sửa truyện.", 403);
+  }
   const { id } = req.params;
   let comic;
   const payload = { ...req.body };
+  delete payload._id;
+  delete payload.id;
+  delete payload.__v;
+  delete payload.created_at;
+  delete payload.updated_at;
   if (payload.genres) {
     payload.genres = await processGenres(payload.genres);
   }
@@ -224,6 +261,9 @@ const updateComic = asyncHandler(async (req, res) => {
 });
 
 const deleteComic = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
+    throw new AppError("Bạn không có quyền xóa truyện.", 403);
+  }
   const { id } = req.params;
   let comic;
 

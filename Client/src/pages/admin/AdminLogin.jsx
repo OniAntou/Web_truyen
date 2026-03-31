@@ -41,6 +41,7 @@ const AdminLogin = () => {
 
             if (response.ok) {
                 localStorage.setItem('admin', JSON.stringify(data.admin));
+                if (data.token) localStorage.setItem('token', data.token);
                 navigate('/admin', { replace: true });
             } else {
                 setError(data.message || 'Sai tên đăng nhập hoặc mật khẩu');

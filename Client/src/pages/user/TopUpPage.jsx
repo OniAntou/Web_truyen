@@ -48,92 +48,115 @@ const TopUpPage = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+        <div className="min-h-screen bg-[#0E0E0E] flex flex-col font-sans">
             <Navbar />
-            <div className="container" style={{ flex: 1, padding: '100px 20px 40px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-                <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '1.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(52, 211, 153, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', margin: '0 auto 1.5rem' }}>
-                            <CreditCard size={32} />
+            <div className="flex-1 w-full max-w-5xl mx-auto px-4 pt-24 pb-16">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-white mb-2 pb-4 border-b border-white/5">Nạp Xu</h1>
+                    <p className="text-zinc-500 text-sm mt-3">Mua Xu để mở khóa truy cập sớm các chương truyện đặc quyền.</p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column: Bundles & Custom */}
+                    <div className="lg:col-span-2 space-y-8">
+                        <div>
+                            <h2 className="text-white font-semibold mb-4">Các gói Xu ưu đãi</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {amounts.map((val) => (
+                                    <button
+                                        key={val}
+                                        onClick={() => setAmount(val)}
+                                        className={`relative p-5 rounded-2xl border text-center transition-colors ${
+                                            amount === val 
+                                            ? 'border-yellow-500 bg-yellow-500/5' 
+                                            : 'border-white/5 bg-[#151515] hover:border-white/20'
+                                        }`}
+                                    >
+                                        <div className="flex justify-center mb-2">
+                                            <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                                                <CreditCard size={18} />
+                                            </div>
+                                        </div>
+                                        <div className="text-lg font-bold text-white mb-1">
+                                            {(val / 10).toLocaleString()} <span className="text-xs text-yellow-500">Xu</span>
+                                        </div>
+                                        <div className="text-sm text-zinc-500 font-medium">
+                                            {val.toLocaleString()}đ
+                                        </div>
+                                        {amount === val && (
+                                            <div className="absolute top-3 right-3 text-yellow-500">
+                                                <CheckCircle2 size={16} />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                        <h1 style={{ color: 'var(--text-primary)', fontSize: '1.75rem', marginBottom: '0.5rem' }}>Nạp Linh Thạch</h1>
-                        <p style={{ color: 'var(--text-secondary)' }}>Chọn số tiền bạn muốn nạp vào tài khoản</p>
+
+                        <div>
+                            <h2 className="text-white font-semibold mb-4">Mệnh giá khác</h2>
+                            <div className="bg-[#151515] border border-white/5 p-2 rounded-2xl flex items-center hover:border-white/20 transition-colors focus-within:border-yellow-500/50">
+                                <span className="text-zinc-500 font-medium px-4 text-sm">VNĐ</span>
+                                <input 
+                                    type="number"
+                                    value={amount}
+                                    onChange={(e) => setAmount(Number(e.target.value))}
+                                    min="10000"
+                                    className="flex-1 bg-transparent border-l border-white/5 py-3 px-4 text-white font-semibold outline-none transition-colors"
+                                />
+                            </div>
+                            <p className="text-xs text-zinc-600 font-medium mt-3 ml-2">Mệnh giá tối thiểu nạp hợp lệ: 10,000 VNĐ.</p>
+                        </div>
                     </div>
 
-                    {error && (
-                        <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '0.75rem', color: '#ef4444', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <AlertCircle size={20} />
-                            {error}
-                        </div>
-                    )}
+                    {/* Right Column: Checkout Summary */}
+                    <div>
+                        <div className="bg-[#151515] border border-white/5 rounded-2xl p-6 sticky top-24">
+                            <h3 className="text-lg font-bold text-white mb-6">Chi tiết thanh toán</h3>
+                            
+                            <div className="space-y-4 mb-6">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-zinc-500 font-medium">Tỷ giá quy đổi</span>
+                                    <span className="text-zinc-300 font-medium">1,000đ = 100 Xu</span>
+                                </div>
+                                <div className="h-px bg-white/5"></div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-white font-semibold">Tổng thanh toán</span>
+                                    <span className="text-lg font-bold text-white">
+                                        {amount.toLocaleString()}đ
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center bg-yellow-500/5 p-4 rounded-xl border border-yellow-500/10">
+                                    <span className="text-yellow-500 font-bold">Thực nhận</span>
+                                    <span className="text-3xl font-black text-yellow-500">
+                                        {(Math.floor(amount / 1000) * 100).toLocaleString()} <span className="text-sm">Xu</span>
+                                    </span>
+                                </div>
+                            </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-                        {amounts.map((val) => (
+                            {error && (
+                                <div className="text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-sm font-medium mb-6 flex items-start gap-2">
+                                    <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+                                    <span>{error}</span>
+                                </div>
+                            )}
+
                             <button
-                                key={val}
-                                onClick={() => setAmount(val)}
-                                style={{
-                                    padding: '1rem',
-                                    borderRadius: '0.75rem',
-                                    border: `2px solid ${amount === val ? 'var(--accent)' : 'var(--border)'}`,
-                                    background: amount === val ? 'rgba(var(--accent-rgb), 0.1)' : 'transparent',
-                                    color: amount === val ? 'var(--accent)' : 'var(--text-primary)',
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    fontSize: '1rem'
-                                }}
+                                onClick={handleTopUp}
+                                disabled={loading || amount < 10000}
+                                className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wide transition-colors flex items-center justify-center gap-2 ${
+                                    loading || amount < 10000 
+                                    ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
+                                    : 'bg-yellow-500 hover:bg-yellow-400 text-black'
+                                }`}
                             >
-                                {val.toLocaleString()} VNĐ
+                                {loading ? 'Đang khởi tạo VNPay...' : 'Thanh Toán Ngay'}
                             </button>
-                        ))}
-                    </div>
-
-                    <div style={{ marginBottom: '2rem' }}>
-                        <label style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: '0.75rem', fontSize: '0.9rem' }}>Số tiền khác (VNĐ)</label>
-                        <input 
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                            min="5000"
-                            style={{
-                                width: '100%',
-                                padding: '1rem',
-                                borderRadius: '0.75rem',
-                                border: '1px solid var(--border)',
-                                background: 'var(--bg-primary)',
-                                color: 'var(--text-primary)',
-                                fontSize: '1.1rem',
-                                outline: 'none'
-                            }}
-                        />
-                    </div>
-
-                    <div style={{ background: 'var(--bg-primary)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--border)', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <span style={{ color: 'var(--text-secondary)' }}>Tỷ giá:</span>
-                            <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>1,000 VNĐ = 100 Linh Thạch</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                            <span style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>Bạn sẽ nhận được:</span>
-                            <span style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.5rem' }}>
-                                {(Math.floor(amount / 1000) * 100).toLocaleString()} <span style={{fontSize: '0.9rem'}}>Linh Thạch</span>
-                            </span>
+                            <p className="text-xs text-center text-zinc-600 mt-5 px-4 font-medium leading-relaxed">
+                                Giao dịch được mã hóa bảo mật 100% qua cổng thanh toán quốc gia VNPay.
+                            </p>
                         </div>
                     </div>
-
-                    <button
-                        onClick={handleTopUp}
-                        disabled={loading || amount < 5000}
-                        className="nav-button accent"
-                        style={{ width: '100%', height: '3.5rem', borderRadius: '0.75rem', fontSize: '1.1rem', fontWeight: 'bold' }}
-                    >
-                        {loading ? 'Đang kết nối tới VNPay...' : 'Tiến hành thanh toán'}
-                    </button>
-                    
-                    <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '1.5rem' }}>
-                        Bằng việc nhấn thanh toán, bạn đồng ý với Điều khoản dịch vụ của chúng tôi.
-                    </p>
                 </div>
             </div>
             <Footer />
