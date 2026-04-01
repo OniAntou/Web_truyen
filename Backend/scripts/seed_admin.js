@@ -8,27 +8,26 @@ mongoose.connect(dbURI)
     .then(async () => {
         console.log('✅ Connected to MongoDB');
 
-        const username = 'admin';
-        const rawPassword = '123';
+        // Delete existing admin(s)
+        await AdminLogin.deleteMany({});
+        console.log('🗑️ Deleted all existing admin user(s)');
 
-        // Check if admin exists
-        const existing = await AdminLogin.findOne({ username });
+        const username = 'admin2';
+        const rawPassword = '123';
+        const email = 'admin2@example.com';
+        const role = 'superadmin';
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(rawPassword, salt);
 
-        if (existing) {
-            console.log('Admin user already exists. Updating password to hashed version...');
-            existing.password = hashedPassword;
-            await existing.save();
-            console.log('✅ Updated admin password.');
-        } else {
-            const newAdmin = new AdminLogin({
-                username,
-                password: hashedPassword
-            });
-            await newAdmin.save();
-            console.log(`✅ Created default admin user: ${username} / ${rawPassword} (Hashed)`);
-        }
+        const newAdmin = new AdminLogin({
+            username,
+            email,
+            role,
+            password: hashedPassword
+        });
+        await newAdmin.save();
+        console.log(`✅ Created new admin user: ${username} / ${rawPassword} / ${email} / ${role} (Hashed)`);
 
         mongoose.disconnect();
     })

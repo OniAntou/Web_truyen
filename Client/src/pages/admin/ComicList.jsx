@@ -28,17 +28,34 @@ const ComicList = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this comic?')) return;
 
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Bạn cần đăng nhập để xóa truyện.');
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
             });
+
             if (response.ok) {
                 setComics(comics.filter(comic => comic._id !== id && comic.id !== id));
+            } else if (response.status === 401 || response.status === 403) {
+                alert('Không có quyền xóa truyện. Vui lòng đăng nhập lại.');
+                localStorage.removeItem('token');
+                localStorage.removeItem('admin');
+                window.location.href = '/admin/login';
             } else {
-                alert('Failed to delete comic');
+                const errorData = await response.json();
+                alert(errorData.message || 'Failed to delete comic');
             }
         } catch (error) {
             console.error('Error deleting comic:', error);
+            alert('Lỗi kết nối khi xóa truyện. Vui lòng thử lại.');
         }
     };
 
