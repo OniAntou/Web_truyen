@@ -33,42 +33,7 @@ const ChevronRightIcon = ({ size, className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 18 15 12 9 6"></polyline></svg>
 );
 
-const ComicCard = ({ comic }) => {
-    return (
-        <Link to={`/p/${comic.id || comic._id}`} className="group flex flex-col gap-3">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)] bg-[var(--bg-secondary)]">
-                <LazyImage
-                    src={comic.cover_url || comic.cover}
-                    alt={comic.title}
-                    className="w-full h-full object-cover"
-                />
-
-                {/* Meta overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                    <div className="flex gap-4 text-white text-xs font-semibold">
-                        <span className="flex items-center gap-1.5"><Eye size={12}/>{formatViews(comic.views)}</span>
-                        <span className="flex items-center gap-1.5 text-yellow-500"><Star size={12} fill="currentColor"/>{comic.rating || '—'}</span>
-                    </div>
-                </div>
-            </div>
-            <div className="px-1 flex flex-col gap-1.5">
-                <h3 className="font-bold text-[0.95rem] leading-tight line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>{comic.title}</h3>
-                
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[0.7rem] font-semibold tracking-wide uppercase" style={{ color: 'var(--text-secondary)' }}>
-                        <Eye size={12} strokeWidth={2.5} />
-                        <span>{formatViews(comic.views)} view</span>
-                    </div>
-                    {comic.genres && comic.genres.length > 0 && (
-                        <p className="text-[0.65rem] uppercase font-bold tracking-widest line-clamp-1 opacity-50" style={{ color: 'var(--accent)' }}>
-                            {comic.genres[0].name || comic.genres[0]}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </Link>
-    );
-};
+import ComicCard from '../components/ui/ComicCard';
 
 const SkeletonCard = () => (
     <div className="flex flex-col gap-3">
@@ -109,14 +74,14 @@ const GenresPage = () => {
     };
 
     const fetchComicsByGenre = async () => {
-        setLoadingComics(true);
+        setComicsLoading(true);
         try {
-            const data = await comicService.getAll(selectedGenre === 'All' ? '' : selectedGenre);
+            const data = await comicService.getAll('', selectedGenre === 'All' ? '' : selectedGenre);
             setComics(data.comics || []);
         } catch (error) {
             console.error('Error fetching comics:', error);
         } finally {
-            setLoadingComics(false);
+            setComicsLoading(false);
         }
     };
 

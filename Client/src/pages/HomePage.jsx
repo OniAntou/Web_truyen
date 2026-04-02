@@ -37,8 +37,8 @@ const HomePage = () => {
             comicService.getTrending(10)
         ])
         .then(([comicsData, trendingData]) => {
-            setComics(Array.isArray(comicsData) ? comicsData : []);
-            setTrending(Array.isArray(trendingData) ? trendingData : []);
+            setComics(comicsData.comics || []);
+            setTrending(trendingData.comics || []);
             setLoading(false);
         })
         .catch(err => {

@@ -319,9 +319,9 @@ const ReadPage = () => {
             {/* Reader Info Bar */}
             <div className="reader-info-bar">
                 <div className="reader-info-content">
-                    <Link to={`/p/${comicId}`} className="reader-info-back" title="Back to Comic">
+                    <Link to={`/p/${comicId}`} className="reader-info-back" title={comic?.title}>
                         <ArrowLeft size={16} />
-                        {comic.title}
+                        <span className="reader-info-back-title">{comic?.title}</span>
                     </Link>
 
                     {chapter.title && (

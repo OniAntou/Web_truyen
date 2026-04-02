@@ -7,35 +7,7 @@ import { formatViews } from '../utils/format';
 import LazyImage from '../components/ui/LazyImage';
 import { comicService } from '../api/comicService';
 
-const PopularComicCard = ({ comic }) => {
-    return (
-        <Link to={`/p/${comic.id || comic._id}`} className="group flex flex-col gap-3">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)]">
-                <LazyImage
-                    src={comic.cover_url || comic.cover}
-                    alt={comic.title}
-                    className="w-full h-full object-cover"
-                />
-                
-                {/* Meta overlay gradient (visible on hover) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                    <div className="flex gap-4 text-white text-xs font-semibold">
-                        <span className="flex items-center gap-1.5"><Eye size={12}/>{formatViews(comic.views)}</span>
-                        <span className="flex items-center gap-1.5 text-yellow-400"><Star size={12} fill="currentColor"/>{comic.rating || '—'}</span>
-                    </div>
-                </div>
-            </div>
-            <div className="px-1">
-                <h3 className="font-bold text-[0.95rem] leading-tight line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>{comic.title}</h3>
-                {comic.genres && comic.genres.length > 0 && (
-                    <p className="text-[0.65rem] uppercase font-semibold tracking-widest mt-1.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
-                        {comic.genres.map(g => g.name || g).join(' • ')}
-                    </p>
-                )}
-            </div>
-        </Link>
-    );
-};
+import ComicCard from '../components/ui/ComicCard';
 
 const PopularPage = () => {
     const [comics, setComics] = useState([]);
@@ -175,7 +147,7 @@ const PopularPage = () => {
                         ))
                     ) : comics.length > 0 ? (
                         comics.map((comic, index) => (
-                            <PopularComicCard key={comic._id || comic.id} comic={comic} rank={index + 1} />
+                            <ComicCard key={comic._id || comic.id} comic={comic} />
                         ))
                     ) : (
                         <div className="col-span-full py-24 flex flex-col items-center justify-center text-center">

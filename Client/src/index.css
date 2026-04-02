@@ -830,10 +830,15 @@ img {
   transition: all 0.2s;
   flex-shrink: 0;
   text-decoration: none;
+  max-width: calc(50% - 60px);
+  min-width: 0;
+}
+
+.reader-info-back-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 250px;
+  display: block;
 }
 
 .reader-info-back:hover {
@@ -874,6 +879,9 @@ img {
   color: var(--text-primary);
   white-space: nowrap;
   pointer-events: none;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .reader-info-spacer {
@@ -892,8 +900,13 @@ img {
     max-width: 100px;
   }
 
+  .reader-info-back {
+    max-width: calc(50% - 50px);
+  }
+
   .reader-info-center-chapter {
     font-size: 0.75rem;
+    max-width: 90px;
   }
 }
 

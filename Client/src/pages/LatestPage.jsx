@@ -7,62 +7,7 @@ import { formatViews } from '../utils/format';
 import LazyImage from '../components/ui/LazyImage';
 import { comicService } from '../api/comicService';
 
-const LatestComicCard = ({ comic }) => {
-    const timeAgo = (date) => {
-        if (!date) return '';
-        const now = new Date();
-        const d = new Date(date);
-        const diff = Math.floor((now - d) / 1000);
-        if (diff < 60) return 'Vừa xong';
-        if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-        if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
-        return d.toLocaleDateString('vi-VN', { month: '2-digit', day: '2-digit', year: 'numeric' });
-    };
-
-    return (
-        <Link to={`/p/${comic.id || comic._id}`} className="group flex flex-col gap-3">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)] bg-[var(--bg-secondary)]">
-                <LazyImage
-                    src={comic.cover_url || comic.cover}
-                    alt={comic.title}
-                    className="w-full h-full object-cover"
-                />
-
-                {/* Chapter Badge */}
-                {comic.chapter_count > 0 && (
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[0.65rem] font-bold tracking-widest uppercase backdrop-blur-md bg-black/60 text-white border border-white/10 shadow-lg pointer-events-none">
-                        Ch. {comic.chapter_count}
-                    </div>
-                )}
-                
-                {/* Meta overlay gradient (visible on hover) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                    <div className="flex gap-4 text-white text-xs font-semibold">
-                        <span className="flex items-center gap-1.5"><Eye size={12}/>{formatViews(comic.views)}</span>
-                        <span className="flex items-center gap-1.5 text-yellow-500"><Star size={12} fill="currentColor"/>{comic.rating || '—'}</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="px-1 flex flex-col gap-1.5">
-                <h3 className="font-bold text-[0.95rem] leading-tight line-clamp-1 transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>{comic.title}</h3>
-                
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-[0.7rem] font-semibold tracking-wide uppercase" style={{ color: 'var(--text-secondary)' }}>
-                        <Clock size={12} strokeWidth={2.5} />
-                        <span>{timeAgo(comic.created_at)}</span>
-                    </div>
-                    {comic.genres && comic.genres.length > 0 && (
-                        <p className="text-[0.65rem] uppercase font-bold tracking-widest line-clamp-1 opacity-50" style={{ color: 'var(--accent)' }}>
-                            {comic.genres[0].name || comic.genres[0]}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </Link>
-    );
-};
+import ComicCard from '../components/ui/ComicCard';
 
 const SkeletonCard = () => (
     <div className="flex flex-col gap-3">
@@ -189,7 +134,7 @@ const LatestPage = () => {
                 ) : comics.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-x-6 md:gap-y-10">
                         {comics.map(comic => (
-                            <LatestComicCard key={comic._id || comic.id} comic={comic} />
+                            <ComicCard key={comic._id || comic.id} comic={comic} showTime={true} />
                         ))}
                     </div>
                 ) : (

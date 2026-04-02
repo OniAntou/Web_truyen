@@ -83,7 +83,7 @@ const Navbar = () => {
             setSearching(true);
             try {
                 const data = await comicService.getAll(value);
-                setSearchResults(data.slice(0, 5));
+                setSearchResults((data.comics || []).slice(0, 5));
                 setShowDropdown(true);
             } catch (err) {
                 console.error('Search error:', err);
@@ -180,11 +180,12 @@ const Navbar = () => {
                                                     src={comic.cover_url || comic.cover}
                                                     alt={comic.title}
                                                     className="search-dropdown-img"
+                                                    style={{ width: '40px', height: '56px', flexShrink: 0 }}
                                                 />
                                                 <div className="search-dropdown-info">
                                                     <span className="search-dropdown-title">{comic.title}</span>
                                                     <div className="search-dropdown-meta">
-                                                        {comic.rating && (
+                                                        {(comic.rating > 0) && (
                                                             <span className="search-dropdown-rating">
                                                                 <Star size={10} fill="#eab308" color="#eab308" />
                                                                 {comic.rating}

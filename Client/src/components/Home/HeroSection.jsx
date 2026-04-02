@@ -110,7 +110,7 @@ const HeroSection = ({ featuredComics }) => {
                 <div className="hidden lg:flex items-center justify-center relative perspective-1000 h-full w-full">
                     <div 
                         ref={frameRef} 
-                        className="relative w-3/4 max-w-md aspect-[2/3] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-[var(--border)] transition-all bg-[var(--bg-secondary)]" 
+                        className="relative w-full max-w-[400px] aspect-[2/3] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-[var(--border)] transition-all bg-[var(--bg-secondary)]" 
                         onMouseMove={handleMouseMove} 
                         onMouseLeave={handleMouseLeave} 
                         onMouseEnter={handleMouseEnter}

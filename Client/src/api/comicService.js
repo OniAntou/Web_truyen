@@ -1,8 +1,15 @@
 import apiClient from './apiClient';
 
 export const comicService = {
-    getAll: (query = '') => {
-        const endpoint = query ? `/comics?q=${encodeURIComponent(query)}` : '/comics';
+    getAll: (query = '', genre = '') => {
+        let endpoint = '/comics';
+        const params = [];
+        if (query) params.push(`q=${encodeURIComponent(query)}`);
+        if (genre) params.push(`genre=${encodeURIComponent(genre)}`);
+        
+        if (params.length > 0) {
+            endpoint += `?${params.join('&')}`;
+        }
         return apiClient(endpoint);
     },
     getTrending: (limit = 10) => apiClient(`/comics/trending?limit=${limit}`),

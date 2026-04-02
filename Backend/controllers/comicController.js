@@ -102,14 +102,35 @@ const getPopularComics = asyncHandler(async (req, res) => {
 });
 
 const getAllComics = asyncHandler(async (req, res) => {
-  const { q } = req.query;
-  let query = {};
+  const { q, genre } = req.query;
+  let filter = {};
 
   if (q) {
-    query = { title: { $regex: q, $options: "i" } };
+    // Find matching genres first to include in search
+    const matchingGenres = await Genre.find({ 
+      name: { $regex: q, $options: "i" } 
+    }).select('_id');
+    const genreIds = matchingGenres.map(g => g._id);
+
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { genres: { $in: genreIds } }
+    ];
   }
 
-  const comics = await Comic.find(query).populate('genres', 'name slug');
+  if (genre) {
+    const genreDoc = await Genre.findOne({
+      $or: [
+        { name: { $regex: new RegExp(`^${genre}$`, 'i') } },
+        { slug: genre.toLowerCase() }
+      ]
+    });
+    if (genreDoc) {
+      filter.genres = genreDoc._id;
+    }
+  }
+
+  const comics = await Comic.find(filter).populate('genres', 'name slug');
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
 
@@ -123,7 +144,7 @@ const getAllComics = asyncHandler(async (req, res) => {
       };
     }),
   );
-  res.json(results);
+  res.json({ comics: results });
 });
 
 const getTrendingComics = asyncHandler(async (req, res) => {
@@ -142,7 +163,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
       };
     })
   );
-  res.json(results);
+  res.json({ comics: results });
 });
 
 const getComicById = asyncHandler(async (req, res) => {

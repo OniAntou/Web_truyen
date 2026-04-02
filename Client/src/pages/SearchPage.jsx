@@ -24,7 +24,7 @@ const SearchPage = () => {
         setLoading(true);
         try {
             const data = await comicService.getAll(query);
-            setComics(data);
+            setComics(data.comics || []);
         } catch (error) {
             console.error('Error fetching search results:', error);
         } finally {
