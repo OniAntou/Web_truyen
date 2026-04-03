@@ -241,4 +241,4 @@ ChapterUnlockSchema.index({ user_id: 1, chapter_id: 1 }, { unique: true });
 
 const ChapterUnlock = mongoose.model("ChapterUnlock", ChapterUnlockSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment, ChapterUnlock };
+module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment, ChapterUnlock, mongoose };

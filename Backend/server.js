@@ -4,6 +4,7 @@ dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const { initCronJobs } = require('./cron/cronJobs');
+require('../Database/database'); // Initialize DB connection immediately
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -61,5 +62,5 @@ app.use('/api/payment', paymentRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} (REFACTORED)`);
+  console.log(`Server running on port ${PORT} (REFACTORED-V3-TRULY-FINAL)`);
 });

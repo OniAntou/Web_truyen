@@ -203,8 +203,19 @@ const ChapterManager = () => {
     const reorderChapterIdRef = useRef(null);
 
     const fetchData = async () => {
+        const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${API_BASE_URL}/comics/${id}`);
+            const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+                return;
+            }
             const data = await response.json();
             setChapters(data.chapters || []);
             setComicTitle(data.title);
@@ -238,9 +249,20 @@ const ChapterManager = () => {
 
     const handleAddChapter = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('token');
         try {
             // 1. Get Comic ID (ensure MongoDB _id)
-            const comicRes = await fetch(`${API_BASE_URL}/comics/${id}`);
+            const comicRes = await fetch(`${API_BASE_URL}/comics/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (comicRes.status === 401 || comicRes.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+                return;
+            }
             const comicData = await comicRes.json();
 
             const payload = {
@@ -399,8 +421,19 @@ const ChapterManager = () => {
         reorderChapterIdRef.current = chapterId;
         setReorderLoading(true);
         setReorderModalOpen(true);
+        const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`);
+            const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+                return;
+            }
             const pages = await res.json();
             setReorderPages(pages.map(p => ({
                 _id: p._id,

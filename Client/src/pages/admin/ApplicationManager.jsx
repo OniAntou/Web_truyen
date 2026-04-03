@@ -8,9 +8,23 @@ const ApplicationManager = () => {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        fetch(`${API_BASE_URL}/applications/admin`)
-            .then(res => res.json())
+        const token = localStorage.getItem('token');
+        fetch(`${API_BASE_URL}/applications/admin`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('admin');
+                    localStorage.removeItem('token');
+                    window.location.href = '/admin/login';
+                    return;
+                }
+                return res.json();
+            })
             .then(data => {
+                if (!data) return;
                 const formatted = data.map(app => ({
                     id: app._id,
                     penName: app.penName,
@@ -30,14 +44,22 @@ const ApplicationManager = () => {
     }, []);
 
     const handleApprove = async (id) => {
+        const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: 'approved' })
             });
             if (res.ok) {
                 setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'approved' } : app));
+            } else if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
             }
         } catch (err) {
             console.error(err);
@@ -45,14 +67,22 @@ const ApplicationManager = () => {
     };
 
     const handleReject = async (id) => {
+        const token = localStorage.getItem('token');
         try {
             const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: 'rejected' })
             });
             if (res.ok) {
                 setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'rejected' } : app));
+            } else if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
             }
         } catch (err) {
             console.error(err);

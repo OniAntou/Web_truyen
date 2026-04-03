@@ -13,7 +13,7 @@ const ComicList = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/comics`);
             const data = await response.json();
-            setComics(data);
+            setComics(data.comics || []);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching comics:', error);
@@ -59,9 +59,9 @@ const ComicList = () => {
         }
     };
 
-    const filteredComics = comics.filter(comic =>
+    const filteredComics = Array.isArray(comics) ? comics.filter(comic =>
         comic.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ) : [];
 
     if (loading) return (
         <div className="flex items-center justify-center h-64 text-zinc-500">
