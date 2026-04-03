@@ -13,11 +13,11 @@ import {
 import { API_BASE_URL } from '../../constants/api';
 
 const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
-    <div className="bg-zinc-900/40 p-6 rounded-3xl border border-white/5 hover:border-rose-500/30 transition-all duration-300 group relative overflow-hidden">
+    <div className="bg-zinc-900/40 p-8 rounded-3xl border border-white/5 hover:border-rose-500/30 transition-all duration-300 group relative overflow-hidden">
         <div className="relative z-10">
             <div className="flex justify-between items-start mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-500 group-hover:scale-110 transition-transform duration-300">
-                    <Icon size={20} strokeWidth={2} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-500 group-hover:scale-110 transition-transform duration-300">
+                    <Icon size={24} strokeWidth={2} />
                 </div>
                 {trend && (
                     <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold">
@@ -27,16 +27,16 @@ const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
                 )}
             </div>
             
-            <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider mb-1">{title}</h3>
+            <h3 className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider mb-1">{title}</h3>
             <div className="flex items-baseline gap-1.5">
                 <p className="text-3xl font-bold text-white tabular-nums">
                     {typeof value === 'number' && (title.includes('Revenue') || title.includes('Capital'))
                         ? value.toLocaleString('vi-VN') 
                         : value}
                 </p>
-                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-500 text-xs font-medium">VND</span>}
+                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-400 text-xs font-medium">VND</span>}
             </div>
-            <p className="text-[10px] text-zinc-500 mt-2 font-medium">
+            <p className="text-[10px] text-zinc-400 mt-2 font-medium">
                 {subtext}
             </p>
         </div>
@@ -46,17 +46,40 @@ const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
 const RevenueChart = ({ data, previousData }) => {
     const [hoveredIdx, setHoveredIdx] = useState(null);
     const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+    const chartContainerRef = React.useRef(null);
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    React.useEffect(() => {
+        if (!chartContainerRef.current) return;
+        const observer = new ResizeObserver(([entry]) => {
+            setContainerWidth(entry.contentRect.width);
+        });
+        observer.observe(chartContainerRef.current);
+        return () => observer.disconnect();
+    }, []);
 
     if (!data || data.length === 0) return null;
 
     const maxCurrent = Math.max(...data.map(d => d.amount), 1);
     const maxPrev = previousData ? Math.max(...previousData.map(d => d.amount), 1) : 1;
-    const maxAmount = Math.max(maxCurrent, maxPrev, 1);
+    const rawMax = Math.max(maxCurrent, maxPrev, 1);
     
-    const chartHeight = 180;
-    const chartWidth = 800;
-    const paddingX = 60; // Increased padding to prevent label clipping
-    const paddingY = 30;
+    // Round up to a nice clean number for scaling
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rawMax)));
+    const maxAmount = Math.ceil(rawMax / magnitude) * magnitude;
+    
+    // Format large numbers with K, M, B abbreviations
+    const formatYValue = (val) => {
+        if (val >= 1000000000) return (val / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+        if (val >= 1000000) return (val / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+        return val.toString();
+    };
+    
+    const chartHeight = 260;
+    const chartWidth = Math.max(containerWidth || 1050, 1050);
+    const paddingX = 80; // Increased padding to prevent label clipping
+    const paddingY = 35;
     
     const getPoints = (dSet) => dSet.map((d, i) => {
         const x = (i / (dSet.length - 1)) * (chartWidth - paddingX * 2) + paddingX;
@@ -73,8 +96,9 @@ const RevenueChart = ({ data, previousData }) => {
         for (let i = 0; i < pts.length - 1; i++) {
             const p0 = pts[i];
             const p1 = pts[i + 1];
-            const cp1x = p0.x + (p1.x - p0.x) / 3;
-            const cp2x = p1.x - (p1.x - p0.x) / 3;
+            // Further reduce curvature
+            const cp1x = p0.x + (p1.x - p0.x) * 0.05;
+            const cp2x = p1.x - (p1.x - p0.x) * 0.05;
             d += ` C ${cp1x} ${p0.y}, ${cp2x} ${p1.y}, ${p1.x} ${p1.y}`;
         }
         return d;
@@ -102,12 +126,12 @@ const RevenueChart = ({ data, previousData }) => {
         <div className="bg-zinc-900 shadow-2xl rounded-3xl border border-white/[0.05] p-8 relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight">Revenue Insights</h3>
-                    <p className="text-zinc-500 text-xs mt-1">Comparing current week performance with previous period.</p>
+                    <h3 className="text-xl font-bold text-white tracking-tight">Revenue Trend</h3>
+                    <p className="text-zinc-400 text-xs mt-1">7-day revenue performance chart</p>
                 </div>
                 <div className="flex gap-4">
                     <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full bg-rose-500" />
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Current</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -117,7 +141,7 @@ const RevenueChart = ({ data, previousData }) => {
                 </div>
             </div>
 
-            <div className="relative h-[220px] w-full">
+            <div ref={chartContainerRef} className="relative h-[280px] w-full">
                 {hoveredIdx !== null && (
                     <>
                         <div 
@@ -128,16 +152,16 @@ const RevenueChart = ({ data, previousData }) => {
                                 transform: 'translate(-50%, -130%)'
                             }}
                         >
-                            <div className="bg-zinc-950/95 border border-white/[0.2] p-2 rounded-lg shadow-lg backdrop-blur-sm min-w-[120px]">
+                            <div className="bg-zinc-950/95 border border-emerald-500/20 p-2 rounded-lg shadow-lg backdrop-blur-sm min-w-[120px]">
                                 <div className="text-zinc-200 text-[9px] uppercase tracking-wide mb-0.5">
                                     {new Date(data[hoveredIdx].date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}
                                 </div>
-                                <div className="text-white font-bold text-xs tracking-tight">
+                                <div className="text-emerald-400 font-bold text-xs tracking-tight">
                                     {data[hoveredIdx].amount.toLocaleString('vi-VN')} VND
                                 </div>
                             </div>
                         </div>
-                        <div className="absolute z-20 w-2 h-2 bg-rose-500 rounded-full"
+                        <div className="absolute z-20 w-2 h-2 bg-emerald-500 rounded-full"
                             style={{ left: `${(tooltipPos.x / chartWidth) * 100}%`, top: `${(tooltipPos.y / chartHeight) * 100}%`, transform: 'translate(-50%, -50%)' }}
                         />
                     </>
@@ -155,26 +179,54 @@ const RevenueChart = ({ data, previousData }) => {
                             <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
                             <feComposite in="SourceGraphic" in2="blur" operator="over" />
                         </filter>
-                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="rgba(244, 63, 94, 0.15)" />
-                            <stop offset="100%" stopColor="rgba(244, 63, 94, 0)" />
+                        <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="100%" stopColor="#059669" />
                         </linearGradient>
                     </defs>
                     
-                    {[0, 0.25, 0.5, 0.75, 1].map(i => (
+                    {/* Grid lines and Y-axis labels */}
+                    {[0, 0.2, 0.4, 0.6, 0.8, 1].map(i => (
+                        <React.Fragment key={`grid-${i}`}>
+                            <line 
+                                x1={paddingX}
+                                y1={paddingY + i * (chartHeight - paddingY * 2)}
+                                x2={chartWidth - paddingX}
+                                y2={paddingY + i * (chartHeight - paddingY * 2)}
+                                stroke="white"
+                                strokeOpacity="0.08"
+                                strokeWidth="1"
+                            />
+                            <text
+                                x={paddingX - 15}
+                                y={paddingY + i * (chartHeight - paddingY * 2)}
+                                fill="#71717a"
+                                fontSize="12"
+                                textAnchor="end"
+                                alignmentBaseline="middle"
+                                dominantBaseline="middle"
+                                className="font-mono font-medium"
+                            >
+                                {formatYValue(Math.round(maxAmount * (1 - i)))}
+                            </text>
+                        </React.Fragment>
+                    ))}
+                    
+                    {/* Vertical grid lines */}
+                    {data.map((_, i) => (
                         <line 
                             key={i}
-                            x1={paddingX}
-                            y1={paddingY + i * (chartHeight - paddingY * 2)}
-                            x2={chartWidth - paddingX}
-                            y2={paddingY + i * (chartHeight - paddingY * 2)}
+                            x1={paddingX + (i / (data.length - 1)) * (chartWidth - paddingX * 2)}
+                            y1={paddingY}
+                            x2={paddingX + (i / (data.length - 1)) * (chartWidth - paddingX * 2)}
+                            y2={chartHeight - paddingY}
                             stroke="white"
-                            strokeOpacity="0.03"
+                            strokeOpacity="0.05"
                             strokeWidth="1"
                         />
                     ))}
 
-                    <path d={areaD} fill="url(#areaGradient)" />
+                    <path d={areaD} fill="none" />
 
                     {prevPathD && (
                         <path 
@@ -190,8 +242,8 @@ const RevenueChart = ({ data, previousData }) => {
                     <path 
                         d={pathD} 
                         fill="none" 
-                        stroke="#f43f5e" 
-                        strokeWidth="2.5" 
+                        stroke="url(#lineGradient)" 
+                        strokeWidth="2" 
                         strokeLinecap="round" 
                         strokeLinejoin="round"
                     />
@@ -200,27 +252,41 @@ const RevenueChart = ({ data, previousData }) => {
                         <g>
                             <line 
                                 x1={tooltipPos.x} y1="0" x2={tooltipPos.x} y2={chartHeight}
-                                stroke="#f43f5e" strokeOpacity="0.15" strokeWidth="1"
+                                stroke="#10b981" strokeOpacity="0.2" strokeWidth="1"
                             />
                             <circle 
-                                cx={tooltipPos.x} cy={tooltipPos.y} r="1"
-                                fill="#f43f5e" 
+                                cx={tooltipPos.x} cy={tooltipPos.y} r="3"
+                                fill="#10b981" 
                             />
                         </g>
                     )}
+                    {/* X-axis labels */}
+                    {data.map((d, i) => {
+                        const xPos = paddingX + (i / (data.length - 1)) * (chartWidth - paddingX * 2);
+                        const isHovered = hoveredIdx === i;
+                        return (
+                            <g key={`x-label-${i}`}>
+                                <text
+                                    x={xPos}
+                                    y={chartHeight - 12}
+                                    fill="currentColor"
+                                    className={`text-[11px] font-bold uppercase tracking-wider transition-colors duration-300 pointer-events-none ${isHovered ? 'text-emerald-500' : 'text-zinc-400'}`}
+                                    textAnchor="middle"
+                                >
+                                    {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                                </text>
+                                {isHovered && (
+                                    <circle 
+                                        cx={xPos} 
+                                        cy={chartHeight - 2} 
+                                        r="2" 
+                                        fill="#10b981" 
+                                    />
+                                )}
+                            </g>
+                        );
+                    })}
                 </svg>
-
-                {/* Timeline Labels */}
-                <div className="flex justify-between mt-6 relative z-10" style={{ paddingLeft: `${(paddingX / chartWidth) * 100}%`, paddingRight: `${(paddingX / chartWidth) * 100}%` }}>
-                    {data.map((d, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2 w-0 overflow-visible">
-                            <div className={`text-[9px] font-bold uppercase tracking-wider transition-colors duration-300 whitespace-nowrap ${hoveredIdx === i ? 'text-rose-500' : 'text-zinc-600'}`}>
-                                {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' })}
-                            </div>
-                            {hoveredIdx === i && <div className="w-1 h-1 rounded-full bg-rose-500" />}
-                        </div>
-                    ))}
-                </div>
             </div>
         </div>
     );
@@ -291,17 +357,17 @@ const Dashboard = () => {
         return (
             <div className="max-w-7xl mx-auto mt-32 flex flex-col items-center justify-center space-y-4">
                 <div className="w-16 h-16 border-4 border-rose-500/20 border-t-rose-500 rounded-full animate-spin" />
-                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Administrative Data...</p>
+                <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Administrative Data...</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 my-20 px-8">
+        <div className="w-full space-y-10 my-4">
             <div className="flex justify-between items-end pb-8 border-b border-white/[0.05]">
                 <div>
                     <h2 className="text-3xl font-bold text-white tracking-tight">Analytics Overview</h2>
-                    <p className="text-zinc-500 mt-1 text-sm">Real-time performance and financial metrics for your platform.</p>
+                    <p className="text-zinc-400 mt-1 text-sm">Real-time performance and financial metrics for your platform.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-white/[0.05] rounded-xl">
@@ -314,7 +380,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatCard
                     title="Platform Revenue"
                     value={stats.totalRevenue}
@@ -342,10 +408,11 @@ const Dashboard = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <RevenueChart data={stats.revenueHistory} previousData={stats.previousRevenueHistory} />
-                
-                <div className="bg-zinc-900 shadow-2xl rounded-3xl border border-white/[0.05] p-8 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-2">
+                    <RevenueChart data={stats.revenueHistory} previousData={stats.previousRevenueHistory} />
+                </div>
+                <div className="bg-zinc-900 shadow-2xl rounded-3xl border border-white/[0.05] p-10 overflow-hidden">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
                             <TrendingUp size={20} className="text-rose-500" />
@@ -365,7 +432,7 @@ const Dashboard = () => {
                                         <h4 className="text-white text-sm font-bold truncate max-w-[150px]">{comic.title}</h4>
                                         <div className="flex items-center gap-1.5 mt-0.5">
                                             <div className="w-1 h-1 rounded-full bg-rose-500" />
-                                            <span className="text-zinc-500 text-[10px] font-medium tracking-wide">ID: {comic._id.substring(0, 8)}...</span>
+                                            <span className="text-zinc-400 text-[10px] font-medium tracking-wide">ID: {comic._id.substring(0, 8)}...</span>
                                         </div>
                                     </div>
                                 </div>
@@ -387,7 +454,7 @@ const Dashboard = () => {
                     </h3>
                     <div className="space-y-5">
                         <div className="flex justify-between items-center group cursor-default">
-                            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                            <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-zinc-700" />
                                 Database Node
                             </span>
@@ -396,14 +463,14 @@ const Dashboard = () => {
                             </span>
                         </div>
                         <div className="flex justify-between items-center group cursor-default">
-                            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                            <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-zinc-700" />
                                 Uptime Counter
                             </span>
                             <span className="text-white text-[9px] font-black uppercase tracking-widest">{formatUptime(stats.systemHealth?.uptime)}</span>
                         </div>
                         <div className="flex justify-between items-center group cursor-default">
-                            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                            <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                                 <div className="w-1 h-1 rounded-full bg-zinc-700" />
                                 Network Secure
                             </span>
