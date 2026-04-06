@@ -9,5 +9,9 @@ export const commentService = {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: { content, chapterId }
+    }),
+    delete: (comicId, commentId, token) => apiClient(`/comics/${comicId}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
     })
 };

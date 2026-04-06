@@ -21,6 +21,7 @@ import ComicEditor from './pages/admin/ComicEditor';
 import ChapterManager from './pages/admin/ChapterManager';
 import AdminLogin from './pages/admin/AdminLogin';
 import ApplicationManager from './pages/admin/ApplicationManager';
+import UserManager from './pages/admin/UserManager';
 
 import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute';
 import ProtectedCreatorRoute from './components/auth/ProtectedCreatorRoute';
@@ -107,6 +108,7 @@ export const router = createBrowserRouter([
                     { path: 'comics/edit/:id', element: <ComicEditor /> },
                     { path: 'comics/:id/chapters', element: <ChapterManager /> },
                     { path: 'applications', element: <ApplicationManager /> },
+                    { path: 'users', element: <UserManager /> },
                 ]
             }
         ]

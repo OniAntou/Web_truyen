@@ -48,8 +48,19 @@ const updateApplicationStatus = asyncHandler(async (req, res) => {
   res.json({ message: `Đã ${status} đơn ứng tuyển`, application: appDoc });
 });
 
+const deleteApplication = asyncHandler(async (req, res) => {
+  const appDoc = await Application.findById(req.params.id);
+  if (!appDoc) {
+    throw new AppError("Không tìm thấy đơn", 404);
+  }
+  
+  await Application.findByIdAndDelete(req.params.id);
+  res.json({ message: "Đã xóa đơn ứng tuyển thành công" });
+});
+
 module.exports = {
   submitApplication,
   getApplications,
-  updateApplicationStatus
+  updateApplicationStatus,
+  deleteApplication
 };

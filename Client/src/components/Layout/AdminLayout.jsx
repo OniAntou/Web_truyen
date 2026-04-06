@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users } from 'lucide-react';
 
 const AdminLayout = () => {
     const location = useLocation();
@@ -49,6 +49,14 @@ const AdminLayout = () => {
                     >
                         <UserPlus size={20} className={location.pathname === '/admin/applications' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
                         <span className="font-medium">Applications</span>
+                    </Link>
+
+                    <Link
+                        to="/admin/users"
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/users')}`}
+                    >
+                        <Users size={20} className={location.pathname === '/admin/users' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
+                        <span className="font-medium">User Management</span>
                     </Link>
                 </nav>
 

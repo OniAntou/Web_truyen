@@ -16,6 +16,7 @@ const studioRoutes = require('./routes/studioRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const errorHandler = require('./middleware/errorHandler');
@@ -51,6 +52,7 @@ app.use('/api/studio', studioRoutes);
 app.use('/api/upload', uploadRoutes); 
 app.use('/api/stats', statsRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/payment', paymentRoutes);
 
 // Compatibility / Special cases

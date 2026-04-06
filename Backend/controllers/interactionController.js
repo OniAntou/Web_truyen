@@ -111,6 +111,22 @@ const postComment = asyncHandler(async (req, res) => {
   res.json({ message: "Đăng bình luận thành công", comment: populatedComment });
 });
 
+const deleteComment = asyncHandler(async (req, res) => {
+  const comment = await Comment.findById(req.params.commentId);
+  if (!comment) throw new AppError("Bình luận không tồn tại", 404);
+
+  // Allow delete if user is the comment owner OR is an admin
+  const isOwner = comment.user_id.toString() === req.user.id;
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new AppError("Bạn không có quyền xoá bình luận này", 403);
+  }
+
+  await Comment.findByIdAndDelete(comment._id);
+  res.json({ message: "Đã xoá bình luận thành công" });
+});
+
 // Favorites
 const checkFavorite = asyncHandler(async (req, res) => {
   const comic = await findComic(req.params.id);
@@ -311,6 +327,7 @@ module.exports = {
   recordView,
   getComments,
   postComment,
+  deleteComment,
   checkFavorite,
   getUserFavorites,
   toggleFavorite,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, UserX, Clock, Search, ExternalLink, HelpCircle } from 'lucide-react';
+import { UserCheck, UserX, Clock, Search, ExternalLink, HelpCircle, Trash2 } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 
 const ApplicationManager = () => {
@@ -79,6 +79,29 @@ const ApplicationManager = () => {
             });
             if (res.ok) {
                 setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'rejected' } : app));
+            } else if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('admin');
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa đơn ứng tuyển này? Thao tác này không thể hoàn tác.')) return;
+        
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}`, {
+                method: 'DELETE',
+                headers: { 
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (res.ok) {
+                setApplications(apps => apps.filter(app => app.id !== id));
             } else if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
                 localStorage.removeItem('token');
@@ -181,22 +204,32 @@ const ApplicationManager = () => {
                             </div>
 
                             {/* Actions */}
-                            {app.status === 'pending' && (
-                                <div className="shrink-0 flex lg:flex-col gap-3 pt-4 border-t lg:border-t-0 lg:border-l border-white/5 lg:pl-6 lg:pt-0">
+                            <div className="shrink-0 flex lg:flex-col gap-3 pt-4 border-t lg:border-t-0 lg:border-l border-white/5 lg:pl-6 lg:pt-0">
+                                {app.status === 'pending' && (
+                                    <>
+                                        <button 
+                                            onClick={() => handleApprove(app.id)}
+                                            className="flex-1 lg:w-36 py-3 px-4 rounded-xl font-medium text-sm border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all duration-300 flex items-center justify-center gap-2 group"
+                                        >
+                                            <UserCheck size={18} className="group-hover:scale-110 transition-transform" /> Approve
+                                        </button>
+                                        <button 
+                                            onClick={() => handleReject(app.id)}
+                                            className="flex-1 lg:w-36 py-3 px-4 rounded-xl font-medium text-sm border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 flex items-center justify-center gap-2 group"
+                                        >
+                                            <UserX size={18} className="group-hover:scale-110 transition-transform" /> Reject
+                                        </button>
+                                    </>
+                                )}
+                                {(app.status === 'approved' || app.status === 'rejected') && (
                                     <button 
-                                        onClick={() => handleApprove(app.id)}
-                                        className="flex-1 lg:w-36 py-3 px-4 rounded-xl font-medium text-sm border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all duration-300 flex items-center justify-center gap-2 group"
+                                        onClick={() => handleDelete(app.id)}
+                                        className="flex-1 lg:w-36 py-3 px-4 rounded-xl font-medium text-sm border border-zinc-500/20 bg-zinc-500/10 text-zinc-400 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 flex items-center justify-center gap-2 group"
                                     >
-                                        <UserCheck size={18} className="group-hover:scale-110 transition-transform" /> Approve
+                                        <Trash2 size={18} className="group-hover:scale-110 transition-transform" /> Delete
                                     </button>
-                                    <button 
-                                        onClick={() => handleReject(app.id)}
-                                        className="flex-1 lg:w-36 py-3 px-4 rounded-xl font-medium text-sm border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 flex items-center justify-center gap-2 group"
-                                    >
-                                        <UserX size={18} className="group-hover:scale-110 transition-transform" /> Reject
-                                    </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
 
                         </div>
                     ))

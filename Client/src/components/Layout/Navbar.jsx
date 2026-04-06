@@ -22,12 +22,54 @@ const Navbar = () => {
     const debounceRef = useRef(null);
     const navigate = useNavigate();
 
-    // Re-check authentication context
+    // Validate token and check authentication
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try { setUser(JSON.parse(storedUser)); } catch(e) {}
-        }
+        const checkAuth = () => {
+            const token = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+
+            if (token && storedUser) {
+                // Validate token is not expired
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const isExpired = payload.exp && (payload.exp * 1000 < Date.now());
+                    if (isExpired) {
+                        // Token expired — clear session
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setUser(null);
+                        navigate('/auth');
+                        return;
+                    }
+                    setUser(JSON.parse(storedUser));
+                } catch (e) {
+                    // Invalid token format — clear session
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    setUser(null);
+                    navigate('/auth');
+                }
+            } else {
+                setUser(null);
+            }
+        };
+
+        checkAuth();
+
+        // Listen for auth:logout events from apiClient
+        const handleLogoutEvent = () => {
+            setUser(null);
+            setShowProfileDropdown(false);
+            navigate('/auth');
+        };
+        window.addEventListener('auth:logout', handleLogoutEvent);
+        // Also re-check when localStorage changes (e.g. from another tab)
+        window.addEventListener('storage', checkAuth);
+
+        return () => {
+            window.removeEventListener('auth:logout', handleLogoutEvent);
+            window.removeEventListener('storage', checkAuth);
+        };
     }, [navigate]);
 
     const handleLogout = () => {

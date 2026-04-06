@@ -13,6 +13,7 @@ router.post('/:id/view', authenticateToken, interactionController.recordView);
 // Comments
 router.get('/:id/comments', interactionController.getComments);
 router.post('/:id/comments', authenticateToken, interactionController.postComment);
+router.delete('/:id/comments/:commentId', authenticateToken, interactionController.deleteComment);
 
 // Favorites
 router.get('/:id/favorite', authenticateToken, interactionController.checkFavorite);
