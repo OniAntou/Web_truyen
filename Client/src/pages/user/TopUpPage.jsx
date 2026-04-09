@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
@@ -53,7 +53,7 @@ const TopUpPage = () => {
             <div className="flex-1 w-full max-w-5xl mx-auto px-4 pt-24 pb-16">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-white mb-2 pb-4 border-b border-white/5">Nạp Xu</h1>
-                    <p className="text-zinc-500 text-sm mt-3">Mua Xu để mở khóa truy cập sớm các chương truyện đặc quyền.</p>
+                    <p className="text-zinc-500 text-sm mt-3">Mua Xu để mở khóa truy cập sớm các chapter truyện đặc quyền.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -93,20 +93,6 @@ const TopUpPage = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <h2 className="text-white font-semibold mb-4">Mệnh giá khác</h2>
-                            <div className="bg-[#151515] border border-white/5 p-2 rounded-2xl flex items-center hover:border-white/20 transition-colors focus-within:border-yellow-500/50">
-                                <span className="text-zinc-500 font-medium px-4 text-sm">VNĐ</span>
-                                <input 
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(Number(e.target.value))}
-                                    min="10000"
-                                    className="flex-1 bg-transparent border-l border-white/5 py-3 px-4 text-white font-semibold outline-none transition-colors"
-                                />
-                            </div>
-                            <p className="text-xs text-zinc-600 font-medium mt-3 ml-2">Mệnh giá tối thiểu nạp hợp lệ: 10,000 VNĐ.</p>
-                        </div>
                     </div>
 
                     {/* Right Column: Checkout Summary */}

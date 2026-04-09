@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
@@ -114,7 +114,7 @@ const CreatorApplication = () => {
                                 required
                                 className="w-full p-4 md:p-5 rounded-2xl outline-none transition-all duration-300 hover:opacity-80 focus:opacity-100"
                                 style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-                                placeholder="Tên hiển thị của bạn trên các chương truyện..."
+                                placeholder="Tên hiển thị của bạn trên các chapter truyện..."
                             />
                         </div>
 

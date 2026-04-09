@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
 import { formatViews, translateStatus } from '../../utils/format';
@@ -148,7 +148,7 @@ const ComicInfo = ({ comic }) => {
                             onClick={(e) => {
                                 if (!comic.chapters || comic.chapters.length === 0) {
                                     e.preventDefault();
-                                    alert('Chưa có chương nào');
+                                    alert('Chưa có chapter nào');
                                 }
                             }}
                         >
@@ -163,7 +163,7 @@ const ComicInfo = ({ comic }) => {
                                 style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none' }}
                             >
                                 <BookOpen size={20} />
-                                Đọc Tiếp - Chương {readingProgress.chapter_number}
+                                Đọc Tiếp - Chapter {readingProgress.chapter_number}
                             </Link>
                         )}
                         <button className="btn btn-glass" onClick={handleFavorite} style={{ color: isFavorited ? '#ef4444' : 'inherit' }}>

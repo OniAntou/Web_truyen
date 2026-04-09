@@ -141,6 +141,7 @@ const CommentSchema = new mongoose.Schema(
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
     chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: false },
+    parent_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: null },
     content: { type: String, required: true },
     created_at: { type: Date, default: Date.now }
   },

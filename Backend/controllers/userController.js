@@ -1,4 +1,4 @@
-const { User, ComicView, Comic, Rating, Comment, Favorite } = require('../../Database/database');
+const { User, ComicView, Comic, Rating, Comment, Favorite, Payment, ChapterUnlock } = require('../../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
@@ -146,10 +146,35 @@ const updateMe = asyncHandler(async (req, res) => {
   res.json(safeUser);
 });
 
+const getTransactions = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  
+  // Get payments (top ups)
+  const payments = await Payment.find({ user_id: userId })
+    .sort({ created_at: -1 })
+    .limit(50);
+    
+  // Get chapter unlocks (spending)
+  const unlocks = await ChapterUnlock.find({ user_id: userId })
+    .populate({
+      path: 'chapter_id',
+      select: 'chapter_number title comic_id',
+      populate: {
+        path: 'comic_id',
+        select: 'title'
+      }
+    })
+    .sort({ created_at: -1 })
+    .limit(50);
+
+  res.json({ payments, unlocks });
+});
+
 module.exports = {
   getMe,
   updateMe,
   deleteMe,
   deleteUser,
-  upgradeVip
+  upgradeVip,
+  getTransactions
 };

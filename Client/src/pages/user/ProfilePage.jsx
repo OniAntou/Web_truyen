@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
-import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 
 const ProfilePage = () => {
@@ -13,6 +13,9 @@ const ProfilePage = () => {
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [transactions, setTransactions] = useState({ payments: [], unlocks: [] });
+    const [loadingHistory, setLoadingHistory] = useState(false);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
@@ -83,6 +86,28 @@ const ProfilePage = () => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const fetchHistory = async () => {
+        setLoadingHistory(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/users/transactions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setTransactions(data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch history', err);
+        } finally {
+            setLoadingHistory(false);
+        }
+    };
+
+    const handleOpenHistory = () => {
+        setShowHistoryModal(true);
+        fetchHistory();
     };
 
     const handleKeyDown = (e) => {
@@ -195,9 +220,14 @@ const ProfilePage = () => {
                                 <div style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0.5rem 0' }}>
                                     {(profile.coins || 0).toLocaleString('vi-VN')} <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>xu</span>
                                 </div>
-                                <button className="btn btn-glass" style={{ width: '100%', fontSize: '0.85rem' }} onClick={() => navigate('/payment/topup')}>
-                                    <Plus size={15} /> Nạp Xu
-                                </button>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button className="btn btn-glass" style={{ flex: 1, fontSize: '0.85rem' }} onClick={() => navigate('/payment/topup')}>
+                                        <Plus size={15} /> Nạp Xu
+                                    </button>
+                                    <button className="btn btn-glass" style={{ flex: 1, fontSize: '0.85rem' }} onClick={handleOpenHistory}>
+                                        <History size={15} /> Lịch sử
+                                    </button>
+                                </div>
                             </div>
 
                             {/* VIP */}
@@ -257,6 +287,65 @@ const ProfilePage = () => {
                             >
                                 {saving ? 'Đang xóa...' : 'Xác nhận xóa'}
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* History Modal */}
+            {showHistoryModal && (
+                <div className="modal-overlay" onClick={(e) => { if (e.target.className === 'modal-overlay') setShowHistoryModal(false); }}>
+                    <div className="glass-panel modal-content" style={{ borderRadius: '1rem', padding: '2rem', maxWidth: '750px', width: '95%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><History size={20} className="text-accent" /> Lịch sử giao dịch</h3>
+                            <button className="profile-icon-btn cancel" onClick={() => setShowHistoryModal(false)}><X size={20} /></button>
+                        </div>
+                        
+                        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }} className="custom-scrollbar">
+                            {loadingHistory ? (
+                                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Đang tải...</div>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {[...transactions.payments.map(p => ({ ...p, type: 'payment' })), ...transactions.unlocks.map(u => ({ ...u, type: 'unlock' }))]
+                                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                        .map((item, idx) => (
+                                            <div key={idx} style={{ 
+                                                display: 'flex', alignItems: 'center', gap: '1rem', 
+                                                padding: '1rem', background: 'rgba(255,255,255,0.03)', 
+                                                borderRadius: '0.75rem', border: '1px solid var(--glass-border)' 
+                                            }}>
+                                                <div style={{ 
+                                                    width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    background: item.type === 'payment' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
+                                                    color: item.type === 'payment' ? '#10b981' : '#f43f5e'
+                                                }}>
+                                                    {item.type === 'payment' ? <Plus size={20} /> : <Crown size={20} />}
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.2rem' }}>
+                                                        {item.type === 'payment' 
+                                                            ? `Nạp qua VNPay (${item.status === 'success' ? 'Thành công' : item.status === 'failed' ? 'Thất bại' : 'Đang chờ'})` 
+                                                            : `Mở khóa Chapter ${item.chapter_id?.chapter_number || '?'}`}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                        {item.type === 'unlock' && item.chapter_id?.comic_id?.title && <span style={{display: 'block', marginBottom: '0.1rem'}}>{item.chapter_id.comic_id.title}</span>}
+                                                        {new Date(item.created_at).toLocaleString('vi-VN')}
+                                                    </div>
+                                                </div>
+                                                <div style={{ 
+                                                    fontWeight: 700, whiteSpace: 'nowrap',
+                                                    color: item.type === 'payment' && item.status === 'success' ? '#10b981' : item.type === 'unlock' ? '#f43f5e' : 'var(--text-secondary)' 
+                                                }}>
+                                                    {item.type === 'payment' ? (item.status === 'success' ? '+' : '') + Math.floor(item.amount / 1000 * 100).toLocaleString('vi-VN') : '-' + item.price.toLocaleString('vi-VN')} xu
+                                                </div>
+                                            </div>
+                                        ))}
+                                    {transactions.payments.length === 0 && transactions.unlocks.length === 0 && (
+                                        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Chưa có giao dịch nào.</div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

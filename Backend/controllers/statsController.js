@@ -14,8 +14,11 @@ const getStats = asyncHandler(async (req, res) => {
   });
 
   // Calculate total revenue from successful payments
-  const successfulPayments = await Payment.find({ status: 'success' });
-  const totalRevenue = successfulPayments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const totalRevResult = await Payment.aggregate([
+    { $match: { status: 'success' } },
+    { $group: { _id: null, total: { $sum: "$amount" } } }
+  ]);
+  const totalRevenue = totalRevResult.length > 0 ? totalRevResult[0].total : 0;
 
   // Get revenue history for the last 7 days
   const now = new Date();
@@ -25,19 +28,19 @@ const getStats = asyncHandler(async (req, res) => {
   const fourteenDaysAgo = new Date(now);
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
 
-  // Current period revenue (last 7 days)
-  const currentPeriodPayments = await Payment.find({
+  // Fetch only the payments from the last 14 days
+  const recentPayments = await Payment.find({
     status: 'success',
-    created_at: { $gte: sevenDaysAgo }
-  });
-  const currentRevenue = currentPeriodPayments.reduce((acc, curr) => acc + curr.amount, 0);
+    created_at: { $gte: fourteenDaysAgo }
+  }).lean();
+
+  // Current period revenue (last 7 days)
+  const currentPeriodPayments = recentPayments.filter(p => new Date(p.created_at) >= sevenDaysAgo);
+  const currentRevenue = currentPeriodPayments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
   // Previous period revenue (7-14 days ago)
-  const previousPeriodPayments = await Payment.find({
-    status: 'success',
-    created_at: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo }
-  });
-  const previousRevenue = previousPeriodPayments.reduce((acc, curr) => acc + curr.amount, 0);
+  const previousPeriodPayments = recentPayments.filter(p => new Date(p.created_at) >= fourteenDaysAgo && new Date(p.created_at) < sevenDaysAgo);
+  const previousRevenue = previousPeriodPayments.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
   // Calculate trend (%)
   let revenueTrend = 0;
@@ -54,8 +57,12 @@ const getStats = asyncHandler(async (req, res) => {
     const dateString = date.toISOString().split('T')[0];
     
     const dayTotal = currentPeriodPayments
-      .filter(p => new Date(p.created_at).toISOString().split('T')[0] === dateString)
-      .reduce((acc, curr) => acc + curr.amount, 0);
+      .filter(p => {
+         const pDate = new Date(p.created_at);
+         const pDateString = new Date(pDate.getTime() - pDate.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+         return pDateString === dateString;
+      })
+      .reduce((acc, curr) => acc + (curr.amount || 0), 0);
     
     revenueHistory.push({
       date: dateString,

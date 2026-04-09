@@ -7,6 +7,7 @@ const authenticateToken = require('../middleware/auth');
 router.get('/me', authenticateToken, userController.getMe);
 router.put('/me', authenticateToken, userController.updateMe);
 router.delete('/me', authenticateToken, userController.deleteMe);
+router.get('/transactions', authenticateToken, userController.getTransactions);
 router.delete('/:id', userController.deleteUser);
 
 // Interactions

@@ -82,7 +82,7 @@ const getComments = asyncHandler(async (req, res) => {
   if (chapterId) {
     filter.chapter_id = chapterId;
   } else {
-    filter.chapter_id = { $exists: false };
+    filter.chapter_id = null;
   }
 
   const comments = await Comment.find(filter)
@@ -93,18 +93,23 @@ const getComments = asyncHandler(async (req, res) => {
 });
 
 const postComment = asyncHandler(async (req, res) => {
-  const { content } = req.body;
+  const { content, parentId, chapterId } = req.body;
   
   if (!content || !content.trim()) throw new AppError("Nội dung không được để trống", 400);
 
   const comic = await findComic(req.params.id);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
-  const newComment = await Comment.create({
+  const payload = {
     user_id: req.user.id,
     comic_id: comic._id,
     content: content.trim()
-  });
+  };
+  
+  if (chapterId) payload.chapter_id = chapterId;
+  if (parentId) payload.parent_id = parentId;
+
+  const newComment = await Comment.create(payload);
 
   const populatedComment = await Comment.findById(newComment._id).populate('user_id', 'username avatar');
   
@@ -124,6 +129,9 @@ const deleteComment = asyncHandler(async (req, res) => {
   }
 
   await Comment.findByIdAndDelete(comment._id);
+  // Delete all nested replies associated with this comment
+  await Comment.deleteMany({ parent_id: comment._id });
+  
   res.json({ message: "Đã xoá bình luận thành công" });
 });
 

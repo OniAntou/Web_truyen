@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { comicService } from "../../api/comicService";
@@ -48,55 +48,57 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
   return (
     <>
       <div className="reader-controls-fixed">
-        <div className="reader-controls-bar">
+        <div className="reader-controls-bar glass-panel shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
           <button
             onClick={onPrev}
-            className="control-btn"
+            className="control-btn hover:text-[var(--accent)] transition-colors"
             title="Previous Chapter"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={22} strokeWidth={2.5} />
           </button>
 
           <button
             onClick={() => setShowChapters(true)}
-            className="control-btn px-4 text-white font-medium whitespace-nowrap"
+            className="px-6 py-2 rounded-full text-[var(--accent)] font-bold text-sm tracking-wide bg-white/5 hover:bg-white/10 transition-all border border-white/5 whitespace-nowrap"
             title="Chapter List"
           >
-            {currentChapter ? `Chapter ${currentChapter.chapter_number}` : 'Chapters'}
+            {currentChapter ? `Chapter ${currentChapter.chapter_number}` : 'Danh sách chapter'}
           </button>
 
-
-
-          <button onClick={onNext} className="control-btn" title="Next Chapter">
-            <ArrowRight size={24} />
+          <button 
+            onClick={onNext} 
+            className="control-btn hover:text-[var(--accent)] transition-colors" 
+            title="Next Chapter"
+          >
+            <ArrowRight size={22} strokeWidth={2.5} />
           </button>
         </div>
       </div>
 
       {showChapters && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm animate-in fade-in duration-300"
           onClick={() => setShowChapters(false)}
         >
           <div
-            className="bg-gray-900 border border-gray-700/50 rounded-xl w-full max-w-md max-h-[85vh] flex flex-col overflow-hidden shadow-2xl"
+            className="bg-[var(--bg-secondary)] border border-white/10 rounded-[2rem] w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 py-4 border-b border-gray-700/50 flex justify-between items-center bg-gray-800/80">
-              <h3 className="text-white font-semibold text-lg">Chapters</h3>
+            <div className="px-6 py-5 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md sticky top-0 z-10">
+              <h3 className="text-white font-bold text-xl tracking-tight">Danh sách chapter</h3>
               <button
                 onClick={() => setShowChapters(false)}
-                className="text-gray-400 hover:text-white transition-colors bg-gray-800 p-1.5 rounded-full hover:bg-gray-700"
+                className="text-gray-400 hover:text-white transition-colors bg-white/5 p-2 rounded-full hover:bg-white/10"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="overflow-y-auto p-3 flex-1 custom-scrollbar">
+            <div className="overflow-y-auto p-4 flex-1 custom-scrollbar">
               {loadingStatus ? (
-                <div className="py-10 text-center text-gray-500 italic">Loading chapter status...</div>
+                <div className="py-20 text-center text-[var(--text-secondary)] italic font-medium animate-pulse">Đang tải trạng thái...</div>
               ) : displayChapters && displayChapters.length > 0 ? (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   {[...displayChapters].reverse().map((ch) => {
                     const isActive = ch._id === currentChapterId || ch.id === currentChapterId;
                     return (
@@ -105,26 +107,26 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
                         to={`/read/${comicId}/${ch._id || ch.id}`}
                         onClick={() => setShowChapters(false)}
                         ref={isActive ? activeChapterRef : null}
-                        className={`px-4 py-3 rounded-lg transition-all flex justify-between items-center cursor-pointer ${
+                        className={`px-5 py-4 rounded-2xl transition-all duration-300 flex justify-between items-center border ${
                           isActive
-                            ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30 font-medium'
+                            ? 'bg-[var(--accent)] text-white border-transparent shadow-lg shadow-[var(--accent)]/30 font-bold scale-[1.02]'
                             : ch.isRead
-                            ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-300 border border-transparent'
-                            : 'text-gray-300 hover:bg-gray-800 hover:text-white border border-transparent'
+                            ? 'text-[var(--text-secondary)] bg-white/5 hover:bg-white/10 border-transparent'
+                            : 'text-[var(--text-primary)] hover:bg-white/10 border-white/5'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <span>Chapter {ch.chapter_number} {ch.title ? `: ${ch.title}` : ''}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="truncate max-w-[200px]">{ch.title || `Chapter ${ch.chapter_number}`}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          {isActive && <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full font-semibold">Current</span>}
+                          {ch.isRead && !isActive && <span className="w-2 h-2 rounded-full bg-green-500 opacity-50"></span>}
                         </div>
                       </Link>
                     );
                   })}
                 </div>
               ) : (
-                <div className="py-10 text-center text-gray-500 italic">No chapters available</div>
+                <div className="py-20 text-center text-[var(--text-secondary)] italic">Chưa có chapter nào</div>
               )}
             </div>
           </div>

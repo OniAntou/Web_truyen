@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
@@ -135,7 +135,7 @@ const ReadPage = () => {
         setConfirmModal({ 
             isOpen: true, 
             type: 'unlock', 
-            message: `Xác nhận dùng ${error?.price || 0} Xu để mở khóa chương này?`, 
+            message: `Xác nhận dùng ${error?.price || 0} Xu để mở khóa chapter này?`, 
             price: error?.price || 0 
         });
     };
@@ -156,7 +156,7 @@ const ReadPage = () => {
             if (confirmModal.type === 'unlock') {
                 await chapterService.unlockChapter(chapter?._id || chapterId, token);
                 setConfirmModal({ ...confirmModal, isOpen: false });
-                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chương thành công!', isSuccess: true });
+                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true });
                 setTimeout(() => window.location.reload(), 1500);
             } else if (confirmModal.type === 'vip') {
                 const response = await fetch(`${API_BASE_URL}/users/upgrade-vip`, {
@@ -204,9 +204,9 @@ const ReadPage = () => {
                             </div>
                         )}
                         
-                        <h2 className="text-xl font-bold mb-2">Chương Yêu Cầu Trả Phí</h2>
+                        <h2 className="text-xl font-bold mb-2">Chapter Yêu Cầu Trả Phí</h2>
                         <p className={`${isDarkTheme ? 'text-zinc-400' : 'text-zinc-500'} text-sm mb-6 leading-relaxed`}>
-                            Bạn cần dùng Xu để đọc trước chương này. <br/>
+                            Bạn cần dùng Xu để đọc trước chapter này. <br/>
                             Hoặc đăng ký tài khoản VIP để đọc toàn bộ truyện miễn phí!
                         </p>
                         

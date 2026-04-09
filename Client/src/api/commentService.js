@@ -5,10 +5,10 @@ export const commentService = {
         const endpoint = `/comics/${comicId}/comments${chapterId ? `?chapterId=${chapterId}` : ''}`;
         return apiClient(endpoint);
     },
-    create: (comicId, content, chapterId = null, token) => apiClient(`/comics/${comicId}/comments`, {
+    create: (comicId, content, chapterId = null, parentId = null, token) => apiClient(`/comics/${comicId}/comments`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
-        body: { content, chapterId }
+        body: { content, chapterId, parentId }
     }),
     delete: (comicId, commentId, token) => apiClient(`/comics/${comicId}/comments/${commentId}`, {
         method: 'DELETE',
