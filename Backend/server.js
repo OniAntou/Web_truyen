@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const { initCronJobs } = require('./cron/cronJobs');
 require('../Database/database'); // Initialize DB connection immediately
 
@@ -29,6 +30,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+app.use(compression()); // Gzip compress all responses
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin image/resource loading (R2, S3)
   crossOriginEmbedderPolicy: false, // Don't block cross-origin embeds

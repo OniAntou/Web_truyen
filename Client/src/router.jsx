@@ -13,6 +13,7 @@ import CreatorApplication from './pages/CreatorApplication';
 import CreatorStudio from './pages/CreatorStudio';
 import TopUpPage from './pages/user/TopUpPage';
 import PaymentReturnPage from './pages/user/PaymentReturnPage';
+import HistoryPage from './pages/HistoryPage';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
     {
         path: '/auth',
         element: <AuthPage />,
+    },
+    {
+        path: '/history',
+        element: <HistoryPage />,
     },
     {
         path: '/following',

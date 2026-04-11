@@ -183,6 +183,7 @@ const Navbar = () => {
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
                     <Link to="/latest">Latest</Link>
+                    <Link to="/history">History</Link>
                     {user && <Link to="/following" style={{ color: '#eab308' }}>Following</Link>}
                 </div>
 
@@ -342,6 +343,7 @@ const Navbar = () => {
                     <Link to="/popular" onClick={() => setIsMobileMenuOpen(false)}>Popular</Link>
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
+                    <Link to="/history" onClick={() => setIsMobileMenuOpen(false)}>History</Link>
                     {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
                     {user?.role === 'creator' ? (
                         <Link to="/studio" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Creator Studio</Link>

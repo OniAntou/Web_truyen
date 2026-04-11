@@ -10,6 +10,7 @@ import CommentSection from '../components/Comic/CommentSection';
 import { comicService } from '../api/comicService';
 import { chapterService } from '../api/chapterService';
 import { API_BASE_URL } from '../constants/api';
+import { saveReadingHistory } from '../utils/readingHistory';
 
 const ReadPage = () => {
     const { comicId, chapterId } = useParams();
@@ -88,6 +89,18 @@ const ReadPage = () => {
         if (token && comic && chapter && chapter.pages && chapter.pages.length > 0) {
             console.log('ReadPage: Chapter loaded with pages, marking as read:', chapter.title);
             updateReadingProgress(1);
+        }
+
+        // Save to local reading history (works for both logged-in and guest users)
+        if (comic && chapter) {
+            saveReadingHistory({
+                comicId: comicId,
+                comicTitle: comic.title,
+                coverUrl: comic.cover_url || comic.cover,
+                chapterId: chapter._id || chapterId,
+                chapterTitle: chapter.title,
+                chapterNumber: chapter.chapter_number
+            });
         }
     }, [chapter?._id, chapter?.pages?.length]); // Only run when chapter or its pages change
 

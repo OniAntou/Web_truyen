@@ -7,6 +7,7 @@ import ComicInfo from '../components/Comic/ComicInfo';
 import ChapterList from '../components/Comic/ChapterList';
 import CommentSection from '../components/Comic/CommentSection';
 import { comicService } from '../api/comicService';
+import ComicInfoSkeleton from '../components/Comic/ComicInfoSkeleton';
 
 const ComicInfoPage = () => {
     const { id } = useParams();
@@ -28,7 +29,7 @@ const ComicInfoPage = () => {
     }, [id]);
 
     if (loading) {
-        return <div style={{ paddingTop: '8rem', textAlign: 'center' }}>Đang tải...</div>;
+        return <ComicInfoSkeleton />;
     }
 
     if (!comic) {

@@ -9,6 +9,7 @@ import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
 import LazyImage from '../components/ui/LazyImage';
 import { comicService } from '../api/comicService';
+import HomePageSkeleton from '../components/Home/HomePageSkeleton';
 
 const HomePage = () => {
     const { data: comicsData, isLoading: isLoadingComics } = useQuery({ queryKey: ['comics', 'all'], queryFn: () => comicService.getAll() });
@@ -46,7 +47,7 @@ const HomePage = () => {
     const newComics = [...comics].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 12);
 
     if (loading) {
-        return <div style={{ paddingTop: '8rem', textAlign: 'center', color: 'white' }}>Đang tải truyện...</div>;
+        return <HomePageSkeleton />;
     }
 
     return (
@@ -96,7 +97,7 @@ const HomePage = () => {
                             </div>
                         </div>
 
-                        {/* Navigation Buttons inside the flex-1 container but absolute */}
+                        {/* Navigation Buttons */}
                         <button 
                             onClick={() => scroll('left')} 
                             className="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/80 text-white backdrop-blur-md border border-white/20 opacity-100 md:opacity-0 md:group-hover/nav:opacity-100 transition-all hover:bg-[var(--accent)] hover:scale-110 cursor-pointer flex items-center justify-center shadow-2xl"
