@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
@@ -314,7 +315,16 @@ const ReadPage = () => {
 
     return (
         <div className="reader-page">
+            <Helmet>
+                <title>{comic.title} - {chapter.title} | Web Truyện</title>
+                <meta name="description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
+                <meta property="og:title" content={`${comic.title} - ${chapter.title} | Web Truyện`} />
+                <meta property="og:description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
+                <meta property="og:image" content={comic.cover || comic.cover_url} />
+                <meta property="og:type" content="article" />
+            </Helmet>
             <Navbar />
+            <main>
 
             {/* Reader Info Bar */}
             <div className="reader-info-bar">
@@ -392,6 +402,7 @@ const ReadPage = () => {
 
             <CommentSection comicId={comicId} chapterId={chapter._id || chapter.id} />
 
+            </main>
             <Footer />
         </div>
     );

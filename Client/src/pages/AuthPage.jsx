@@ -3,34 +3,56 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Layout/Navbar";
 import Footer from "../components/Layout/Footer";
 import { authService } from "../api/authService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const registerSchema = z.object({
+  username: z.string().min(3, "Tên hiển thị phải có ít nhất 3 ký tự").max(50, "Tên hiển thị quá dài"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Email không hợp lệ").min(1, "Vui lòng nhập email"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+});
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    resolver: zodResolver(isLogin ? loginSchema : registerSchema),
+    mode: "onBlur"
+  });
+
+  const onSubmit = async (data) => {
+    setApiError("");
     setLoading(true);
     try {
-      const data = isLogin 
-        ? await authService.login(email, password)
-        : await authService.register(username, email, password);
+      const response = isLogin 
+        ? await authService.login(data.email, data.password)
+        : await authService.register(data.username, data.email, data.password);
         
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
       navigate("/");
     } catch (err) {
-      setError(err.message || err);
+      setApiError(err.message || err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleLogin = () => {
+    setIsLogin(!isLogin);
+    setIsForgotPassword(false);
+    reset();
+    setApiError("");
   };
 
   const renderForm = () => {
@@ -57,11 +79,25 @@ const AuthPage = () => {
         <h2 style={titleStyle}>{isLogin ? "ComicVerse" : "Gia Nhập Verse"}</h2>
         <p style={subTitleStyle}>{isLogin ? "Đăng nhập để theo dõi truyện yêu thích" : "Tạo tài khoản để trải nghiệm tốt hơn"}</p>
 
-        <form style={formStyle} onSubmit={handleSubmit}>
-          {error && <div style={{ color: "#ef4444", fontSize: "0.9rem", textAlign: "left" }}>{error}</div>}
-          {!isLogin && <input type="text" placeholder="Tên hiển thị" style={inputStyle} value={username} onChange={(e) => setUsername(e.target.value)} required />}
-          <input type="email" placeholder="Email của bạn" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Mật khẩu" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <form style={formStyle} onSubmit={handleSubmit(onSubmit)}>
+          {apiError && <div style={{ color: "#ef4444", fontSize: "0.9rem", textAlign: "left" }}>{apiError}</div>}
+          
+          {!isLogin && (
+            <div style={{ textAlign: "left" }}>
+              <input type="text" placeholder="Tên hiển thị" style={inputStyle} {...register("username")} />
+              {errors.username && <span style={{ color: "#ef4444", fontSize: "0.8rem", display: "block", marginTop: "4px" }}>{errors.username.message}</span>}
+            </div>
+          )}
+          
+          <div style={{ textAlign: "left" }}>
+            <input type="email" placeholder="Email của bạn" style={inputStyle} {...register("email")} />
+            {errors.email && <span style={{ color: "#ef4444", fontSize: "0.8rem", display: "block", marginTop: "4px" }}>{errors.email.message}</span>}
+          </div>
+
+          <div style={{ textAlign: "left" }}>
+            <input type="password" placeholder="Mật khẩu" style={inputStyle} {...register("password")} />
+            {errors.password && <span style={{ color: "#ef4444", fontSize: "0.8rem", display: "block", marginTop: "4px" }}>{errors.password.message}</span>}
+          </div>
 
           {/* Nút Quên mật khẩu nằm ở đây */}
           {isLogin && (
@@ -80,10 +116,7 @@ const AuthPage = () => {
         <div style={{ marginTop: "1.5rem" }}>
           <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>{isLogin ? "Bạn mới biết đến ComicVerse?" : "Đã có tài khoản rồi?"}</span>
           <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setIsForgotPassword(false);
-            }}
+            onClick={toggleLogin}
             style={linkBtnStyle}
           >
             {isLogin ? "Tạo tài khoản" : "Đăng nhập"}
@@ -118,7 +151,7 @@ const cardStyle = {
 const titleStyle = { color: "var(--text-primary)", fontSize: "2rem", fontWeight: "800", marginBottom: "0.5rem" };
 const subTitleStyle = { color: "var(--text-secondary)", marginBottom: "2rem", fontSize: "0.9rem" };
 const formStyle = { display: "flex", flexDirection: "column", gap: "1rem" };
-const inputStyle = { padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "var(--text-primary)", outline: "none" };
+const inputStyle = { width: "100%", boxSizing: "border-box", padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "var(--text-primary)", outline: "none" };
 const buttonStyle = { padding: "1rem", borderRadius: "0.8rem", background: "var(--accent)", color: "white", border: "none", fontWeight: "700", cursor: "pointer", marginTop: "0.5rem" };
 const linkBtnStyle = { background: "none", border: "none", color: "var(--accent)", fontWeight: "bold", marginLeft: "0.5rem", cursor: "pointer", textDecoration: "underline" };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Menu, X, User, Star, Sun, Moon, Trash2 } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
@@ -21,9 +21,11 @@ const Navbar = () => {
     const profileRef = useRef(null);
     const debounceRef = useRef(null);
     const navigate = useNavigate();
-
+    const location = useLocation();
     // Validate token and check authentication
     useEffect(() => {
+        let authTimeout;
+
         const checkAuth = () => {
             const token = localStorage.getItem('token');
             const storedUser = localStorage.getItem('user');
@@ -32,7 +34,10 @@ const Navbar = () => {
                 // Validate token is not expired
                 try {
                     const payload = JSON.parse(atob(token.split('.')[1]));
-                    const isExpired = payload.exp && (payload.exp * 1000 < Date.now());
+                    const expiryTime = payload.exp ? payload.exp * 1000 : 0;
+                    const now = Date.now();
+                    const isExpired = expiryTime && (expiryTime < now);
+                    
                     if (isExpired) {
                         // Token expired — clear session
                         localStorage.removeItem('token');
@@ -41,7 +46,24 @@ const Navbar = () => {
                         navigate('/auth');
                         return;
                     }
+                    
                     setUser(JSON.parse(storedUser));
+
+                    // Schedule automatic logout when token expires
+                    if (expiryTime) {
+                        const timeUntilExpiry = expiryTime - now;
+                        if (authTimeout) clearTimeout(authTimeout);
+                        
+                        // Max setTimeout delay is ~24.8 days
+                        if (timeUntilExpiry > 0 && timeUntilExpiry < 2147483647) {
+                            authTimeout = setTimeout(() => {
+                                localStorage.removeItem('token');
+                                localStorage.removeItem('user');
+                                setUser(null);
+                                navigate('/auth');
+                            }, timeUntilExpiry);
+                        }
+                    }
                 } catch (e) {
                     // Invalid token format — clear session
                     localStorage.removeItem('token');
@@ -69,8 +91,9 @@ const Navbar = () => {
         return () => {
             window.removeEventListener('auth:logout', handleLogoutEvent);
             window.removeEventListener('storage', checkAuth);
+            if (authTimeout) clearTimeout(authTimeout);
         };
-    }, [navigate]);
+    }, [navigate, location.pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -165,15 +188,15 @@ const Navbar = () => {
 
                 {/* Actions */}
                 <div className="nav-actions flex items-center">
-                    {(user?.role === 'creator' || user?.role === 'admin') ? (
+                    {user?.role === 'creator' ? (
                         <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-[var(--accent)] hover:bg-orange-600 text-white rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                             Studio
                         </Link>
-                    ) : (
+                    ) : user?.role !== 'admin' ? (
                         <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                             Creator
                         </Link>
-                    )}
+                    ) : null}
                     <div className="nav-search-container flex-shrink-0" ref={searchRef}>
                         <div className="nav-search-box">
                             <Search size={18} className="nav-search-icon" />
@@ -283,7 +306,7 @@ const Navbar = () => {
                                             Admin Panel
                                         </Link>
                                     )}
-                                    {(user?.role === 'creator' || user?.role === 'admin') && (
+                                    {user?.role === 'creator' && (
                                         <Link to="/studio" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--accent)', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
                                             Creator Studio
                                         </Link>
@@ -320,11 +343,11 @@ const Navbar = () => {
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
                     {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
-                    {(user?.role === 'creator' || user?.role === 'admin') ? (
+                    {user?.role === 'creator' ? (
                         <Link to="/studio" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Creator Studio</Link>
-                    ) : (
+                    ) : user?.role !== 'admin' ? (
                         <Link to="/become-creator" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#a855f7', fontWeight: 'bold' }}>Become Creator</Link>
-                    )}
+                    ) : null}
                     <div style={{ height: '1px', background: 'var(--border)' }}></div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Theme</span>

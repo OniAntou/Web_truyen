@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
@@ -9,9 +11,11 @@ import LazyImage from '../components/ui/LazyImage';
 import { comicService } from '../api/comicService';
 
 const HomePage = () => {
-    const [comics, setComics] = useState([]);
-    const [trending, setTrending] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: comicsData, isLoading: isLoadingComics } = useQuery({ queryKey: ['comics', 'all'], queryFn: () => comicService.getAll() });
+    const { data: trendingData, isLoading: isLoadingTrending } = useQuery({ queryKey: ['comics', 'trending'], queryFn: () => comicService.getTrending(10) });
+    const loading = isLoadingComics || isLoadingTrending;
+    const comics = comicsData?.comics || [];
+    const trending = trendingData?.comics || [];
 
     // Scroll ref for navigation
     const scrollRef = useRef(null);
@@ -31,23 +35,6 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        // Fetch all comics and trending comics concurrently
-        Promise.all([
-            comicService.getAll(),
-            comicService.getTrending(10)
-        ])
-        .then(([comicsData, trendingData]) => {
-            setComics(comicsData.comics || []);
-            setTrending(trendingData.comics || []);
-            setLoading(false);
-        })
-        .catch(err => {
-            console.error('Failed to fetch data:', err);
-            setComics([]);
-            setTrending([]);
-            setLoading(false);
-        });
-
         // Test connection (Console only)
         comicService.testConnection()
             .then(data => console.log('Backend connected:', data))
@@ -64,7 +51,16 @@ const HomePage = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+            <Helmet>
+                <title>Web Truyện - Đọc truyện tranh online</title>
+                <meta name="description" content="Đọc truyện tranh bản quyền, chất lượng cao cực nhanh, cập nhật liên tục mỗi ngày." />
+                <meta property="og:title" content="Web Truyện - Đọc truyện tranh online" />
+                <meta property="og:description" content="Đọc truyện tranh bản quyền, chất lượng cao cực nhanh, cập nhật liên tục mỗi ngày." />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <Navbar />
+            <main>
+                <h1 className="sr-only" style={{ display: 'none' }}>Web Truyện - Đọc truyện tranh online, truyện tranh bản quyền, cập nhật nhanh nhất</h1>
             {featuredComics.length > 0 && <HeroSection featuredComics={featuredComics} />}
 
             {/* Trending Section wrapper */}
@@ -121,6 +117,7 @@ const HomePage = () => {
 
             <ComicGrid title="Truyện Thịnh Hành" comics={popularComics} linkTo="/popular" />
             <ComicGrid title="Truyện Mới" comics={newComics} linkTo="/latest" />
+            </main>
             <Footer />
         </div>
     );

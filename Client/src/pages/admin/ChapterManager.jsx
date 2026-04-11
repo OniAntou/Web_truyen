@@ -275,7 +275,6 @@ const ChapterManager = () => {
             };
 
             // 2. Create Chapter
-            const token = localStorage.getItem('token');
             const response = await fetch(`${API_BASE_URL}/chapters`, {
                 method: 'POST',
                 headers: { 

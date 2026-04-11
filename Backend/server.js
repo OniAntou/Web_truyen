@@ -3,6 +3,8 @@ dotenv.config();
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { initCronJobs } = require('./cron/cronJobs');
 require('../Database/database'); // Initialize DB connection immediately
 
@@ -19,6 +21,7 @@ const applicationRoutes = require('./routes/applicationRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const seoRoutes = require('./routes/seoRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -26,7 +29,22 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin image/resource loading (R2, S3)
+  crossOriginEmbedderPolicy: false, // Don't block cross-origin embeds
+  contentSecurityPolicy: false, // Disable CSP for API server (frontend handles its own)
+})); // Secure HTTP headers
 app.use(express.json());
+
+// Global Rate Limiter for all routes (prevent basic DDoS)
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
+  message: { message: "Quá nhiều yêu cầu từ IP này. Hệ thống đang tạm thời chặn để bảo vệ máy chủ." },
+  standardHeaders: true, 
+  legacyHeaders: false, 
+});
+app.use('/api', globalLimiter);
 
 // Initialize Cron Jobs
 initCronJobs();
@@ -54,6 +72,7 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api', seoRoutes);
 
 // Compatibility / Special cases
 // Some routes in interactionRoutes were originally at /api/users/

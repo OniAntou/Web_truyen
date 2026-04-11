@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
@@ -36,12 +37,33 @@ const ComicInfoPage = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+            <Helmet>
+                <title>{comic.title} | Web Truyện</title>
+                <meta name="description" content={comic.description?.substring(0, 160) || `Đọc truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
+                <meta property="og:title" content={`${comic.title} | Web Truyện`} />
+                <meta property="og:description" content={comic.description?.substring(0, 160) || `Đọc truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
+                <meta property="og:image" content={comic.cover || comic.cover_url} />
+                <meta property="og:type" content="book" />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "ComicStory",
+                        "name": comic.title,
+                        "description": comic.description,
+                        "image": comic.cover || comic.cover_url,
+                        "author": {
+                            "@type": "Person",
+                            "name": comic.author || "Đang cập nhật"
+                        }
+                    })}
+                </script>
+            </Helmet>
             <Navbar />
-            <div>
+            <main>
                 <ComicInfo comic={comic} />
                 <ChapterList chapters={comic.chapters} comicId={comic.id || comic._id} />
                 <CommentSection comicId={comic.id || comic._id} />
-            </div>
+            </main>
             <Footer />
         </div>
     );
