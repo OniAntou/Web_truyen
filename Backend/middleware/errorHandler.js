@@ -23,6 +23,11 @@ const errorHandler = (err, req, res, next) => {
     message = `Invalid ${err.path}: ${err.value}`;
   }
 
+  if (err.name === 'MongooseServerSelectionError') {
+    statusCode = 503;
+    message = 'Database connection unavailable';
+  }
+
   // Mongoose duplicate key error
   if (err.code === 11000) {
     statusCode = 409;
@@ -30,12 +35,11 @@ const errorHandler = (err, req, res, next) => {
     message = `Duplicate value for field: ${field}`;
   }
 
-  // Log error in development for debugging
-  if (process.env.NODE_ENV !== 'production') {
+  if (statusCode >= 500) {
+    console.error(`[Error] ${req.method} ${req.originalUrl} -> ${statusCode} ${message}`);
+    console.error(err.stack || err);
+  } else if (process.env.NODE_ENV !== 'production') {
     console.error(`[Error] ${statusCode} - ${message}`);
-    if (statusCode === 500) {
-      console.error(err.stack);
-    }
   }
 
   res.status(statusCode).json({ message });

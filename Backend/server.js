@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const { initCronJobs } = require('./cron/cronJobs');
-require('./Database/database'); // Initialize DB connection immediately
+const ensureDbConnection = require('./middleware/ensureDbConnection');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -28,6 +28,13 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+if (process.env.TRUST_PROXY) {
+  const trustProxyValue = Number(process.env.TRUST_PROXY);
+  app.set('trust proxy', Number.isNaN(trustProxyValue) ? process.env.TRUST_PROXY : trustProxyValue);
+} else if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -74,6 +81,8 @@ app.get("/", (req, res) => {
 app.get("/api/test", (req, res) => {
   res.json({ message: "Connection successful! Hello from Express!" });
 });
+
+app.use('/api', ensureDbConnection);
 
 // Mount Routes
 app.use('/api/auth', authRoutes);

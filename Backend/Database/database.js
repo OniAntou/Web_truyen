@@ -1,60 +1,78 @@
 const mongoose = require("mongoose");
 
-// Kết nối tới MongoDB
 const uriFromEnv = process.env.MONGO_URI;
 if (!uriFromEnv) {
-  console.error("⚠️ CẢNH BÁO: Không tìm thấy biến MONGO_URI trong môi trường! Đang dùng localhost mặc định.");
+  console.error("WARNING: MONGO_URI was not found in the environment. Falling back to localhost.");
 }
 
 const dbURI = uriFromEnv || "mongodb://localhost:27017/skycomic";
+const globalMongoose = global.__webTruyenMongoose || (global.__webTruyenMongoose = {
+  promise: null,
+  loggedUri: null,
+});
 
-mongoose
-  .connect(dbURI)
-  .then(() => {
-    const isAtlas = dbURI.includes('mongodb.net');
-    console.log(`✅ Connected to MongoDB: ${isAtlas ? 'MongoDB Atlas' : 'Localhost'}`);
-    if (isAtlas) {
-      // Log một phần URI để kiểm tra (ẩn mật khẩu)
-      console.log(`📡 URI đang dùng: ${dbURI.split('@')[1] || 'Hidden'}`);
+async function connectDB() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!globalMongoose.promise) {
+    globalMongoose.promise = mongoose.connect(dbURI, {
+      serverSelectionTimeoutMS: 5000,
+      maxPoolSize: 10,
+    });
+  }
+
+  try {
+    await globalMongoose.promise;
+    const isAtlas = dbURI.includes("mongodb.net");
+    if (globalMongoose.loggedUri !== dbURI) {
+      console.log(`Connected to MongoDB: ${isAtlas ? "MongoDB Atlas" : "Localhost"}`);
+      if (isAtlas) {
+        console.log(`MongoDB host: ${dbURI.split("@")[1] || "Hidden"}`);
+      }
+      globalMongoose.loggedUri = dbURI;
     }
-  })
-  .catch((err) => {
-    console.error("❌ Connection error:", err);
-    console.error("Vui lòng kiểm tra lại MONGO_URI trong file .env hoặc Vercel Settings");
-  });
+    return mongoose.connection;
+  } catch (err) {
+    globalMongoose.promise = null;
+    console.error("MongoDB connection error:", err);
+    throw err;
+  }
+}
 
-// --- SCHEMAS ---
+mongoose.connection.on("disconnected", () => {
+  globalMongoose.promise = null;
+});
 
-// 1. Comic Collection
 const ComicSchema = new mongoose.Schema(
   {
-    id: Number, // Legacy ID from mockData for easy migration
+    id: Number,
     title: { type: String, required: true },
     author: String,
     artist: String,
     status: String,
-    cover_url: String, // Cloudflare URL
+    cover_url: String,
     description: String,
     rating: { type: Number, default: 0 },
     rating_count: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     weekly_views: { type: Number, default: 0 },
-    genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
-    uploader_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    genres: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
+    uploader_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "comic" },
-); // Chỉ định rõ tên collection
+);
 
 const Comic = mongoose.model("Comic", ComicSchema);
 
-// 2. Chapter Collection
 const ChapterSchema = new mongoose.Schema(
   {
     comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic" },
     chapter_number: Number,
     title: String,
-    date: String, // For display strings like "2 days ago"
+    date: String,
     price: { type: Number, default: 0 },
     early_access_end_date: { type: Date },
     created_at: { type: Date, default: Date.now },
@@ -64,30 +82,28 @@ const ChapterSchema = new mongoose.Schema(
 
 const Chapter = mongoose.model("Chapter", ChapterSchema);
 
-// 3. Pages Collection (Sửa tên theo ý bạn)
 const PageSchema = new mongoose.Schema(
   {
     chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
     page_number: { type: Number, required: true },
-    image_url: { type: String, required: true }, // Cloudflare URL
+    image_url: { type: String, required: true },
   },
   { collection: "pages" },
-); // Ép buộc tên collection là 'pages'
+);
 
 const Pages = mongoose.model("Pages", PageSchema);
 
-// 4. Upload Collection – liên kết file R2 với Comic/Chapter (ảnh bìa + ảnh chapter)
 const UploadSchema = new mongoose.Schema(
   {
-    key: { type: String, required: true }, // R2 key (vd: "r2:covers/xxx.jpg")
+    key: { type: String, required: true },
     type: { type: String, enum: ["cover", "page"], required: true },
     comic_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comic",
       required: true,
     },
-    chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" }, // null cho ảnh bìa
-    page_number: { type: Number }, // cho type 'page'
+    chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter" },
+    page_number: { type: Number },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "uploads" },
@@ -95,7 +111,6 @@ const UploadSchema = new mongoose.Schema(
 
 const Upload = mongoose.model("Upload", UploadSchema);
 
-// 5. AdminLogin Collection
 const AdminLoginSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
@@ -106,13 +121,12 @@ const AdminLoginSchema = new mongoose.Schema(
 
 const AdminLogin = mongoose.model("AdminLogin", AdminLoginSchema);
 
-// 5.1. User Collection
 const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'creator', 'admin'], default: 'user' },
+    role: { type: String, enum: ["user", "creator", "admin"], default: "user" },
     coins: { type: Number, default: 0 },
     is_vip: { type: Boolean, default: false },
     vip_expiry: { type: Date },
@@ -125,7 +139,6 @@ const UserSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", UserSchema);
 
-// 5.2. Rating Collection
 const RatingSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -138,7 +151,6 @@ const RatingSchema = new mongoose.Schema(
 
 const Rating = mongoose.model("Rating", RatingSchema);
 
-// 5.3. ComicView Collection
 const ComicViewSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -152,7 +164,6 @@ ComicViewSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const ComicView = mongoose.model("ComicView", ComicViewSchema);
 
-// 5.4. Comment Collection
 const CommentSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -160,19 +171,18 @@ const CommentSchema = new mongoose.Schema(
     chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: false },
     parent_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: null },
     content: { type: String, required: true },
-    created_at: { type: Date, default: Date.now }
+    created_at: { type: Date, default: Date.now },
   },
   { collection: "comments" },
 );
 
 const Comment = mongoose.model("Comment", CommentSchema);
 
-// 5.5. Favorite Collection
 const FavoriteSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
-    created_at: { type: Date, default: Date.now }
+    created_at: { type: Date, default: Date.now },
   },
   { collection: "favorites" },
 );
@@ -181,12 +191,11 @@ FavoriteSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const Favorite = mongoose.model("Favorite", FavoriteSchema);
 
-// 6. Genre Collection – Lưu thể loại truyện
 const GenreSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true }, // Tên thể loại (vd: "Hành Động")
-    slug: { type: String, required: true, unique: true }, // URL-friendly (vd: "hanh-dong")
-    description: { type: String, default: "" },            // Mô tả thể loại
+    name: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
+    description: { type: String, default: "" },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "genres" },
@@ -194,7 +203,6 @@ const GenreSchema = new mongoose.Schema(
 
 const Genre = mongoose.model("Genre", GenreSchema);
 
-// 7. Application Collection - Creator application requests
 const ApplicationSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -209,54 +217,69 @@ const ApplicationSchema = new mongoose.Schema(
 
 const Application = mongoose.model("Application", ApplicationSchema);
 
-// 8. ReadingProgress Collection - Track user's reading progress
 const ReadingProgressSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     comic_id: { type: mongoose.Schema.Types.ObjectId, ref: "Comic", required: true },
     chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: true },
-    page_number: { type: Number, default: 1 }, // Page number where user stopped
+    page_number: { type: Number, default: 1 },
     created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
+    updated_at: { type: Date, default: Date.now },
   },
-  { collection: "reading_progress" }
+  { collection: "reading_progress" },
 );
 
 ReadingProgressSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const ReadingProgress = mongoose.model("ReadingProgress", ReadingProgressSchema);
 
-// 9. Payment Collection - Track VNPay transactions
 const PaymentSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     amount: { type: Number, required: true },
     description: { type: String },
-    order_id: { type: String, required: true, unique: true }, // vnp_TxnRef
-    vnp_transaction_no: { type: String }, // vnp_TransactionNo
+    order_id: { type: String, required: true, unique: true },
+    vnp_transaction_no: { type: String },
     status: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
     vnp_response_code: { type: String },
     created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
+    updated_at: { type: Date, default: Date.now },
   },
-  { collection: "payments" }
+  { collection: "payments" },
 );
 
 const Payment = mongoose.model("Payment", PaymentSchema);
 
-// 10. ChapterUnlock Collection - Track early access purchases
 const ChapterUnlockSchema = new mongoose.Schema(
   {
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     chapter_id: { type: mongoose.Schema.Types.ObjectId, ref: "Chapter", required: true },
     price: { type: Number, required: true },
-    created_at: { type: Date, default: Date.now }
+    created_at: { type: Date, default: Date.now },
   },
-  { collection: "chapter_unlocks" }
+  { collection: "chapter_unlocks" },
 );
 
 ChapterUnlockSchema.index({ user_id: 1, chapter_id: 1 }, { unique: true });
 
 const ChapterUnlock = mongoose.model("ChapterUnlock", ChapterUnlockSchema);
 
-module.exports = { Comic, Chapter, Pages, Upload, AdminLogin, Genre, User, Rating, ComicView, Comment, Favorite, Application, ReadingProgress, Payment, ChapterUnlock, mongoose };
+module.exports = {
+  Comic,
+  Chapter,
+  Pages,
+  Upload,
+  AdminLogin,
+  Genre,
+  User,
+  Rating,
+  ComicView,
+  Comment,
+  Favorite,
+  Application,
+  ReadingProgress,
+  Payment,
+  ChapterUnlock,
+  connectDB,
+  mongoose,
+};
