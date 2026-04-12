@@ -318,6 +318,10 @@ const updateComic = asyncHandler(async (req, res) => {
   }
 
   if (!comic) throw new AppError("Comic not found", 404);
+  
+  // Clear cache after update
+  apiCache.flush();
+  
   res.json(comic);
 });
 
@@ -353,7 +357,10 @@ const deleteComic = asyncHandler(async (req, res) => {
   await ComicView.deleteMany({ comic_id: comic._id });
   await Comment.deleteMany({ comic_id: comic._id });
   await Favorite.deleteMany({ comic_id: comic._id });
-
+  
+  // Clear cache after deletion
+  apiCache.flush();
+  
   res.json({ message: "Comic deleted successfully" });
 });
 

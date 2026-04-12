@@ -2,6 +2,7 @@ const { Chapter, Pages, Upload, User, ChapterUnlock } = require('../Database/dat
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
+const apiCache = require('../utils/cache');
 
 const getChapterPages = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
@@ -119,6 +120,10 @@ const createChapter = asyncHandler(async (req, res) => {
   }
   const newChapter = new Chapter(req.body);
   await newChapter.save();
+  
+  // Clear cache after adding new chapter
+  apiCache.flush();
+  
   res.status(201).json(newChapter);
 });
 
@@ -136,6 +141,9 @@ const deleteChapter = asyncHandler(async (req, res) => {
 
   await Pages.deleteMany({ chapter_id: chapterId });
   await Upload.deleteMany({ chapter_id: chapterId });
+
+  // Clear cache after deleting chapter
+  apiCache.flush();
 
   res.json({ message: "Chapter and its pages deleted" });
 });
@@ -157,6 +165,9 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
   await Upload.deleteMany({ chapter_id: { $in: chapterIds } });
   const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
   
+  // Clear cache after bulk deletion
+  apiCache.flush();
+
   res.json({ message: 'Chapters and their pages deleted', count: result.deletedCount });
 });
 
@@ -179,6 +190,9 @@ const deletePage = asyncHandler(async (req, res) => {
     { chapter_id: chapterId, page_number: { $gt: page.page_number } },
     { $inc: { page_number: -1 } }
   );
+
+  // Clear cache after deleting page
+  apiCache.flush();
 
   res.json({ message: "Page deleted successfully" });
 });
