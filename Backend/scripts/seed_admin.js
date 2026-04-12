@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { AdminLogin } = require('../../Database/database');
+const { AdminLogin } = require('../Database/database');
 
 const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/skycomic';
 

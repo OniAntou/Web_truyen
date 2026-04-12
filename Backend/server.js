@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const { initCronJobs } = require('./cron/cronJobs');
-require('../Database/database'); // Initialize DB connection immediately
+require('./Database/database'); // Initialize DB connection immediately
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
