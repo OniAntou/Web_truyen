@@ -24,15 +24,19 @@ const getGenres = asyncHandler(async (req, res) => {
     });
 
     if (genreDoc) {
-      let filtered = await Comic.find({ genres: genreDoc._id }).populate('genres', 'name slug');
-
+      const sortOption = {};
       if (sort === 'rating') {
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        sortOption.rating = -1;
       } else if (sort === 'newest') {
-        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        sortOption.created_at = -1;
       } else {
-        filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+        sortOption.views = -1;
       }
+
+      const filtered = await Comic.find({ genres: genreDoc._id })
+        .populate('genres', 'name slug')
+        .sort(sortOption)
+        .limit(20); // Default limit for genre page
 
       const comicIds = filtered.map(c => c._id);
       const chapterCounts = await getChapterCounts(comicIds);

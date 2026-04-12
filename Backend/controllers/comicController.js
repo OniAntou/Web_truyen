@@ -87,19 +87,22 @@ const getPopularComics = asyncHandler(async (req, res) => {
     }
   }
 
-  let comics = await Comic.find(filter).populate('genres', 'name slug');
-
+  const sortOption = {};
   if (sort === "rating") {
-    comics.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    sortOption.rating = -1;
   } else if (sort === "newest") {
-    comics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    sortOption.created_at = -1;
   } else {
-    comics.sort((a, b) => (b.views || 0) - (a.views || 0));
+    sortOption.views = -1;
   }
 
+  let query = Comic.find(filter).populate('genres', 'name slug').sort(sortOption);
+  
   if (limit) {
-    comics = comics.slice(0, parseInt(limit));
+    query = query.limit(parseInt(limit));
   }
+
+  const comics = await query;
 
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);

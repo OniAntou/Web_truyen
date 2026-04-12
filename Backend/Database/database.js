@@ -65,6 +65,12 @@ const ComicSchema = new mongoose.Schema(
   { collection: "comic" },
 );
 
+ComicSchema.index({ views: -1 });
+ComicSchema.index({ weekly_views: -1 });
+ComicSchema.index({ created_at: -1 });
+ComicSchema.index({ genres: 1 });
+ComicSchema.index({ uploader_id: 1 });
+
 const Comic = mongoose.model("Comic", ComicSchema);
 
 const ChapterSchema = new mongoose.Schema(
@@ -79,6 +85,9 @@ const ChapterSchema = new mongoose.Schema(
   },
   { collection: "chapter" },
 );
+
+ChapterSchema.index({ comic_id: 1, chapter_number: 1 });
+ChapterSchema.index({ created_at: -1 });
 
 const Chapter = mongoose.model("Chapter", ChapterSchema);
 
@@ -137,6 +146,8 @@ const UserSchema = new mongoose.Schema(
   { collection: "users" },
 );
 
+UserSchema.index({ role: 1 });
+
 const User = mongoose.model("User", UserSchema);
 
 const RatingSchema = new mongoose.Schema(
@@ -175,6 +186,11 @@ const CommentSchema = new mongoose.Schema(
   },
   { collection: "comments" },
 );
+
+CommentSchema.index({ comic_id: 1 });
+CommentSchema.index({ chapter_id: 1 });
+CommentSchema.index({ parent_id: 1 });
+CommentSchema.index({ created_at: -1 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
 

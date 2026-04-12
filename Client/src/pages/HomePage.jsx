@@ -12,10 +12,14 @@ import { comicService } from '../api/comicService';
 import HomePageSkeleton from '../components/Home/HomePageSkeleton';
 
 const HomePage = () => {
-    const { data: comicsData, isLoading: isLoadingComics } = useQuery({ queryKey: ['comics', 'all'], queryFn: () => comicService.getAll() });
+    const { data: popularData, isLoading: isLoadingPopular } = useQuery({ queryKey: ['comics', 'popular'], queryFn: () => comicService.getPopular('views', 12) });
+    const { data: latestData, isLoading: isLoadingLatest } = useQuery({ queryKey: ['comics', 'latest'], queryFn: () => comicService.getLatest(1, 12) });
     const { data: trendingData, isLoading: isLoadingTrending } = useQuery({ queryKey: ['comics', 'trending'], queryFn: () => comicService.getTrending(10) });
-    const loading = isLoadingComics || isLoadingTrending;
-    const comics = comicsData?.comics || [];
+    
+    const loading = isLoadingPopular || isLoadingLatest || isLoadingTrending;
+    
+    const popularComics = popularData?.comics || [];
+    const newComics = latestData?.comics || [];
     const trending = trendingData?.comics || [];
 
     // Scroll ref for navigation
@@ -42,9 +46,7 @@ const HomePage = () => {
             .catch(err => console.error('Failed to connect to server:', err));
     }, []);
 
-    const featuredComics = trending.length > 0 ? trending.slice(0, 5) : comics.slice(0, 5);
-    const popularComics = [...comics].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 12);
-    const newComics = [...comics].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 12);
+    const featuredComics = trending.length > 0 ? trending.slice(0, 5) : popularComics.slice(0, 5);
 
     if (loading) {
         return <HomePageSkeleton />;

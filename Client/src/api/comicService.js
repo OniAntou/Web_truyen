@@ -39,8 +39,8 @@ export const comicService = {
     getChaptersReadStatus: (id, token) => apiClient(`/comics/${id}/chapters/read-status`, {
         headers: { 'Authorization': `Bearer ${token}` }
     }),
-    getPopular: (sortBy = 'views', genre = '') => {
-        let endpoint = `/comics/popular?sort=${sortBy}`;
+    getPopular: (sortBy = 'views', limit = 12, genre = '') => {
+        let endpoint = `/comics/popular?sort=${sortBy}&limit=${limit}`;
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;
         return apiClient(endpoint);
     },
