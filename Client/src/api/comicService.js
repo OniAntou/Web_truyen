@@ -62,5 +62,8 @@ export const comicService = {
             page_number: pageNum
         }
     }),
+    getUserReadingHistory: (token) => apiClient('/users/reading-progress', {
+        headers: { 'Authorization': `Bearer ${token}` }
+    }),
     testConnection: () => apiClient('/test')
 };

@@ -25,10 +25,10 @@ const Footer = () => {
                     <div className="footer-col">
                         <h4>Legal</h4>
                         <ul className="footer-links">
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
+                            <li><Link to="/about">About Us</Link></li>
+                            <li><Link to="/privacy">Privacy Policy</Link></li>
+                            <li><Link to="/terms">Terms of Service</Link></li>
                             <li><a href="#">DMCA</a></li>
-                            <li><a href="#">Contact Us</a></li>
                         </ul>
                     </div>
                 </div>

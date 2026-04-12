@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users, MessageSquare } from 'lucide-react';
 
 const AdminLayout = () => {
     const location = useLocation();
@@ -57,6 +57,14 @@ const AdminLayout = () => {
                     >
                         <Users size={20} className={location.pathname === '/admin/users' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
                         <span className="font-medium">User Management</span>
+                    </Link>
+
+                    <Link
+                        to="/admin/comments"
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/comments')}`}
+                    >
+                        <MessageSquare size={20} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
+                        <span className="font-medium">Comments</span>
                     </Link>
                 </nav>
 

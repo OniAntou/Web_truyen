@@ -86,13 +86,8 @@ const ReadPage = () => {
 
     // Mark chapter as read only when user can actually view pages (not locked)
     useEffect(() => {
+        // Save to local reading history as fallback
         if (token && comic && chapter && chapter.pages && chapter.pages.length > 0) {
-            console.log('ReadPage: Chapter loaded with pages, marking as read:', chapter.title);
-            updateReadingProgress(1);
-        }
-
-        // Save to local reading history (works for both logged-in and guest users)
-        if (comic && chapter) {
             saveReadingHistory({
                 comicId: comicId,
                 comicTitle: comic.title,
@@ -101,8 +96,11 @@ const ReadPage = () => {
                 chapterTitle: chapter.title,
                 chapterNumber: chapter.chapter_number
             });
+            
+            // Sync to backend
+            updateReadingProgress(1);
         }
-    }, [chapter?._id, chapter?.pages?.length]); // Only run when chapter or its pages change
+    }, [chapter?._id, chapter?.pages?.length, token]); // Only run when chapter or its pages change
 
     // Track reading progress
     const updateReadingProgress = async (pageNum) => {

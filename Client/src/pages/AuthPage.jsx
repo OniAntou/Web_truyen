@@ -25,6 +25,10 @@ const AuthPage = () => {
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
 
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     mode: "onBlur"
@@ -53,6 +57,23 @@ const AuthPage = () => {
     setIsForgotPassword(false);
     reset();
     setApiError("");
+    setForgotMessage("");
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    setForgotMessage('');
+    setApiError('');
+    try {
+      const res = await authService.forgotPassword(forgotEmail);
+      setForgotMessage(res.message || 'Đã gửi hướng dẫn đặt lại mật khẩu.');
+    } catch (err) {
+      setApiError(err.message || err);
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   const renderForm = () => {
@@ -61,13 +82,22 @@ const AuthPage = () => {
         <>
           <h2 style={titleStyle}>Khôi phục mật khẩu</h2>
           <p style={subTitleStyle}>Nhập email của bạn để nhận hướng dẫn thay đổi mật khẩu mới.</p>
-          <form style={formStyle}>
-            <input type="email" placeholder="Email khôi phục" style={inputStyle} />
-            <button type="button" style={buttonStyle}>
-              Gửi yêu cầu
+          {apiError && <div style={{ color: "#ef4444", fontSize: "0.9rem", textAlign: "left", marginBottom: "0.5rem" }}>{apiError}</div>}
+          {forgotMessage && <div style={{ color: "#22c55e", fontSize: "0.9rem", textAlign: "left", marginBottom: "0.5rem" }}>{forgotMessage}</div>}
+          <form style={formStyle} onSubmit={handleForgotPassword}>
+            <input
+              type="email"
+              placeholder="Email khôi phục"
+              style={inputStyle}
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              required
+            />
+            <button type="submit" style={buttonStyle} disabled={forgotLoading}>
+              {forgotLoading ? "Đang gửi..." : "Gửi yêu cầu"}
             </button>
           </form>
-          <button onClick={() => setIsForgotPassword(false)} style={linkBtnStyle}>
+          <button onClick={() => { setIsForgotPassword(false); setApiError(''); setForgotMessage(''); }} style={linkBtnStyle}>
             Quay lại Đăng nhập
           </button>
         </>

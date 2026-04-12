@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../constants/api';
+import { clearReadingHistory } from '../utils/readingHistory';
 
 const apiClient = async (endpoint, options = {}) => {
     const { body, ...customConfig } = options;
@@ -26,6 +27,7 @@ const apiClient = async (endpoint, options = {}) => {
             if (token && authHeader) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                clearReadingHistory();
                 // Dispatch a custom event so Navbar and other components can react
                 window.dispatchEvent(new Event('auth:logout'));
             }

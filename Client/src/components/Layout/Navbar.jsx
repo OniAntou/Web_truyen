@@ -4,6 +4,7 @@ import { Search, Menu, X, User, Star, Sun, Moon, Trash2 } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 import { userService } from '../../api/userService';
+import { clearReadingHistory } from '../../utils/readingHistory';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -42,6 +43,7 @@ const Navbar = () => {
                         // Token expired — clear session
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
+                        clearReadingHistory();
                         setUser(null);
                         navigate('/auth');
                         return;
@@ -59,6 +61,7 @@ const Navbar = () => {
                             authTimeout = setTimeout(() => {
                                 localStorage.removeItem('token');
                                 localStorage.removeItem('user');
+                                clearReadingHistory();
                                 setUser(null);
                                 navigate('/auth');
                             }, timeUntilExpiry);
@@ -68,6 +71,7 @@ const Navbar = () => {
                     // Invalid token format — clear session
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
+                    clearReadingHistory();
                     setUser(null);
                     navigate('/auth');
                 }
@@ -80,6 +84,7 @@ const Navbar = () => {
 
         // Listen for auth:logout events from apiClient
         const handleLogoutEvent = () => {
+            clearReadingHistory();
             setUser(null);
             setShowProfileDropdown(false);
             navigate('/auth');
@@ -98,6 +103,7 @@ const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        clearReadingHistory();
         setUser(null);
         setShowProfileDropdown(false);
         navigate('/');
@@ -183,7 +189,7 @@ const Navbar = () => {
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
                     <Link to="/latest">Latest</Link>
-                    <Link to="/history">History</Link>
+                    {user && <Link to="/history">History</Link>}
                     {user && <Link to="/following" style={{ color: '#eab308' }}>Following</Link>}
                 </div>
 
@@ -343,7 +349,7 @@ const Navbar = () => {
                     <Link to="/popular" onClick={() => setIsMobileMenuOpen(false)}>Popular</Link>
                     <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
                     <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
-                    <Link to="/history" onClick={() => setIsMobileMenuOpen(false)}>History</Link>
+                    {user && <Link to="/history" onClick={() => setIsMobileMenuOpen(false)}>History</Link>}
                     {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
                     {user?.role === 'creator' ? (
                         <Link to="/studio" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Creator Studio</Link>

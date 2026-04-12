@@ -1,18 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { BookOpen, Clock, ChevronRight, Trash2, History } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import LazyImage from '../components/ui/LazyImage';
-import { getReadingHistory, clearReadingHistory } from '../utils/readingHistory';
+import { clearReadingHistory } from '../utils/readingHistory';
+import { comicService } from '../api/comicService';
 
 const HistoryPage = () => {
     const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
-        setHistory(getReadingHistory());
-    }, []);
+        if (!token) {
+            navigate('/auth');
+            return;
+        }
+
+        const fetchHistory = async () => {
+            setLoading(true);
+            try {
+                const data = await comicService.getUserReadingHistory(token);
+                // Map backend data format to component format
+                const mappedHistory = (data || []).map(item => ({
+                    comicId: item.comic_id,
+                    comicTitle: item.comic_title,
+                    coverUrl: item.comic_cover,
+                    chapterId: item.chapter_id,
+                    chapterTitle: item.chapter_title,
+                    chapterNumber: item.chapter_number,
+                    timestamp: new Date(item.updated_at).getTime()
+                }));
+                setHistory(mappedHistory);
+            } catch (err) {
+                console.error('Error fetching history:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHistory();
+    }, [navigate, token]);
 
     const handleClear = () => {
         if (!window.confirm('Xóa toàn bộ lịch sử đọc truyện?')) return;
@@ -79,7 +111,12 @@ const HistoryPage = () => {
                 </div>
 
                 {/* History Grid */}
-                {history.length > 0 ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-24">
+                        <div className="search-spinner mb-4" style={{ width: '40px', height: '40px' }}></div>
+                        <p style={{ color: 'var(--text-secondary)' }}>Đang tải lịch sử...</p>
+                    </div>
+                ) : history.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-x-6 md:gap-y-8">
                         {history.map(item => (
                             <div key={item.comicId} className="group relative flex flex-col gap-2.5">

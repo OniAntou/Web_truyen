@@ -14,6 +14,10 @@ import CreatorStudio from './pages/CreatorStudio';
 import TopUpPage from './pages/user/TopUpPage';
 import PaymentReturnPage from './pages/user/PaymentReturnPage';
 import HistoryPage from './pages/HistoryPage';
+import AboutPage from './pages/info/AboutPage';
+import TermsOfService from './pages/info/TermsOfService';
+import PrivacyPolicy from './pages/info/PrivacyPolicy';
+import ResetPassword from './pages/ResetPassword';
 
 import AdminLayout from './components/Layout/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -23,6 +27,7 @@ import ChapterManager from './pages/admin/ChapterManager';
 import AdminLogin from './pages/admin/AdminLogin';
 import ApplicationManager from './pages/admin/ApplicationManager';
 import UserManager from './pages/admin/UserManager';
+import CommentManager from './pages/admin/CommentManager';
 
 import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute';
 import ProtectedCreatorRoute from './components/auth/ProtectedCreatorRoute';
@@ -59,6 +64,22 @@ export const router = createBrowserRouter([
     {
         path: '/auth',
         element: <AuthPage />,
+    },
+    {
+        path: '/reset-password/:token',
+        element: <ResetPassword />,
+    },
+    {
+        path: '/about',
+        element: <AboutPage />,
+    },
+    {
+        path: '/terms',
+        element: <TermsOfService />,
+    },
+    {
+        path: '/privacy',
+        element: <PrivacyPolicy />,
     },
     {
         path: '/history',
@@ -114,6 +135,7 @@ export const router = createBrowserRouter([
                     { path: 'comics/:id/chapters', element: <ChapterManager /> },
                     { path: 'applications', element: <ApplicationManager /> },
                     { path: 'users', element: <UserManager /> },
+                    { path: 'comments', element: <CommentManager /> },
                 ]
             }
         ]

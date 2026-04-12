@@ -6,5 +6,11 @@ export const authService = {
     }),
     register: (username, email, password) => apiClient('/auth/register', {
         body: { username, email, password }
-    })
+    }),
+    forgotPassword: (email) => apiClient('/auth/forgot-password', {
+        body: { email }
+    }),
+    resetPassword: (token, password) => apiClient(`/auth/reset-password/${token}`, {
+        body: { password }
+    }),
 };

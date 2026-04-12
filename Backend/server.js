@@ -20,6 +20,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
+const adminCommentRoutes = require('./routes/adminCommentRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const seoRoutes = require('./routes/seoRoutes');
@@ -28,8 +29,22 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// CORS Configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:4173'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS: Origin not allowed'), false);
+  },
+  credentials: true
+}));
 app.use(compression()); // Gzip compress all responses
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin image/resource loading (R2, S3)
@@ -73,6 +88,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/comments', adminCommentRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api', seoRoutes);
 

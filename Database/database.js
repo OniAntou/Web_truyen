@@ -101,6 +101,8 @@ const UserSchema = new mongoose.Schema(
     coins: { type: Number, default: 0 },
     is_vip: { type: Boolean, default: false },
     vip_expiry: { type: Date },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },

@@ -252,12 +252,16 @@ const getAllReadingProgress = asyncHandler(async (req, res) => {
     })
     .populate('chapter_id', 'title chapter_number')
     .sort({ updated_at: -1 })
-    .limit(10);
+    .limit(20);
 
-  const results = await Promise.all(progresses.map(async (progress) => {
+  const results = [];
+  for (const progress of progresses) {
+    if (!progress.comic_id || !progress.chapter_id) continue;
+
     const coverUrl = await resolveR2Url(progress.comic_id.cover_url);
-    return {
+    results.push({
       comic_id: progress.comic_id._id,
+      comic_id_legacy: progress.comic_id.id,
       comic_title: progress.comic_id.title,
       comic_cover: coverUrl || progress.comic_id.cover_url,
       chapter_id: progress.chapter_id._id,
@@ -266,8 +270,8 @@ const getAllReadingProgress = asyncHandler(async (req, res) => {
       page_number: progress.page_number,
       updated_at: progress.updated_at,
       genres: progress.comic_id.genres
-    };
-  }));
+    });
+  }
 
   res.json(results);
 });
@@ -300,14 +304,15 @@ const getChapterReadStatus = asyncHandler(async (req, res) => {
 
   const progressMap = {};
   progresses.forEach(progress => {
+    if (!progress.chapter_id) return;
     const chapterId = progress.chapter_id.toString();
     const totalPages = pageCountMap[chapterId] || 1;
     
     progressMap[chapterId] = {
-      hasProgress: true,
-      current_page: progress.page_number,
-      isRead: progress.page_number > 0,
-      totalPages: totalPages
+        hasProgress: true,
+        current_page: progress.page_number,
+        isRead: progress.page_number > 0,
+        totalPages: totalPages
     };
   });
 
