@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
 
-// Kết nối tới MongoDB localhost theo thông số bạn cung cấp
-const dbURI = "mongodb://localhost:27017/skycomic";
+// Kết nối tới MongoDB (sử dụng biến môi trường cho Atlas hoặc localhost mặc định)
+const dbURI = process.env.MONGO_URI || "mongodb://localhost:27017/skycomic";
 
 mongoose
   .connect(dbURI)
-  .then(() => console.log("✅ Connected to MongoDB: skycomic"))
-  .catch((err) => console.error("❌ Connection error:", err));
+  .then(() => console.log(`✅ Connected to MongoDB: ${dbURI.includes('atlassian') || dbURI.includes('mongodb.net') ? 'MongoDB Atlas' : 'Localhost'}`))
+  .catch((err) => {
+    console.error("❌ Connection error:", err);
+    console.error("Vui lòng kiểm tra lại MONGO_URI trong file .env");
+  });
 
 // --- SCHEMAS ---
 

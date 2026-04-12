@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm install",
+  "devCommand": "node --watch server.js",
+  "installCommand": "npm install",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/server.js"
+    }
+  ]
+}

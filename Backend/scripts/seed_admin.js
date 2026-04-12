@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { AdminLogin } = require('../../Database/database');
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/skycomic';
+const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/skycomic';
 
 mongoose.connect(dbURI)
     .then(async () => {

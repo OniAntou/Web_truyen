@@ -100,6 +100,11 @@ app.use('/api', seoRoutes);
 // Centralized Error Handler (must be last middleware)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} (REFACTORED-V3-TRULY-FINAL)`);
-});
+// Export for Vercel
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} (REFACTORED-V3-TRULY-FINAL)`);
+  });
+}
