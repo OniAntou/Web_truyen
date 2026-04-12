@@ -36,11 +36,21 @@ const getChapterPages = asyncHandler(async (req, res) => {
 
   const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 });
   const pagesWithUrls = await Promise.all(
-    pages.map(async (p) => ({
-      _id: p._id,
-      page_number: p.page_number,
-      image_url: (await resolveR2Url(p.image_url)) || p.image_url,
-    }))
+    pages.map(async (p) => {
+      let imageUrl = p.image_url;
+
+      try {
+        imageUrl = (await resolveR2Url(p.image_url)) || p.image_url;
+      } catch (err) {
+        console.error(`Failed to resolve chapter page URL for page ${p._id}:`, err);
+      }
+
+      return {
+        _id: p._id,
+        page_number: p.page_number,
+        image_url: imageUrl,
+      };
+    })
   );
   res.json(pagesWithUrls);
 });

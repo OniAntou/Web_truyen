@@ -2,6 +2,36 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { API_BASE_URL } from '../../constants/api';
 
+const MAX_FILES_PER_UPLOAD_BATCH = 3;
+const MAX_BYTES_PER_UPLOAD_BATCH = 18 * 1024 * 1024;
+
+const splitFilesIntoUploadBatches = (fileList) => {
+    const batches = [];
+    let currentBatch = [];
+    let currentBatchBytes = 0;
+
+    fileList.forEach((file) => {
+        const fileSize = file?.size || 0;
+        const exceedsFileCount = currentBatch.length >= MAX_FILES_PER_UPLOAD_BATCH;
+        const exceedsBatchBytes = currentBatch.length > 0 && (currentBatchBytes + fileSize) > MAX_BYTES_PER_UPLOAD_BATCH;
+
+        if (exceedsFileCount || exceedsBatchBytes) {
+            batches.push(currentBatch);
+            currentBatch = [];
+            currentBatchBytes = 0;
+        }
+
+        currentBatch.push(file);
+        currentBatchBytes += fileSize;
+    });
+
+    if (currentBatch.length > 0) {
+        batches.push(currentBatch);
+    }
+
+    return batches;
+};
+
 // ─── Reusable ImagePreviewGrid with drag-and-drop reorder ───
 const ImagePreviewGrid = ({ images, setImages, showRemove = true, onRemove }) => {
     const dragItem = useRef(null);
@@ -186,6 +216,7 @@ const ChapterManager = () => {
     });
     const [files, setFiles] = useState([]); // array of { file, preview }
     const [uploading, setUploading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState('');
 
     // For preview popup (new chapter)
     const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -288,9 +319,10 @@ const ChapterManager = () => {
                 const createdChapter = await response.json();
 
                 // 3. Upload Images if selected (in user-arranged order)
+                let uploadResult = { completed: true, uploadedCount: 0, total: files.length, message: '' };
                 if (files.length > 0) {
                     setUploading(true);
-                    await uploadImages(createdChapter._id, files.map(f => f.file));
+                    uploadResult = await uploadImages(createdChapter._id, files.map(f => f.file));
                     setUploading(false);
                 }
 
@@ -303,6 +335,10 @@ const ChapterManager = () => {
                 }
 
                 fetchData(); // Refresh list
+
+                if (!uploadResult.completed) {
+                    alert(`Đã tạo chapter nhưng mới upload ${uploadResult.uploadedCount}/${uploadResult.total} ảnh. ${uploadResult.message}`);
+                }
             } else {
                 alert('Failed to add chapter');
             }
@@ -313,28 +349,66 @@ const ChapterManager = () => {
     };
 
     const uploadImages = async (chapterId, fileList) => {
+        const batches = splitFilesIntoUploadBatches(fileList);
+        let uploadedCount = 0;
+
         try {
-            const formData = new FormData();
-            for (let i = 0; i < fileList.length; i++) {
-                formData.append('pages', fileList[i]);
-            }
-
             const token = localStorage.getItem('token');
-            const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
+            for (let i = 0; i < batches.length; i++) {
+                const batch = batches[i];
+                const formData = new FormData();
 
-            if (!res.ok) {
-                const err = await res.json();
-                alert(`Upload failed: ${err.message}`);
+                for (let j = 0; j < batch.length; j++) {
+                    formData.append('pages', batch[j]);
+                }
+
+                setUploadStatus(`Đang upload ${uploadedCount + 1}-${uploadedCount + batch.length}/${fileList.length} ảnh...`);
+
+                const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    let errorMessage = 'Upload failed';
+
+                    try {
+                        const err = await res.json();
+                        errorMessage = err?.message || errorMessage;
+                    } catch {
+                        // Ignore JSON parsing failure and use the fallback message.
+                    }
+
+                    return {
+                        completed: false,
+                        uploadedCount,
+                        total: fileList.length,
+                        message: errorMessage,
+                    };
+                }
+
+                uploadedCount += batch.length;
             }
+
+            return {
+                completed: true,
+                uploadedCount,
+                total: fileList.length,
+                message: '',
+            };
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Upload error occurred');
+            return {
+                completed: false,
+                uploadedCount,
+                total: fileList.length,
+                message: error?.message || 'Upload error occurred',
+            };
+        } finally {
+            setUploadStatus('');
         }
     };
 
@@ -396,7 +470,7 @@ const ChapterManager = () => {
         if (existingChapterFiles.length === 0 || !targetChapterIdRef.current) return;
 
         setUploading(true);
-        await uploadImages(targetChapterIdRef.current, existingChapterFiles.map(f => f.file));
+        const uploadResult = await uploadImages(targetChapterIdRef.current, existingChapterFiles.map(f => f.file));
         setUploading(false);
 
         // Cleanup
@@ -404,8 +478,14 @@ const ChapterManager = () => {
         setExistingChapterFiles([]);
         setModalOpen(false);
         targetChapterIdRef.current = null;
-        alert('Images uploaded successfully!');
         fetchData();
+
+        if (uploadResult.completed) {
+            alert('Images uploaded successfully!');
+            return;
+        }
+
+        alert(`Đã upload ${uploadResult.uploadedCount}/${uploadResult.total} ảnh. ${uploadResult.message}`);
     };
 
     const handleExistingModalClose = () => {
@@ -433,7 +513,16 @@ const ChapterManager = () => {
                 window.location.href = '/admin/login';
                 return;
             }
-            const pages = await res.json();
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data?.message || 'Không thể tải danh sách ảnh');
+            }
+
+            const pages = Array.isArray(data) ? data : data?.pages;
+            if (!Array.isArray(pages)) {
+                throw new Error('Dữ liệu danh sách ảnh không hợp lệ');
+            }
+
             setReorderPages(pages.map(p => ({
                 _id: p._id,
                 page_number: p.page_number,
@@ -441,7 +530,7 @@ const ChapterManager = () => {
             })));
         } catch (err) {
             console.error('Error fetching pages:', err);
-            alert('Không thể tải danh sách ảnh');
+            alert(err.message || 'Không thể tải danh sách ảnh');
             setReorderModalOpen(false);
         } finally {
             setReorderLoading(false);
@@ -646,7 +735,7 @@ const ChapterManager = () => {
 
             {uploading && (
                 <div className="mb-8 bg-white/5 border border-white/10 text-white px-6 py-4 rounded-2xl animate-pulse text-sm font-medium tracking-wide flex items-center justify-center">
-                    Please wait... Uploading images to Cloudflare R2...
+                    {uploadStatus || 'Please wait... Uploading images to Cloudflare R2...'}
                 </div>
             )}
 

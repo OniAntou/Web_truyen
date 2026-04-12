@@ -28,6 +28,18 @@ const errorHandler = (err, req, res, next) => {
     message = 'Database connection unavailable';
   }
 
+  if (err.name === 'MulterError') {
+    statusCode = 400;
+
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      message = 'Mỗi ảnh chỉ được tối đa 10MB.';
+    } else if (err.code === 'LIMIT_FILE_COUNT') {
+      message = 'Số lượng ảnh tải lên vượt quá giới hạn cho phép.';
+    } else {
+      message = err.message;
+    }
+  }
+
   // Mongoose duplicate key error
   if (err.code === 11000) {
     statusCode = 409;
