@@ -119,11 +119,38 @@ async function deleteFromR2(keyOrR2Key) {
   }
 }
 
+/**
+ * Download file từ R2 trả về Buffer.
+ */
+async function downloadFromR2(keyOrR2Key) {
+  if (!R2_ENABLED) return null;
+  const key = typeof keyOrR2Key === 'string' && keyOrR2Key.startsWith('r2:')
+    ? keyOrR2Key.slice(3)
+    : keyOrR2Key;
+  if (!key) return null;
+
+  try {
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const response = await s3Client.send(command);
+    
+    // Chuyển stream sang buffer
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  } catch (err) {
+    console.error(`Lỗi khi tải file từ R2 (${key}):`, err);
+    return null;
+  }
+}
+
 module.exports = {
   R2_ENABLED,
   uploadToR2,
   getFileUrl,
   resolveR2Url,
   deleteFromR2,
+  downloadFromR2,
   bucket,
 };

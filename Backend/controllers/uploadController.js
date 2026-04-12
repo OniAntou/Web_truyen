@@ -2,6 +2,7 @@ const { Comic, Chapter, Upload, Pages } = require('../Database/database');
 const { R2_ENABLED, getFileUrl, uploadToR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
+const { convertToWebp } = require('../utils/imageHelper');
 
 const getR2Status = (req, res) => {
   res.json({
@@ -29,12 +30,15 @@ const uploadCover = asyncHandler(async (req, res) => {
   }
   if (!comic) throw new AppError("Comic không tồn tại", 404);
   if (!req.file) throw new AppError("Cần gửi file ảnh (field: cover)", 400);
-  const ext = (req.file.originalname || "").split(".").pop() || "jpg";
-  const key = `covers/${comicId}/${Date.now()}.${ext}`;
+
+  // Convert to WebP
+  const webpBuffer = await convertToWebp(req.file.buffer);
+  const key = `covers/${comicId}/${Date.now()}.webp`;
+
   const { key: r2Key } = await uploadToR2(
     key,
-    req.file.buffer,
-    req.file.mimetype,
+    webpBuffer,
+    "image/webp",
   );
   await Upload.create({ key: r2Key, type: "cover", comic_id: comic._id });
   comic.cover_url = r2Key;
@@ -52,15 +56,19 @@ const uploadChapterPages = asyncHandler(async (req, res) => {
   const existingPages = await Pages.find({ chapter_id: chapter._id }).sort('-page_number');
   const maxPageNumber = existingPages.length > 0 ? existingPages[0].page_number : 0;
 
-  // Upload all files to R2 in parallel (instead of sequential)
-  const uploadPromises = req.files.map((f, i) => {
+  // Upload all files to R2 in parallel
+  const uploadPromises = req.files.map(async (f, i) => {
     const pageNum = maxPageNumber + i + 1;
-    const ext = (f.originalname || "").split(".").pop() || "jpg";
-    const key = `chapters/${chapterId}/${pageNum}-${Date.now()}.${ext}`;
-    return uploadToR2(key, f.buffer, f.mimetype).then(({ key: r2Key }) => ({
+    
+    // Convert to WebP
+    const webpBuffer = await convertToWebp(f.buffer);
+    const key = `chapters/${chapterId}/${pageNum}-${Date.now()}.webp`;
+
+    const { key: r2Key } = await uploadToR2(key, webpBuffer, "image/webp");
+    return {
       r2Key,
       pageNum,
-    }));
+    };
   });
 
   const uploadedData = await Promise.all(uploadPromises);
