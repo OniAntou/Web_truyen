@@ -39,13 +39,23 @@ class Cache {
     }
 
     /**
-     * Clear specific or all cache
+     * Clear specific, by prefix, or all cache
      */
-    flush(key = null) {
-        if (key) {
-            this.cache.delete(key);
-        } else {
+    flush(pattern = null) {
+        if (!pattern) {
             this.cache.clear();
+            return;
+        }
+
+        if (this.cache.has(pattern)) {
+            this.cache.delete(pattern);
+        } else {
+            // Treat pattern as prefix
+            for (const key of this.cache.keys()) {
+                if (key.startsWith(pattern)) {
+                    this.cache.delete(key);
+                }
+            }
         }
     }
 }

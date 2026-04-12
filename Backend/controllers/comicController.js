@@ -30,10 +30,12 @@ const getLatestComics = asyncHandler(async (req, res) => {
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const total = await Comic.countDocuments(filter);
   const comics = await Comic.find(filter)
+    .select('title id author status cover_url rating views weekly_views genres created_at')
     .populate('genres', 'name slug')
     .sort({ created_at: -1 })
     .skip(skip)
-    .limit(parseInt(limit));
+    .limit(parseInt(limit))
+    .lean();
 
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
@@ -41,7 +43,7 @@ const getLatestComics = asyncHandler(async (req, res) => {
   const results = await Promise.all(comics.map(async (c) => {
     const coverUrl = await resolveR2Url(c.cover_url);
     return {
-      ...c.toObject(),
+      ...c,
       cover_url: coverUrl || c.cover_url,
       chapter_count: chapterCounts[c._id.toString()] || 0,
     };
@@ -102,7 +104,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
     query = query.limit(parseInt(limit));
   }
 
-  const comics = await query;
+  const comics = await query.select('title id author status cover_url rating views weekly_views genres created_at').lean();
 
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
@@ -111,7 +113,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
     comics.map(async (c) => {
       const coverUrl = await resolveR2Url(c.cover_url);
       return {
-        ...c.toObject(),
+        ...c,
         cover_url: coverUrl || c.cover_url,
         chapter_count: chapterCounts[c._id.toString()] || 0,
       };
@@ -156,7 +158,10 @@ const getAllComics = asyncHandler(async (req, res) => {
     }
   }
 
-  const comics = await Comic.find(filter).populate('genres', 'name slug');
+  const comics = await Comic.find(filter)
+    .select('title id author status cover_url rating views genres created_at')
+    .populate('genres', 'name slug')
+    .lean();
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
 
@@ -164,7 +169,7 @@ const getAllComics = asyncHandler(async (req, res) => {
     comics.map(async (c) => {
       const coverUrl = await resolveR2Url(c.cover_url);
       return {
-        ...c.toObject(),
+        ...c,
         cover_url: coverUrl || c.cover_url,
         chapter_count: chapterCounts[c._id.toString()] || 0,
       };
@@ -181,7 +186,12 @@ const getTrendingComics = asyncHandler(async (req, res) => {
   const cachedData = apiCache.get(cacheKey);
   if (cachedData) return res.json(cachedData);
 
-  let comics = await Comic.find({}).sort({ weekly_views: -1 }).limit(parseInt(limit)).populate('genres', 'name slug');
+  let comics = await Comic.find({})
+    .sort({ weekly_views: -1 })
+    .limit(parseInt(limit))
+    .populate('genres', 'name slug')
+    .select('title id author status cover_url rating weekly_views genres')
+    .lean();
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
 
@@ -189,7 +199,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
     comics.map(async (c) => {
       const coverUrl = await resolveR2Url(c.cover_url);
       return {
-        ...c.toObject(),
+        ...c,
         cover_url: coverUrl || c.cover_url,
         chapter_count: chapterCounts[c._id.toString()] || 0,
       };
@@ -206,14 +216,14 @@ const getComicById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   let comic;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    comic = await Comic.findById(id);
+    comic = await Comic.findById(id).select('-__v').lean();
   } else {
-    comic = await Comic.findOne({ id: parseInt(id) });
+    comic = await Comic.findOne({ id: parseInt(id) }).select('-__v').lean();
   }
 
   if (!comic) throw new AppError("Comic not found", 404);
 
-  const chapters = await Chapter.find({ comic_id: comic._id }).sort({ chapter_number: 1 });
+  const chapters = await Chapter.find({ comic_id: comic._id }).sort({ chapter_number: 1 }).lean();
   
   const formatExactDate = (date) => {
     const d = new Date(date);
@@ -227,9 +237,9 @@ const getComicById = asyncHandler(async (req, res) => {
   let unlockedChapters = new Set();
   if (req.user) {
     const { User, ChapterUnlock } = require('../Database/database');
-    userDoc = await User.findById(req.user.id);
+    userDoc = await User.findById(req.user.id).select('is_vip vip_expiry role').lean();
     if (!userDoc || !userDoc.is_vip || !userDoc.vip_expiry || new Date(userDoc.vip_expiry) <= new Date()) {
-      const unlocks = await ChapterUnlock.find({ user_id: req.user.id });
+      const unlocks = await ChapterUnlock.find({ user_id: req.user.id }).select('chapter_id').lean();
       unlocks.forEach(u => unlockedChapters.add(u.chapter_id.toString()));
     }
   }
@@ -240,10 +250,10 @@ const getComicById = asyncHandler(async (req, res) => {
 
     if (ch.early_access_end_date && new Date(ch.early_access_end_date) > new Date()) {
       is_locked = true;
-      if (req.user) {
-        if (req.user.role === 'admin' || req.user.role === 'creator') {
+      if (req.user && userDoc) { // check userDoc exists
+        if (userDoc.role === 'admin' || userDoc.role === 'creator') {
           is_locked = false;
-        } else if (userDoc && userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) {
+        } else if (userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) {
           is_locked = false;
         } else if (unlockedChapters.has(ch._id.toString())) {
           is_locked = false;
@@ -251,7 +261,7 @@ const getComicById = asyncHandler(async (req, res) => {
       }
     }
 
-    return { ...ch.toObject(), date: relativeDate, is_locked, price: ch.price || 0 };
+    return { ...ch, date: relativeDate, is_locked, price: ch.price || 0 };
   });
 
   const coverUrl = await resolveR2Url(comic.cover_url);
@@ -260,12 +270,76 @@ const getComicById = asyncHandler(async (req, res) => {
     ? await Genre.find({ _id: { $in: genreIds } }).select('name slug')
     : [];
   const out = {
-    ...comic.toObject(),
+    ...comic,
     cover_url: coverUrl || comic.cover_url,
     chapters: chaptersWithoutPages,
     genres: genreNames,
   };
   res.json(out);
+});
+
+/**
+ * Combined Reader Meta + Pages endpoint to reduce round-trips
+ */
+const getReaderData = asyncHandler(async (req, res) => {
+  const { id, chapterId } = req.params;
+  
+  let comic;
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    comic = await Comic.findById(id).select('title id cover_url genres').lean();
+  } else {
+    comic = await Comic.findOne({ id: parseInt(id) }).select('title id cover_url genres').lean();
+  }
+
+  if (!comic) throw new AppError("Comic not found", 404);
+
+  const chapters = await Chapter.find({ comic_id: comic._id }).sort({ chapter_number: 1 }).select('chapter_number title created_at price early_access_end_date').lean();
+  const chapter = chapters.find(ch => ch._id.toString() === chapterId || (ch.id && ch.id.toString() === chapterId));
+  
+  if (!chapter) throw new AppError("Chapter not found", 404);
+
+  // Check locking logic
+  let is_locked = false;
+  let userDoc = null;
+  if (chapter.early_access_end_date && new Date(chapter.early_access_end_date) > new Date()) {
+    is_locked = true;
+    if (req.user) {
+      const { User, ChapterUnlock } = require('../Database/database');
+      userDoc = await User.findById(req.user.id).lean();
+      if (req.user.role === 'admin' || req.user.role === 'creator') {
+        is_locked = false;
+      } else if (userDoc && userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) {
+        is_locked = false;
+      } else {
+        const unlock = await ChapterUnlock.findOne({ user_id: req.user.id, chapter_id: chapter._id }).lean();
+        if (unlock) is_locked = false;
+      }
+    }
+  }
+
+  if (is_locked) {
+    return res.status(403).json({
+      message: "Chapter is locked",
+      is_locked: true,
+      price: chapter.price || 0,
+      early_access_end_date: chapter.early_access_end_date,
+      comic: { title: comic.title, id: comic.id }
+    });
+  }
+
+  const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 }).lean();
+  const pageResults = await Promise.all(pages.map(async p => ({
+    ...p,
+    image_url: await resolveR2Url(p.image_url)
+  })));
+
+  const coverUrl = await resolveR2Url(comic.cover_url);
+  
+  res.json({
+    comic: { ...comic, cover_url: coverUrl },
+    chapter: { ...chapter, pages: pageResults },
+    all_chapters: chapters.map(ch => ({ _id: ch._id, title: ch.title, chapter_number: ch.chapter_number }))
+  });
 });
 
 const createComic = asyncHandler(async (req, res) => {
@@ -289,8 +363,10 @@ const createComic = asyncHandler(async (req, res) => {
   const newComic = new Comic(comicData);
   await newComic.save();
 
-  // Clear cache to show new comic
-  apiCache.flush();
+  // Selective cache flush
+  apiCache.flush('latest');
+  apiCache.flush('trending');
+  apiCache.flush('popular');
 
   res.status(201).json(newComic);
 });
@@ -319,8 +395,11 @@ const updateComic = asyncHandler(async (req, res) => {
 
   if (!comic) throw new AppError("Comic not found", 404);
   
-  // Clear cache after update
-  apiCache.flush();
+  // Selective cache flush
+  apiCache.flush('latest');
+  apiCache.flush('popular');
+  apiCache.flush('trending');
+  apiCache.flush(`detail_${id}`);
   
   res.json(comic);
 });
@@ -358,8 +437,11 @@ const deleteComic = asyncHandler(async (req, res) => {
   await Comment.deleteMany({ comic_id: comic._id });
   await Favorite.deleteMany({ comic_id: comic._id });
   
-  // Clear cache after deletion
-  apiCache.flush();
+  // Selective cache flush
+  apiCache.flush('latest');
+  apiCache.flush('popular');
+  apiCache.flush('trending');
+  apiCache.flush(`detail_${id}`);
   
   res.json({ message: "Comic deleted successfully" });
 });
@@ -370,6 +452,7 @@ module.exports = {
   getAllComics,
   getTrendingComics,
   getComicById,
+  getReaderData,
   createComic,
   updateComic,
   deleteComic

@@ -11,6 +11,7 @@ const accessKeyId = process.env.R2_ACCESS_KEY_ID;
 const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
 const bucket = process.env.R2_BUCKET || 'web-truyen-uploads';
 const publicUrlBase = process.env.R2_PUBLIC_URL || '';
+const urlCache = new Map(); // Cache for signed URLs
 
 const endpoint = accountId
   ? `https://${accountId}.r2.cloudflarestorage.com`
@@ -66,11 +67,28 @@ async function getFileUrl(keyOrR2Key, expiresIn = 3600) {
     : keyOrR2Key;
   if (!key) return null;
   if (!R2_ENABLED) return null;
+  
   if (publicUrlBase) {
     return publicUrlBase.replace(/\/$/, '') + '/' + key;
   }
+
+  // Check cache for signed URL
+  const now = Date.now();
+  const cached = urlCache.get(key);
+  if (cached && cached.expires > now + 60000) { // Still valid for at least 60 seconds
+    return cached.url;
+  }
+
   const command = new GetObjectCommand({ Bucket: bucket, Key: key });
-  return getSignedUrl(s3Client, command, { expiresIn });
+  const signedUrl = await getSignedUrl(s3Client, command, { expiresIn });
+  
+  // Cache for slightly less than expiration time
+  urlCache.set(key, {
+    url: signedUrl,
+    expires: now + (expiresIn * 1000)
+  });
+  
+  return signedUrl;
 }
 
 /**

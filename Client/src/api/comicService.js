@@ -58,10 +58,14 @@ export const comicService = {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: {
-            chapter_id: chapterId,
             page_number: pageNum
         }
     }),
+    getReaderData: (id, chapterId) => {
+        const token = localStorage.getItem('token');
+        const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+        return apiClient(`/comics/${id}/reader/${chapterId}`, options);
+    },
     getUserReadingHistory: (token) => apiClient('/users/reading-progress', {
         headers: { 'Authorization': `Bearer ${token}` }
     }),

@@ -15,11 +15,11 @@ const getChapterPages = asyncHandler(async (req, res) => {
       if (req.user.role === 'admin' || req.user.role === 'creator') {
         hasAccess = true;
       } else {
-        const fullUser = await User.findById(req.user.id);
+        const fullUser = await User.findById(req.user.id).select('is_vip vip_expiry').lean();
         if (fullUser && fullUser.is_vip && fullUser.vip_expiry && new Date(fullUser.vip_expiry) > new Date()) {
           hasAccess = true;
         } else {
-          const unlocked = await ChapterUnlock.findOne({ user_id: req.user.id, chapter_id: chapter._id });
+          const unlocked = await ChapterUnlock.findOne({ user_id: req.user.id, chapter_id: chapter._id }).lean();
           if (unlocked) hasAccess = true;
         }
       }
@@ -35,13 +35,13 @@ const getChapterPages = asyncHandler(async (req, res) => {
     }
   }
 
-  const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 });
+  const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 }).lean();
   const pagesWithUrls = await Promise.all(
     pages.map(async (p) => {
       let imageUrl = p.image_url;
 
       try {
-        imageUrl = (await resolveR2Url(p.image_url)) || p.image_url;
+        imageUrl = await resolveR2Url(p.image_url) || p.image_url;
       } catch (err) {
         console.error(`Failed to resolve chapter page URL for page ${p._id}:`, err);
       }
@@ -142,8 +142,9 @@ const deleteChapter = asyncHandler(async (req, res) => {
   await Pages.deleteMany({ chapter_id: chapterId });
   await Upload.deleteMany({ chapter_id: chapterId });
 
-  // Clear cache after deleting chapter
-  apiCache.flush();
+  // Surgical cache flush
+  apiCache.flush('detail'); // Flush comic detail pages
+  apiCache.flush('latest');
 
   res.json({ message: "Chapter and its pages deleted" });
 });

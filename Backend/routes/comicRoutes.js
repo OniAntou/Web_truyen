@@ -9,6 +9,7 @@ router.get('/popular', comicController.getPopularComics);
 router.get('/trending', comicController.getTrendingComics);
 router.get('/', comicController.getAllComics);
 router.get('/:id', optionalAuth, comicController.getComicById);
+router.get('/:id/reader/:chapterId', optionalAuth, comicController.getReaderData);
 
 router.post('/', authenticateToken, comicController.createComic);
 router.put('/:id', authenticateToken, comicController.updateComic);

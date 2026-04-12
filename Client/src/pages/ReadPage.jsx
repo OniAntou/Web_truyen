@@ -42,40 +42,28 @@ const ReadPage = () => {
         setLoading(true);
         setError(null);
 
-        comicService.getById(comicId)
+        comicService.getReaderData(comicId, chapterId)
             .then(data => {
-                setComic(data);
-                if (data.chapters) {
-                    const found = data.chapters.find(c => c._id === chapterId || c.id === chapterId);
-                    if (found) {
-                        // Fetch pages specifically for this chapter
-                        chapterService.getPages(found._id)
-                            .then(pages => {
-                                setChapter({ ...found, pages });
-                                setLoading(false);
-                            })
-                            .catch(err => {
-                                console.error('Error fetching pages:', err);
-                                if (err.is_locked) {
-                                    setError({ type: 'locked', message: err.message, price: err.price, early_access_end_date: err.early_access_end_date });
-                                } else {
-                                    setError(err.message || 'Failed to load chapter pages');
-                                }
-                                setChapter(found);
-                                setLoading(false);
-                            });
-                    } else {
-                        setError('Chapter not found');
-                        setLoading(false);
-                    }
-                } else {
-                    setError('No chapters found');
-                    setLoading(false);
-                }
+                setComic({ 
+                    ...data.comic, 
+                    chapters: data.all_chapters 
+                });
+                setChapter(data.chapter);
+                setLoading(false);
             })
             .catch(err => {
-                console.error(err);
-                setError(err.message);
+                console.error('Error fetching reader data:', err);
+                if (err.is_locked) {
+                    setError({ 
+                        type: 'locked', 
+                        message: err.message, 
+                        price: err.price, 
+                        early_access_end_date: err.early_access_end_date 
+                    });
+                    if (err.comic) setComic(err.comic);
+                } else {
+                    setError(err.message || 'Failed to load chapter');
+                }
                 setLoading(false);
             });
     }, [comicId, chapterId]);
@@ -420,4 +408,3 @@ const ReadPage = () => {
 };
 
 export default ReadPage;
-
