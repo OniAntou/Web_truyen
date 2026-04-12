@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { AdminLogin } = require('../Database/database');
@@ -12,9 +13,9 @@ mongoose.connect(dbURI)
         await AdminLogin.deleteMany({});
         console.log('🗑️ Deleted all existing admin user(s)');
 
-        const username = 'admin2';
-        const rawPassword = '123';
-        const email = 'admin2@example.com';
+        const username = 'admin';
+        const rawPassword = 'admin123456';
+        const email = 'admin@skycomic.com';
         const role = 'superadmin';
 
         const salt = await bcrypt.genSalt(10);
