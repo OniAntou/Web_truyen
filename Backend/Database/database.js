@@ -60,10 +60,13 @@ const ComicSchema = new mongoose.Schema(
     weekly_views: { type: Number, default: 0 },
     genres: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
     uploader_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    chapter_count: { type: Number, default: 0 },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "comic" },
 );
+
+ComicSchema.index({ title: "text" });
 
 ComicSchema.index({ views: -1 });
 ComicSchema.index({ weekly_views: -1 });

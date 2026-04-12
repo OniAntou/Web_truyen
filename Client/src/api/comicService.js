@@ -13,6 +13,7 @@ export const comicService = {
         return apiClient(endpoint);
     },
     getTrending: (limit = 10) => apiClient(`/comics/trending?limit=${limit}`),
+    getHomeData: () => apiClient('/comics/home'),
     getById: (id) => {
         const token = localStorage.getItem('token');
         const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};

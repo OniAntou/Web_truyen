@@ -30,22 +30,18 @@ const getLatestComics = asyncHandler(async (req, res) => {
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const total = await Comic.countDocuments(filter);
   const comics = await Comic.find(filter)
-    .select('title id author status cover_url rating views weekly_views genres created_at')
+    .select('title id author status cover_url rating views weekly_views genres chapter_count created_at')
     .populate('genres', 'name slug')
     .sort({ created_at: -1 })
     .skip(skip)
     .limit(parseInt(limit))
     .lean();
 
-  const comicIds = comics.map(c => c._id);
-  const chapterCounts = await getChapterCounts(comicIds);
-
   const results = await Promise.all(comics.map(async (c) => {
     const coverUrl = await resolveR2Url(c.cover_url);
     return {
       ...c,
       cover_url: coverUrl || c.cover_url,
-      chapter_count: chapterCounts[c._id.toString()] || 0,
     };
   }));
 
@@ -104,10 +100,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
     query = query.limit(parseInt(limit));
   }
 
-  const comics = await query.select('title id author status cover_url rating views weekly_views genres created_at').lean();
-
-  const comicIds = comics.map(c => c._id);
-  const chapterCounts = await getChapterCounts(comicIds);
+  const comics = await query.select('title id author status cover_url rating views weekly_views genres chapter_count created_at').lean();
 
   const results = await Promise.all(
     comics.map(async (c) => {
@@ -115,7 +108,6 @@ const getPopularComics = asyncHandler(async (req, res) => {
       return {
         ...c,
         cover_url: coverUrl || c.cover_url,
-        chapter_count: chapterCounts[c._id.toString()] || 0,
       };
     }),
   );
@@ -159,11 +151,9 @@ const getAllComics = asyncHandler(async (req, res) => {
   }
 
   const comics = await Comic.find(filter)
-    .select('title id author status cover_url rating views genres created_at')
+    .select('title id author status cover_url rating views genres chapter_count created_at')
     .populate('genres', 'name slug')
     .lean();
-  const comicIds = comics.map(c => c._id);
-  const chapterCounts = await getChapterCounts(comicIds);
 
   const results = await Promise.all(
     comics.map(async (c) => {
@@ -171,7 +161,6 @@ const getAllComics = asyncHandler(async (req, res) => {
       return {
         ...c,
         cover_url: coverUrl || c.cover_url,
-        chapter_count: chapterCounts[c._id.toString()] || 0,
       };
     }),
   );
@@ -190,10 +179,8 @@ const getTrendingComics = asyncHandler(async (req, res) => {
     .sort({ weekly_views: -1 })
     .limit(parseInt(limit))
     .populate('genres', 'name slug')
-    .select('title id author status cover_url rating weekly_views genres')
+    .select('title id author status cover_url rating weekly_views genres chapter_count')
     .lean();
-  const comicIds = comics.map(c => c._id);
-  const chapterCounts = await getChapterCounts(comicIds);
 
   const results = await Promise.all(
     comics.map(async (c) => {
@@ -201,13 +188,46 @@ const getTrendingComics = asyncHandler(async (req, res) => {
       return {
         ...c,
         cover_url: coverUrl || c.cover_url,
-        chapter_count: chapterCounts[c._id.toString()] || 0,
       };
     })
   );
 
   const responseData = { comics: results };
   apiCache.set(cacheKey, responseData);
+
+  res.json(responseData);
+});
+
+/**
+ * Consolidated HomePage API to reduce latency
+ */
+const getHomeData = asyncHandler(async (req, res) => {
+  const cacheKey = 'homepage_all_v2';
+  const cachedData = apiCache.get(cacheKey);
+  if (cachedData) return res.json(cachedData);
+
+  const [popularResult, latestResult, trendingResult, genres] = await Promise.all([
+    Comic.find({}).sort({ views: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating views weekly_views genres chapter_count').lean(),
+    Comic.find({}).sort({ created_at: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count created_at').lean(),
+    Comic.find({}).sort({ weekly_views: -1 }).limit(10).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count').lean(),
+    Genre.find().sort({ name: 1 }).select('name slug')
+  ]);
+
+  const processList = async (list) => {
+    return Promise.all(list.map(async (c) => {
+      const coverUrl = await resolveR2Url(c.cover_url);
+      return { ...c, cover_url: coverUrl || c.cover_url };
+    }));
+  };
+
+  const [popular, latest, trending] = await Promise.all([
+    processList(popularResult),
+    processList(latestResult),
+    processList(trendingResult)
+  ]);
+
+  const responseData = { popular, latest, trending, genres };
+  apiCache.set(cacheKey, responseData, 300); // 5 minutes cache
 
   res.json(responseData);
 });
@@ -367,6 +387,7 @@ const createComic = asyncHandler(async (req, res) => {
   apiCache.flush('latest');
   apiCache.flush('trending');
   apiCache.flush('popular');
+  apiCache.flush('homepage');
 
   res.status(201).json(newComic);
 });
@@ -399,6 +420,7 @@ const updateComic = asyncHandler(async (req, res) => {
   apiCache.flush('latest');
   apiCache.flush('popular');
   apiCache.flush('trending');
+  apiCache.flush('homepage');
   apiCache.flush(`detail_${id}`);
   
   res.json(comic);
@@ -441,6 +463,7 @@ const deleteComic = asyncHandler(async (req, res) => {
   apiCache.flush('latest');
   apiCache.flush('popular');
   apiCache.flush('trending');
+  apiCache.flush('homepage');
   apiCache.flush(`detail_${id}`);
   
   res.json({ message: "Comic deleted successfully" });
@@ -453,6 +476,7 @@ module.exports = {
   getTrendingComics,
   getComicById,
   getReaderData,
+  getHomeData,
   createComic,
   updateComic,
   deleteComic

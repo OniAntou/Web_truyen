@@ -7,6 +7,7 @@ const optionalAuth = require('../middleware/optionalAuth');
 router.get('/latest', comicController.getLatestComics);
 router.get('/popular', comicController.getPopularComics);
 router.get('/trending', comicController.getTrendingComics);
+router.get('/home', comicController.getHomeData);
 router.get('/', comicController.getAllComics);
 router.get('/:id', optionalAuth, comicController.getComicById);
 router.get('/:id/reader/:chapterId', optionalAuth, comicController.getReaderData);

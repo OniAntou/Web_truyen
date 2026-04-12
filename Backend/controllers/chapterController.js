@@ -1,4 +1,4 @@
-const { Chapter, Pages, Upload, User, ChapterUnlock } = require('../Database/database');
+const { Chapter, Pages, Upload, User, ChapterUnlock, Comic } = require('../Database/database');
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
@@ -121,6 +121,11 @@ const createChapter = asyncHandler(async (req, res) => {
   const newChapter = new Chapter(req.body);
   await newChapter.save();
   
+  // Increment chapter_count in Comic
+  if (newChapter.comic_id) {
+    await Comic.findByIdAndUpdate(newChapter.comic_id, { $inc: { chapter_count: 1 } });
+  }
+
   // Clear cache after adding new chapter
   apiCache.flush();
   
@@ -135,6 +140,11 @@ const deleteChapter = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findByIdAndDelete(chapterId);
   if (!chapter) throw new AppError("Chapter not found", 404);
 
+  // Decrement chapter_count in Comic
+  if (chapter.comic_id) {
+    await Comic.findByIdAndUpdate(chapter.comic_id, { $inc: { chapter_count: -1 } });
+  }
+
   const pages = await Pages.find({ chapter_id: chapterId });
   const r2Pages = pages.filter(p => p.image_url && p.image_url.startsWith('r2:'));
   await Promise.all(r2Pages.map(p => deleteFromR2(p.image_url)));
@@ -145,6 +155,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
   // Surgical cache flush
   apiCache.flush('detail'); // Flush comic detail pages
   apiCache.flush('latest');
+  apiCache.flush('homepage');
 
   res.json({ message: "Chapter and its pages deleted" });
 });
@@ -164,8 +175,23 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
 
   await Pages.deleteMany({ chapter_id: { $in: chapterIds } });
   await Upload.deleteMany({ chapter_id: { $in: chapterIds } });
+  
+  // Update chapter counts for related comics before deleting chapters
+  const chapters = await Chapter.find({ _id: { $in: chapterIds } }).select('comic_id');
+  const comicMap = {};
+  chapters.forEach(ch => {
+    if (ch.comic_id) {
+      comicMap[ch.comic_id] = (comicMap[ch.comic_id] || 0) + 1;
+    }
+  });
+
   const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
   
+  // Apply decrements
+  for (const comicId in comicMap) {
+    await Comic.findByIdAndUpdate(comicId, { $inc: { chapter_count: -comicMap[comicId] } });
+  }
+
   // Clear cache after bulk deletion
   apiCache.flush();
 

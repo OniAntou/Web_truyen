@@ -12,15 +12,14 @@ import { comicService } from '../api/comicService';
 import HomePageSkeleton from '../components/Home/HomePageSkeleton';
 
 const HomePage = () => {
-    const { data: popularData, isLoading: isLoadingPopular } = useQuery({ queryKey: ['comics', 'popular'], queryFn: () => comicService.getPopular('views', 12) });
-    const { data: latestData, isLoading: isLoadingLatest } = useQuery({ queryKey: ['comics', 'latest'], queryFn: () => comicService.getLatest(1, 12) });
-    const { data: trendingData, isLoading: isLoadingTrending } = useQuery({ queryKey: ['comics', 'trending'], queryFn: () => comicService.getTrending(10) });
+    const { data, isLoading: loading } = useQuery({ 
+        queryKey: ['comics', 'home'], 
+        queryFn: () => comicService.getHomeData() 
+    });
     
-    const loading = isLoadingPopular || isLoadingLatest || isLoadingTrending;
-    
-    const popularComics = popularData?.comics || [];
-    const newComics = latestData?.comics || [];
-    const trending = trendingData?.comics || [];
+    const popularComics = data?.popular || [];
+    const newComics = data?.latest || [];
+    const trending = data?.trending || [];
 
     // Scroll ref for navigation
     const scrollRef = useRef(null);
