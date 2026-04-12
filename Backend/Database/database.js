@@ -1,14 +1,26 @@
 const mongoose = require("mongoose");
 
-// Kết nối tới MongoDB (sử dụng biến môi trường cho Atlas hoặc localhost mặc định)
-const dbURI = process.env.MONGO_URI || "mongodb://localhost:27017/skycomic";
+// Kết nối tới MongoDB
+const uriFromEnv = process.env.MONGO_URI;
+if (!uriFromEnv) {
+  console.error("⚠️ CẢNH BÁO: Không tìm thấy biến MONGO_URI trong môi trường! Đang dùng localhost mặc định.");
+}
+
+const dbURI = uriFromEnv || "mongodb://localhost:27017/skycomic";
 
 mongoose
   .connect(dbURI)
-  .then(() => console.log(`✅ Connected to MongoDB: ${dbURI.includes('atlassian') || dbURI.includes('mongodb.net') ? 'MongoDB Atlas' : 'Localhost'}`))
+  .then(() => {
+    const isAtlas = dbURI.includes('mongodb.net');
+    console.log(`✅ Connected to MongoDB: ${isAtlas ? 'MongoDB Atlas' : 'Localhost'}`);
+    if (isAtlas) {
+      // Log một phần URI để kiểm tra (ẩn mật khẩu)
+      console.log(`📡 URI đang dùng: ${dbURI.split('@')[1] || 'Hidden'}`);
+    }
+  })
   .catch((err) => {
     console.error("❌ Connection error:", err);
-    console.error("Vui lòng kiểm tra lại MONGO_URI trong file .env");
+    console.error("Vui lòng kiểm tra lại MONGO_URI trong file .env hoặc Vercel Settings");
   });
 
 // --- SCHEMAS ---
