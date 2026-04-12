@@ -4,9 +4,16 @@ const { resolveR2Url, deleteFromR2 } = require('../config/r2');
 const { Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
+const apiCache = require('../utils/cache');
 
 const getLatestComics = asyncHandler(async (req, res) => {
   const { genre, page = 1, limit = 20 } = req.query;
+  
+  // Try to get from cache
+  const cacheKey = `latest_${genre || 'all'}_${page}_${limit}`;
+  const cachedData = apiCache.get(cacheKey);
+  if (cachedData) return res.json(cachedData);
+
   let filter = {};
   if (genre) {
     const genreDoc = await Genre.findOne({
@@ -42,7 +49,7 @@ const getLatestComics = asyncHandler(async (req, res) => {
 
   const allGenres = await Genre.find().sort({ name: 1 }).select('name slug');
 
-  res.json({
+  const responseData = {
     comics: results,
     genres: allGenres,
     pagination: {
@@ -51,11 +58,22 @@ const getLatestComics = asyncHandler(async (req, res) => {
       total,
       totalPages: Math.ceil(total / parseInt(limit)),
     }
-  });
+  };
+
+  // Cache for 5 minutes
+  apiCache.set(cacheKey, responseData);
+
+  res.json(responseData);
 });
 
 const getPopularComics = asyncHandler(async (req, res) => {
   const { genre, sort = "views", limit } = req.query;
+
+  // Try to get from cache
+  const cacheKey = `popular_${genre || 'all'}_${sort}_${limit || 'none'}`;
+  const cachedData = apiCache.get(cacheKey);
+  if (cachedData) return res.json(cachedData);
+
   let filter = {};
   if (genre) {
     const genreDoc = await Genre.findOne({
@@ -98,7 +116,12 @@ const getPopularComics = asyncHandler(async (req, res) => {
   );
 
   const allGenres = await Genre.find().sort({ name: 1 }).select('name slug');
-  res.json({ comics: results, genres: allGenres });
+  const responseData = { comics: results, genres: allGenres };
+  
+  // Cache for 5 minutes
+  if (cacheKey) apiCache.set(cacheKey, responseData);
+
+  res.json(responseData);
 });
 
 const getAllComics = asyncHandler(async (req, res) => {
@@ -149,6 +172,12 @@ const getAllComics = asyncHandler(async (req, res) => {
 
 const getTrendingComics = asyncHandler(async (req, res) => {
   const { limit = 10 } = req.query;
+
+  // Try to get from cache
+  const cacheKey = `trending_${limit}`;
+  const cachedData = apiCache.get(cacheKey);
+  if (cachedData) return res.json(cachedData);
+
   let comics = await Comic.find({}).sort({ weekly_views: -1 }).limit(parseInt(limit)).populate('genres', 'name slug');
   const comicIds = comics.map(c => c._id);
   const chapterCounts = await getChapterCounts(comicIds);
@@ -163,7 +192,11 @@ const getTrendingComics = asyncHandler(async (req, res) => {
       };
     })
   );
-  res.json({ comics: results });
+
+  const responseData = { comics: results };
+  apiCache.set(cacheKey, responseData);
+
+  res.json(responseData);
 });
 
 const getComicById = asyncHandler(async (req, res) => {
@@ -252,6 +285,10 @@ const createComic = asyncHandler(async (req, res) => {
 
   const newComic = new Comic(comicData);
   await newComic.save();
+
+  // Clear cache to show new comic
+  apiCache.flush();
+
   res.status(201).json(newComic);
 });
 

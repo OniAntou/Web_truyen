@@ -1,124 +1,141 @@
+import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import ComicInfoPage from './pages/ComicInfoPage';
-import ReadPage from './pages/ReadPage';
-import SearchPage from './pages/SearchPage';
-import PopularPage from './pages/PopularPage';
-import GenresPage from './pages/GenresPage';
-import LatestPage from './pages/LatestPage';
-import AuthPage from './pages/AuthPage';
-import FollowingPage from './pages/user/FollowingPage';
-import ProfilePage from './pages/user/ProfilePage';
-import CreatorApplication from './pages/CreatorApplication';
-import CreatorStudio from './pages/CreatorStudio';
-import TopUpPage from './pages/user/TopUpPage';
-import PaymentReturnPage from './pages/user/PaymentReturnPage';
-import HistoryPage from './pages/HistoryPage';
-import AboutPage from './pages/info/AboutPage';
-import TermsOfService from './pages/info/TermsOfService';
-import PrivacyPolicy from './pages/info/PrivacyPolicy';
-import ResetPassword from './pages/ResetPassword';
 
-import AdminLayout from './components/Layout/AdminLayout';
-import Dashboard from './pages/admin/Dashboard';
-import ComicList from './pages/admin/ComicList';
-import ComicEditor from './pages/admin/ComicEditor';
-import ChapterManager from './pages/admin/ChapterManager';
-import AdminLogin from './pages/admin/AdminLogin';
-import ApplicationManager from './pages/admin/ApplicationManager';
-import UserManager from './pages/admin/UserManager';
-import CommentManager from './pages/admin/CommentManager';
+// Lazy load pages for code splitting
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ComicInfoPage = lazy(() => import('./pages/ComicInfoPage'));
+const ReadPage = lazy(() => import('./pages/ReadPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const PopularPage = lazy(() => import('./pages/PopularPage'));
+const GenresPage = lazy(() => import('./pages/GenresPage'));
+const LatestPage = lazy(() => import('./pages/LatestPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const FollowingPage = lazy(() => import('./pages/user/FollowingPage'));
+const ProfilePage = lazy(() => import('./pages/user/ProfilePage'));
+const CreatorApplication = lazy(() => import('./pages/CreatorApplication'));
+const CreatorStudio = lazy(() => import('./pages/CreatorStudio'));
+const TopUpPage = lazy(() => import('./pages/user/TopUpPage'));
+const PaymentReturnPage = lazy(() => import('./pages/user/PaymentReturnPage'));
+const HistoryPage = lazy(() => import('./pages/HistoryPage'));
+const AboutPage = lazy(() => import('./pages/info/AboutPage'));
+const TermsOfService = lazy(() => import('./pages/info/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('./pages/info/PrivacyPolicy'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+
+const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
+const ComicList = lazy(() => import('./pages/admin/ComicList'));
+const ComicEditor = lazy(() => import('./pages/admin/ComicEditor'));
+const ChapterManager = lazy(() => import('./pages/admin/ChapterManager'));
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
+const ApplicationManager = lazy(() => import('./pages/admin/ApplicationManager'));
+const UserManager = lazy(() => import('./pages/admin/UserManager'));
+const CommentManager = lazy(() => import('./pages/admin/CommentManager'));
 
 import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute';
 import ProtectedCreatorRoute from './components/auth/ProtectedCreatorRoute';
 
+// Loading Component
+const Loading = () => (
+    <div className="flex items-center justify-center min-h-screen bg-[#0f0f0f]">
+        <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+);
+
+// Helper to wrap element in suspense
+const withSuspense = (Component) => (
+    <Suspense fallback={<Loading />}>
+        {Component}
+    </Suspense>
+);
+
 export const router = createBrowserRouter([
     {
         path: '/',
-        element: <HomePage />,
+        element: withSuspense(<HomePage />),
     },
     {
         path: '/p/:id',
-        element: <ComicInfoPage />,
+        element: withSuspense(<ComicInfoPage />),
     },
     {
         path: '/read/:comicId/:chapterId',
-        element: <ReadPage />,
+        element: withSuspense(<ReadPage />),
     },
     {
         path: '/search',
-        element: <SearchPage />,
+        element: withSuspense(<SearchPage />),
     },
     {
         path: '/popular',
-        element: <PopularPage />,
+        element: withSuspense(<PopularPage />),
     },
     {
         path: '/genres',
-        element: <GenresPage />,
+        element: withSuspense(<GenresPage />),
     },
     {
         path: '/latest',
-        element: <LatestPage />,
+        element: withSuspense(<LatestPage />),
     },
     {
         path: '/auth',
-        element: <AuthPage />,
+        element: withSuspense(<AuthPage />),
     },
     {
         path: '/reset-password/:token',
-        element: <ResetPassword />,
+        element: withSuspense(<ResetPassword />),
     },
     {
         path: '/about',
-        element: <AboutPage />,
+        element: withSuspense(<AboutPage />),
     },
     {
         path: '/terms',
-        element: <TermsOfService />,
+        element: withSuspense(<TermsOfService />),
     },
     {
         path: '/privacy',
-        element: <PrivacyPolicy />,
+        element: withSuspense(<PrivacyPolicy />),
     },
     {
         path: '/history',
-        element: <HistoryPage />,
+        element: withSuspense(<HistoryPage />),
     },
     {
         path: '/following',
-        element: <FollowingPage />,
+        element: withSuspense(<FollowingPage />),
     },
     {
         path: '/profile',
-        element: <ProfilePage />,
+        element: withSuspense(<ProfilePage />),
     },
     {
         path: '/payment/topup',
-        element: <TopUpPage />,
+        element: withSuspense(<TopUpPage />),
     },
     {
         path: '/payment/vnpay_return',
-        element: <PaymentReturnPage />,
+        element: withSuspense(<PaymentReturnPage />),
     },
     {
         path: '/become-creator',
-        element: <CreatorApplication />,
+        element: withSuspense(<CreatorApplication />),
     },
     {
         element: <ProtectedCreatorRoute />,
         children: [
-            { path: '/studio', element: <CreatorStudio /> },
-            { path: '/studio/comics/new', element: <ComicEditor /> },
-            { path: '/studio/comics/edit/:id', element: <ComicEditor /> },
-            { path: '/studio/comics/:id/chapters', element: <ChapterManager /> },
+            { path: '/studio', element: withSuspense(<CreatorStudio />) },
+            { path: '/studio/comics/new', element: withSuspense(<ComicEditor />) },
+            { path: '/studio/comics/edit/:id', element: withSuspense(<ComicEditor />) },
+            { path: '/studio/comics/:id/chapters', element: withSuspense(<ChapterManager />) },
         ]
     },    
 
     // Admin Routes
     {
         path: '/admin/login',
-        element: <AdminLogin />,
+        element: withSuspense(<AdminLogin />),
 
     },
     {
@@ -126,16 +143,16 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/admin',
-                element: <AdminLayout />,
+                element: withSuspense(<AdminLayout />),
                 children: [
-                    { path: '', element: <Dashboard /> },
-                    { path: 'comics', element: <ComicList /> },
-                    { path: 'comics/new', element: <ComicEditor /> },
-                    { path: 'comics/edit/:id', element: <ComicEditor /> },
-                    { path: 'comics/:id/chapters', element: <ChapterManager /> },
-                    { path: 'applications', element: <ApplicationManager /> },
-                    { path: 'users', element: <UserManager /> },
-                    { path: 'comments', element: <CommentManager /> },
+                    { path: '', element: withSuspense(<Dashboard />) },
+                    { path: 'comics', element: withSuspense(<ComicList />) },
+                    { path: 'comics/new', element: withSuspense(<ComicEditor />) },
+                    { path: 'comics/edit/:id', element: withSuspense(<ComicEditor />) },
+                    { path: 'comics/:id/chapters', element: withSuspense(<ChapterManager />) },
+                    { path: 'applications', element: withSuspense(<ApplicationManager />) },
+                    { path: 'users', element: withSuspense(<UserManager />) },
+                    { path: 'comments', element: withSuspense(<CommentManager />) },
                 ]
             }
         ]
