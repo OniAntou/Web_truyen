@@ -351,42 +351,82 @@ const ChapterManager = () => {
     const uploadImages = async (chapterId, fileList) => {
         const batches = splitFilesIntoUploadBatches(fileList);
         let uploadedCount = 0;
+        const MAX_RETRIES = 3;
+
+        // Helper: Upload batch with exponential backoff retry
+        const uploadBatchWithRetry = async (batch, batchIndex) => {
+            const formData = new FormData();
+            for (let j = 0; j < batch.length; j++) {
+                formData.append('pages', batch[j]);
+            }
+
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                try {
+                    setUploadStatus(
+                        `Đang upload ${uploadedCount + 1}-${uploadedCount + batch.length}/${fileList.length} ảnh${attempt > 1 ? ` (retry ${attempt}/${MAX_RETRIES})` : ''}...`
+                    );
+
+                    const token = localStorage.getItem('token');
+                    const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData,
+                    });
+
+                    if (res.ok) {
+                        return { success: true, batch };
+                    }
+
+                    // Only retry on server error (5xx) or network-like errors
+                    const isTransientError = res.status >= 500 || !res.status;
+                    if (attempt < MAX_RETRIES && isTransientError) {
+                        // Exponential backoff: 1s, 2s, 4s
+                        const delay = 1000 * Math.pow(2, attempt - 1);
+                        await new Promise(r => setTimeout(r, delay));
+                        continue;
+                    }
+
+                    // Permanent error or last attempt
+                    let errorMessage = 'Upload failed';
+                    try {
+                        const err = await res.json();
+                        errorMessage = err?.message || errorMessage;
+                    } catch {
+                        // Ignore JSON parse error
+                    }
+
+                    return { success: false, error: errorMessage, status: res.status };
+                } catch (error) {
+                    // Network error - retry if not last attempt
+                    if (attempt < MAX_RETRIES) {
+                        const delay = 1000 * Math.pow(2, attempt - 1);
+                        await new Promise(r => setTimeout(r, delay));
+                        continue;
+                    }
+
+                    return {
+                        success: false,
+                        error: error?.message || 'Network error during upload',
+                        isNetworkError: true,
+                    };
+                }
+            }
+
+            return { success: false, error: 'Upload failed after max retries' };
+        };
 
         try {
             const token = localStorage.getItem('token');
             for (let i = 0; i < batches.length; i++) {
                 const batch = batches[i];
-                const formData = new FormData();
+                const result = await uploadBatchWithRetry(batch, i);
 
-                for (let j = 0; j < batch.length; j++) {
-                    formData.append('pages', batch[j]);
-                }
-
-                setUploadStatus(`Đang upload ${uploadedCount + 1}-${uploadedCount + batch.length}/${fileList.length} ảnh...`);
-
-                const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                if (!res.ok) {
-                    let errorMessage = 'Upload failed';
-
-                    try {
-                        const err = await res.json();
-                        errorMessage = err?.message || errorMessage;
-                    } catch {
-                        // Ignore JSON parsing failure and use the fallback message.
-                    }
-
+                if (!result.success) {
                     return {
                         completed: false,
                         uploadedCount,
                         total: fileList.length,
-                        message: errorMessage,
+                        message: result.error,
                     };
                 }
 

@@ -49,30 +49,40 @@ const uploadChapterPages = asyncHandler(async (req, res) => {
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
   const comicId = chapter.comic_id;
   if (!req.files?.length) throw new AppError("Cần gửi ít nhất một ảnh (field: pages)", 400);
-  const created = [];
   const existingPages = await Pages.find({ chapter_id: chapter._id }).sort('-page_number');
   const maxPageNumber = existingPages.length > 0 ? existingPages[0].page_number : 0;
 
-  for (let i = 0; i < req.files.length; i++) {
-    const f = req.files[i];
+  // Upload all files to R2 in parallel (instead of sequential)
+  const uploadPromises = req.files.map((f, i) => {
     const pageNum = maxPageNumber + i + 1;
     const ext = (f.originalname || "").split(".").pop() || "jpg";
     const key = `chapters/${chapterId}/${pageNum}-${Date.now()}.${ext}`;
-    const { key: r2Key } = await uploadToR2(key, f.buffer, f.mimetype);
-    await Upload.create({
-      key: r2Key,
-      type: "page",
-      comic_id: comicId,
-      chapter_id: chapter._id,
-      page_number: pageNum,
-    });
-    const page = await Pages.create({
+    return uploadToR2(key, f.buffer, f.mimetype).then(({ key: r2Key }) => ({
+      r2Key,
+      pageNum,
+    }));
+  });
+
+  const uploadedData = await Promise.all(uploadPromises);
+
+  // Create database records for all uploaded pages in parallel
+  const pagePromises = uploadedData.map(({ r2Key, pageNum }) =>
+    Pages.create({
       chapter_id: chapter._id,
       page_number: pageNum,
       image_url: r2Key,
-    });
-    created.push(page);
-  }
+    }).then((page) =>
+      Upload.create({
+        key: r2Key,
+        type: "page",
+        comic_id: comicId,
+        chapter_id: chapter._id,
+        page_number: pageNum,
+      }).then(() => page)
+    )
+  );
+
+  const created = await Promise.all(pagePromises);
   res.status(201).json({ chapter: chapterId, pages: created });
 });
 
