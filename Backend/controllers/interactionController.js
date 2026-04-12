@@ -1,4 +1,4 @@
-const { Comic, Rating, ComicView, Comment, Favorite, ReadingProgress, Chapter, Pages } = require('../../Database/database');
+const { Comic, Rating, ComicView, Comment, Favorite, ReadingProgress, Chapter, Pages } = require('../Database/database');
 const { getChapterCounts } = require('../utils/helpers');
 const { resolveR2Url } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');

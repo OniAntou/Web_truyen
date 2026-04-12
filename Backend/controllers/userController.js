@@ -1,4 +1,4 @@
-const { User, ComicView, Comic, Rating, Comment, Favorite, Payment, ChapterUnlock } = require('../../Database/database');
+const { User, ComicView, Comic, Rating, Comment, Favorite, Payment, ChapterUnlock } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 

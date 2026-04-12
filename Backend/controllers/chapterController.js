@@ -1,4 +1,4 @@
-const { Chapter, Pages, Upload, User, ChapterUnlock } = require('../../Database/database');
+const { Chapter, Pages, Upload, User, ChapterUnlock } = require('../Database/database');
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');

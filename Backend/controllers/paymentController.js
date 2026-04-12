@@ -1,4 +1,4 @@
-const { Payment, User } = require("../../Database/database");
+const { Payment, User } = require("../Database/database");
 const vnpay = require("../utils/vnpay");
 const asyncHandler = require("../middleware/asyncHandler");
 const AppError = require("../utils/AppError");

@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const { Comic } = require('../../Database/database');
+const { Comic } = require('../Database/database');
 
 const initCronJobs = () => {
   // Reset weekly_views to 0 every Monday at 00:00

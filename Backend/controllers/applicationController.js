@@ -1,4 +1,4 @@
-const { Application, User } = require('../../Database/database');
+const { Application, User } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 

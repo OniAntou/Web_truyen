@@ -1,4 +1,4 @@
-const { Genre, Chapter } = require('../../Database/database');
+const { Comic, Favorite, ReadingProgress, Genre, Chapter } = require('../Database/database');
 
 // Helper for chapter counts to prevent N+1 queries
 async function getChapterCounts(comicIds) {

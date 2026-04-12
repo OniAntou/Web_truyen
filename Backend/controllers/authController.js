@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { AdminLogin, User } = require('../../Database/database');
+const { AdminLogin, User } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 const { sendPasswordResetEmail } = require('../utils/email');

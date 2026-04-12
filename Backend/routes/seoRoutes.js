@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Comic } = require('../../Database/database');
+const { Comic } = require('../Database/database');
 
 router.get('/sitemap.xml', async (req, res) => {
     try {

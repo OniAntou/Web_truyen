@@ -1,4 +1,4 @@
-const { Comic, Chapter, Upload, Pages } = require('../../Database/database');
+const { Comic, Chapter, Upload, Pages } = require('../Database/database');
 const { R2_ENABLED, getFileUrl, uploadToR2 } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');

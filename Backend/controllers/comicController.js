@@ -1,7 +1,7 @@
-const { Comic, Genre } = require('../../Database/database');
+const { Comic, Genre } = require('../Database/database');
 const { getChapterCounts, processGenres } = require('../utils/helpers');
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
-const { Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite } = require('../../Database/database');
+const { Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 
@@ -190,7 +190,7 @@ const getComicById = asyncHandler(async (req, res) => {
   let userDoc = null;
   let unlockedChapters = new Set();
   if (req.user) {
-    const { User, ChapterUnlock } = require('../../Database/database');
+    const { User, ChapterUnlock } = require('../Database/database');
     userDoc = await User.findById(req.user.id);
     if (!userDoc || !userDoc.is_vip || !userDoc.vip_expiry || new Date(userDoc.vip_expiry) <= new Date()) {
       const unlocks = await ChapterUnlock.find({ user_id: req.user.id });

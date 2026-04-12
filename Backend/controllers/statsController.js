@@ -1,4 +1,4 @@
-const { Comic, User, Chapter, Payment, mongoose } = require('../../Database/database');
+const { Comic, User, Chapter, Payment, mongoose } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const { resolveR2Url } = require('../config/r2');
 

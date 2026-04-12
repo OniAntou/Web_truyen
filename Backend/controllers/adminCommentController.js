@@ -1,4 +1,4 @@
-const { Comment, Comic } = require('../../Database/database');
+const { Comment, Comic } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 

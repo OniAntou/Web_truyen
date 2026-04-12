@@ -1,4 +1,4 @@
-const { Genre, Comic } = require('../../Database/database');
+const { Genre, Comic } = require('../Database/database');
 const { getChapterCounts } = require('../utils/helpers');
 const { resolveR2Url } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
