@@ -61,6 +61,12 @@ const ComicSchema = new mongoose.Schema(
     genres: [{ type: mongoose.Schema.Types.ObjectId, ref: "Genre" }],
     uploader_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     chapter_count: { type: Number, default: 0 },
+    latest_chapter: {
+      id: mongoose.Schema.Types.ObjectId,
+      chapter_number: Number,
+      title: String,
+      created_at: Date,
+    },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "comic" },
@@ -73,6 +79,11 @@ ComicSchema.index({ weekly_views: -1 });
 ComicSchema.index({ created_at: -1 });
 ComicSchema.index({ genres: 1 });
 ComicSchema.index({ uploader_id: 1 });
+
+// Compound indexes for common sorting/filtering
+ComicSchema.index({ views: -1, created_at: -1 });
+ComicSchema.index({ weekly_views: -1, created_at: -1 });
+ComicSchema.index({ rating: -1, created_at: -1 });
 
 const Comic = mongoose.model("Comic", ComicSchema);
 

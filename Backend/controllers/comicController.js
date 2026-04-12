@@ -58,9 +58,11 @@ const getLatestComics = asyncHandler(async (req, res) => {
     }
   };
 
-  // Cache for 5 minutes
+  // Cache for 5 minutes in memory
   apiCache.set(cacheKey, responseData);
 
+  // Vercel Edge Cache: 5 mins fresh, 10 mins stale-while-revalidate
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   res.json(responseData);
 });
 
@@ -115,9 +117,11 @@ const getPopularComics = asyncHandler(async (req, res) => {
   const allGenres = await Genre.find().sort({ name: 1 }).select('name slug');
   const responseData = { comics: results, genres: allGenres };
   
-  // Cache for 5 minutes
+  // Cache for 5 minutes in memory
   if (cacheKey) apiCache.set(cacheKey, responseData);
 
+  // Vercel Edge Cache
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   res.json(responseData);
 });
 
@@ -195,6 +199,8 @@ const getTrendingComics = asyncHandler(async (req, res) => {
   const responseData = { comics: results };
   apiCache.set(cacheKey, responseData);
 
+  // Vercel Edge Cache
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   res.json(responseData);
 });
 
@@ -207,9 +213,9 @@ const getHomeData = asyncHandler(async (req, res) => {
   if (cachedData) return res.json(cachedData);
 
   const [popularResult, latestResult, trendingResult, genres] = await Promise.all([
-    Comic.find({}).sort({ views: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating views weekly_views genres chapter_count').lean(),
-    Comic.find({}).sort({ created_at: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count created_at').lean(),
-    Comic.find({}).sort({ weekly_views: -1 }).limit(10).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count').lean(),
+    Comic.find({}).sort({ views: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating views weekly_views genres chapter_count latest_chapter').lean(),
+    Comic.find({}).sort({ created_at: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count created_at latest_chapter').lean(),
+    Comic.find({}).sort({ weekly_views: -1 }).limit(10).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count latest_chapter').lean(),
     Genre.find().sort({ name: 1 }).select('name slug')
   ]);
 
@@ -229,6 +235,8 @@ const getHomeData = asyncHandler(async (req, res) => {
   const responseData = { popular, latest, trending, genres };
   apiCache.set(cacheKey, responseData, 300); // 5 minutes cache
 
+  // Vercel Edge Cache
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   res.json(responseData);
 });
 

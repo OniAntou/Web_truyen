@@ -6,7 +6,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const { initCronJobs } = require('./cron/cronJobs');
+const { resetWeeklyViews } = require('./cron/cronJobs');
 const ensureDbConnection = require('./middleware/ensureDbConnection');
 
 // Route imports
@@ -24,6 +24,7 @@ const adminCommentRoutes = require('./routes/adminCommentRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const seoRoutes = require('./routes/seoRoutes');
+const cronRoutes = require('./routes/cronRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -74,8 +75,8 @@ const globalLimiter = rateLimit({
 });
 app.use('/api', globalLimiter);
 
-// Initialize Cron Jobs
-initCronJobs();
+// Initialize Cron Jobs (Legacy - now handled by Vercel Crons via /api/cron)
+// initCronJobs();
 
 // Routes
 app.get("/", (req, res) => {
@@ -84,6 +85,14 @@ app.get("/", (req, res) => {
 
 app.get("/api/test", (req, res) => {
   res.json({ message: "Connection successful! Hello from Express!" });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.use('/api', ensureDbConnection);
@@ -104,6 +113,7 @@ app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/comments', adminCommentRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api', seoRoutes);
+app.use('/api/cron', cronRoutes);
 
 // Compatibility / Special cases
 // Some routes in interactionRoutes were originally at /api/users/

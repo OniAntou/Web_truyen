@@ -1,5 +1,6 @@
 const { Chapter, Pages, Upload, User, ChapterUnlock, Comic } = require('../Database/database');
 const { resolveR2Url, deleteFromR2 } = require('../config/r2');
+const { syncLatestChapter } = require('../utils/helpers');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 const apiCache = require('../utils/cache');
@@ -121,9 +122,10 @@ const createChapter = asyncHandler(async (req, res) => {
   const newChapter = new Chapter(req.body);
   await newChapter.save();
   
-  // Increment chapter_count in Comic
+  // Increment chapter_count in Comic and sync latest_chapter
   if (newChapter.comic_id) {
     await Comic.findByIdAndUpdate(newChapter.comic_id, { $inc: { chapter_count: 1 } });
+    await syncLatestChapter(newChapter.comic_id);
   }
 
   // Clear cache after adding new chapter
@@ -140,9 +142,10 @@ const deleteChapter = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findByIdAndDelete(chapterId);
   if (!chapter) throw new AppError("Chapter not found", 404);
 
-  // Decrement chapter_count in Comic
+  // Decrement chapter_count in Comic and sync latest_chapter
   if (chapter.comic_id) {
     await Comic.findByIdAndUpdate(chapter.comic_id, { $inc: { chapter_count: -1 } });
+    await syncLatestChapter(chapter.comic_id);
   }
 
   const pages = await Pages.find({ chapter_id: chapterId });
@@ -187,9 +190,10 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
 
   const result = await Chapter.deleteMany({ _id: { $in: chapterIds } });
   
-  // Apply decrements
+  // Apply decrements and sync latest_chapter
   for (const comicId in comicMap) {
     await Comic.findByIdAndUpdate(comicId, { $inc: { chapter_count: -comicMap[comicId] } });
+    await syncLatestChapter(comicId);
   }
 
   // Clear cache after bulk deletion

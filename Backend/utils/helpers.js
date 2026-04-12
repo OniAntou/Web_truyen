@@ -53,8 +53,38 @@ const formatExactDate = (date) => {
   return `${day}/${month}/${year}`;
 };
 
+// Update comic's latest_chapter denormalized field
+async function syncLatestChapter(comicId) {
+  try {
+    const latestChapter = await Chapter.findOne({ comic_id: comicId })
+      .sort({ chapter_number: -1 })
+      .select("_id chapter_number title created_at")
+      .lean();
+
+    if (latestChapter) {
+      await Comic.findByIdAndUpdate(comicId, {
+        $set: {
+          latest_chapter: {
+            id: latestChapter._id,
+            chapter_number: latestChapter.chapter_number,
+            title: latestChapter.title,
+            created_at: latestChapter.created_at,
+          },
+        },
+      });
+    } else {
+      await Comic.findByIdAndUpdate(comicId, {
+        $unset: { latest_chapter: "" },
+      });
+    }
+  } catch (err) {
+    console.error(`Error syncing latest chapter for comic ${comicId}:`, err);
+  }
+}
+
 module.exports = {
   getChapterCounts,
   processGenres,
-  formatExactDate
+  formatExactDate,
+  syncLatestChapter,
 };
