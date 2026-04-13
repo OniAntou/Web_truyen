@@ -16,12 +16,13 @@ async function connectDB() {
     return mongoose.connection;
   }
 
-  if (!globalMongoose.promise) {
     globalMongoose.promise = mongoose.connect(dbURI, {
       serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
       maxPoolSize: 10,
+      minPoolSize: 1,
+      retryWrites: true,
     });
-  }
 
   try {
     await globalMongoose.promise;

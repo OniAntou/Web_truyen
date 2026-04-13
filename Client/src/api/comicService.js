@@ -71,5 +71,6 @@ export const comicService = {
     getUserReadingHistory: (token) => apiClient('/users/reading-progress', {
         headers: { 'Authorization': `Bearer ${token}` }
     }),
-    testConnection: () => apiClient('/test')
+    testConnection: () => apiClient('/test'),
+    warmup: () => apiClient('/health').catch(() => {}) // Lightweight ping to wake up server
 };

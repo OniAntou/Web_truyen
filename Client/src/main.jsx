@@ -1,3 +1,6 @@
+// Pre-warmup backend cold start as early as possible
+fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => {});
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
