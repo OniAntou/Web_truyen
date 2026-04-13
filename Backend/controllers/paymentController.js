@@ -17,6 +17,8 @@ const createPayment = asyncHandler(async (req, res) => {
   const orderId = `PAY_${Date.now()}`;
   const orderInfo = `Nap Linh thach cho user ${userId}`;
 
+  console.log(`[Payment] Creating payment for user ${userId}, amount ${amount}`);
+  
   // 1. Generate payment URL
   const paymentUrl = vnpay.createPaymentUrl({
     amount,

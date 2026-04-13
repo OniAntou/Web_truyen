@@ -28,6 +28,18 @@ function createPaymentUrl(params) {
   const vnpUrl = process.env.VNP_URL?.trim();
   const returnUrl = process.env.VNP_RETURN_URL?.trim();
 
+  // Validate environment variables
+  if (!tmnCode || !secretKey || !vnpUrl || !returnUrl) {
+    const missing = [];
+    if (!tmnCode) missing.push("VNP_TMN_CODE");
+    if (!secretKey) missing.push("VNP_HASH_SECRET");
+    if (!vnpUrl) missing.push("VNP_URL");
+    if (!returnUrl) missing.push("VNP_RETURN_URL");
+    
+    console.error(`[VNPay] Missing environment variables: ${missing.join(", ")}`);
+    throw new Error(`Cấu hình VNPay chưa hoàn thiện. Thiếu: ${missing.join(", ")}`);
+  }
+
   const date = new Date();
   const createDate = formatDate(date);
 
@@ -49,6 +61,7 @@ function createPaymentUrl(params) {
     vnp_Params["vnp_BankCode"] = params.bankCode;
   }
 
+  // Sort and hash
   vnp_Params = sortObject(vnp_Params);
 
   var signData = qs.stringify(vnp_Params, { encode: false });
@@ -57,7 +70,12 @@ function createPaymentUrl(params) {
 
   vnp_Params["vnp_SecureHash"] = signed;
 
-  return vnpUrl + "?" + qs.stringify(vnp_Params, { encode: false });
+  const finalUrl = vnpUrl + "?" + qs.stringify(vnp_Params, { encode: false });
+  
+  // Log URL (with hash redacted for security)
+  console.log(`[VNPay] Generated URL: ${finalUrl.replace(/vnp_SecureHash=[^&]+/, "vnp_SecureHash=REDACTED")}`);
+
+  return finalUrl;
 }
 
 function verifyReturnUrl(vnp_Params) {
