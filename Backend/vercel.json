@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "builds": [{ "src": "server.js", "use": "@vercel/node" }],
   "functions": {
-    "server.js": {
+    "api/index.js": {
       "runtime": "nodejs20.x",
       "maxDuration": 30
     }
@@ -24,9 +23,8 @@
       ]
     }
   ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/$", "dest": "server.js" },
-    { "src": "/(.*)", "status": 404 }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/", "destination": "/api/index" }
   ]
 }
