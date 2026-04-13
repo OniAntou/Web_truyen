@@ -18,30 +18,38 @@ const apiClient = async (endpoint, options = {}) => {
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = {};
+        }
+
         // Global handling of expired/invalid tokens
         if (response.status === 401 || response.status === 403) {
             const token = localStorage.getItem('token');
             const authHeader = config.headers && Object.keys(config.headers).find(key => key.toLowerCase() === 'authorization');
-            // Only auto-logout if there IS a token (meaning it's expired/invalid)
-            // and the request was authenticated (had Authorization header)
-            if (token && authHeader) {
+            // Only auto-logout if there IS a token, the request was authenticated,
+            // and the response is not a specific "chapter locked" payload.
+            if (token && authHeader && !data.is_locked) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 clearReadingHistory();
-                // Dispatch a custom event so Navbar and other components can react
                 window.dispatchEvent(new Event('auth:logout'));
             }
         }
-
-        const data = await response.json();
         
         if (response.ok) {
             return data;
         }
         
-        throw new Error(data.message || 'Something went wrong');
+        const errorMessage = data.message || 'Something went wrong';
+        throw { ...data, message: errorMessage };
     } catch (err) {
-        return Promise.reject(err.message || err);
+        if (err && typeof err === 'object' && !err.name) {
+            return Promise.reject(err);
+        }
+        return Promise.reject(err?.message || err);
     }
 };
 

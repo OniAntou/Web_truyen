@@ -253,6 +253,12 @@ const getComicById = asyncHandler(async (req, res) => {
     }
   }
 
+  const isChapterRequiresLock = (ch) => {
+    if (!ch.price || ch.price <= 0) return false;
+    if (ch.early_access_end_date && new Date(ch.early_access_end_date) <= new Date()) return false;
+    return true;
+  };
+
   let comic;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
     comic = await Comic.findById(id).select('-__v').lean();
@@ -287,7 +293,7 @@ const getComicById = asyncHandler(async (req, res) => {
     const relativeDate = ch.created_at ? formatExactDate(ch.created_at) : (ch.date || 'Unknown');
     let is_locked = false;
 
-    if (ch.early_access_end_date && new Date(ch.early_access_end_date) > new Date()) {
+    if (isChapterRequiresLock(ch)) {
       is_locked = true;
       if (req.user && userDoc) { // check userDoc exists
         if (userDoc.role === 'admin' || userDoc.role === 'creator') {
@@ -338,6 +344,12 @@ const getReaderData = asyncHandler(async (req, res) => {
       return res.json(cached);
     }
   }
+
+  const isChapterRequiresLock = (ch) => {
+    if (!ch.price || ch.price <= 0) return false;
+    if (ch.early_access_end_date && new Date(ch.early_access_end_date) <= new Date()) return false;
+    return true;
+  };
   
   let comic;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -362,7 +374,7 @@ const getReaderData = asyncHandler(async (req, res) => {
   // Check locking logic
   let is_locked = false;
   let userDoc = null;
-  if (chapter.early_access_end_date && new Date(chapter.early_access_end_date) > new Date()) {
+  if (isChapterRequiresLock(chapter)) {
     is_locked = true;
     if (req.user) {
       const { User, ChapterUnlock } = require('../Database/database');

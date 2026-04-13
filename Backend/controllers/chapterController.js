@@ -9,8 +9,14 @@ const getChapterPages = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
 
-  // Check Early Access Lock
-  if (chapter.early_access_end_date && new Date(chapter.early_access_end_date) > new Date()) {
+  const isChapterRequiresLock = (ch) => {
+    if (!ch.price || ch.price <= 0) return false;
+    if (ch.early_access_end_date && new Date(ch.early_access_end_date) <= new Date()) return false;
+    return true;
+  };
+
+  // Check Early Access / Premium Lock
+  if (isChapterRequiresLock(chapter)) {
     let hasAccess = false;
     if (req.user) {
       if (req.user.role === 'admin' || req.user.role === 'creator') {

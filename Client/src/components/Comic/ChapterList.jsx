@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 
@@ -55,6 +55,8 @@ const ChapterList = ({ chapters, comicId }) => {
                     {chapters.map(chapter => {
                         const chapterId = chapter._id || chapter.id;
                         const isRead = readChapters.has(chapterId);
+                        const requiresPayment = chapter.price > 0 && (!chapter.early_access_end_date || new Date(chapter.early_access_end_date) > new Date());
+                        const displayLockedInfo = chapter.is_locked || requiresPayment;
                         
                         return (
                             <Link
@@ -79,7 +81,7 @@ const ChapterList = ({ chapters, comicId }) => {
                             >
                                 <span className="chapter-title flex items-center gap-2">
                                     {chapter.title}
-                                    {chapter.is_locked && (
+                                    {displayLockedInfo && (
                                         <span className="flex items-center text-[0.65rem] font-bold text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded border border-yellow-500/20 ml-2">
                                             <Lock size={10} className="mr-1" />
                                             {chapter.price || 0} Xu
