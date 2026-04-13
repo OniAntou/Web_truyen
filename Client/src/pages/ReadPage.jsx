@@ -10,6 +10,7 @@ import CommentSection from '../components/Comic/CommentSection';
 import { comicService } from '../api/comicService';
 import { chapterService } from '../api/chapterService';
 import { API_BASE_URL } from '../constants/api';
+import { clearSession } from '../utils/auth';
 import { saveReadingHistory } from '../utils/readingHistory';
 
 const ReadPage = () => {
@@ -163,6 +164,12 @@ const ReadPage = () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
                 });
+                
+                if (response.status === 401) {
+                    clearSession();
+                    return;
+                }
+                
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message);
                 setConfirmModal({ ...confirmModal, isOpen: false });

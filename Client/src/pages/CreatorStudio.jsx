@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, BookOpen, Clock, Edit, Eye, Star, LogOut, Home, LayoutDashboard, Trash2 } from 'lucide-react';
 import LazyImage from '../components/ui/LazyImage';
 import { API_BASE_URL } from '../constants/api';
+import { clearSession } from '../utils/auth';
 
 const CreatorStudio = () => {
     const [comics, setComics] = useState([]);
@@ -24,6 +25,10 @@ const CreatorStudio = () => {
             }
         })
         .then(res => {
+            if (res.status === 401) {
+                clearSession();
+                return null;
+            }
             if (res.status === 403) {
                 throw new Error('Bạn không có quyền truy cập trang này. Vui lòng nộp đơn xin cấp quyền tác giả.');
             }

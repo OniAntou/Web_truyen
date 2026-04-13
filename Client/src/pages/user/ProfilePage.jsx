@@ -4,6 +4,7 @@ import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
 import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
+import { clearSession } from '../../utils/auth';
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
@@ -31,7 +32,7 @@ const ProfilePage = () => {
         })
         .then(res => {
             if (res.status === 401 || res.status === 403) {
-                window.dispatchEvent(new Event('auth:logout'));
+                clearSession();
                 // Do not set loading to false here, so we don't render the expired text before unmounting
                 return null;
             }
@@ -89,8 +90,7 @@ const ProfilePage = () => {
                 const data = await res.json();
                 throw new Error(data.message || 'Lỗi xóa tài khoản');
             }
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            clearSession();
             navigate('/');
         } catch (err) {
             showToast(err.message, 'err');
@@ -147,7 +147,7 @@ const ProfilePage = () => {
                 <Navbar />
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-secondary)' }}>
                     <p>Phiên đăng nhập hết hạn.</p>
-                    <button className="btn btn-primary" onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); navigate('/auth'); }}>Đăng nhập lại</button>
+                    <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>Đăng nhập lại</button>
                 </div>
                 <Footer />
             </div>

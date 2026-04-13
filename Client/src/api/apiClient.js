@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../constants/api';
-import { clearReadingHistory } from '../utils/readingHistory';
+import { clearSession } from '../utils/auth';
 
 const apiClient = async (endpoint, options = {}) => {
     const { body, ...customConfig } = options;
@@ -32,10 +32,7 @@ const apiClient = async (endpoint, options = {}) => {
             // Only auto-logout if there IS a token, the request was authenticated,
             // and the response is not a specific "chapter locked" payload.
             if (token && authHeader && !data.is_locked) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                clearReadingHistory();
-                window.dispatchEvent(new Event('auth:logout'));
+                clearSession();
             }
         }
         

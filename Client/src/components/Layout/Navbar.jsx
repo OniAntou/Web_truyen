@@ -5,6 +5,7 @@ import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 import { userService } from '../../api/userService';
 import { clearReadingHistory } from '../../utils/readingHistory';
+import { clearSession } from '../../utils/auth';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -94,8 +95,11 @@ const Navbar = () => {
         window.addEventListener('focus', handleFocus);
         const authInterval = setInterval(checkAuth, 60000); // Check every minute
 
-        // Listen for auth:logout events from apiClient
+        // Listen for auth:logout events from apiClient or other components
         const handleLogoutEvent = () => {
+            // Ensure storage is cleared to prevent checkAuth from restoring session
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             clearReadingHistory();
             setUser(null);
             setShowProfileDropdown(false);
@@ -116,10 +120,7 @@ const Navbar = () => {
     }, [navigate, location.pathname]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        clearReadingHistory();
-        setUser(null);
+        clearSession();
         setShowProfileDropdown(false);
         navigate('/');
     };

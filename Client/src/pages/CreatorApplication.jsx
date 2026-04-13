@@ -1,9 +1,10 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import { API_BASE_URL } from '../constants/api';
+import { clearSession } from '../utils/auth';
 
 const CreatorApplication = () => {
     const [formData, setFormData] = useState({
@@ -36,6 +37,12 @@ const CreatorApplication = () => {
                 },
                 body: JSON.stringify(formData)
             });
+
+            if (res.status === 401) {
+                clearSession();
+                return;
+            }
+
             const data = await res.json();
             
             if (res.ok) {
