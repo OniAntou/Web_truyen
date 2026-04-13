@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Clock, ChevronRight, X } from 'lucide-react';
+import { BookOpen, ChevronRight, X } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
 import { getReadingHistory, clearReadingHistory } from '../../utils/readingHistory';
 
@@ -21,16 +21,7 @@ const ContinueReading = () => {
     // Only show the 6 most recent
     const displayHistory = history.slice(0, 6);
 
-    const timeAgo = (timestamp) => {
-        const diff = Date.now() - timestamp;
-        const minutes = Math.floor(diff / 60000);
-        if (minutes < 1) return 'Vừa xong';
-        if (minutes < 60) return `${minutes} phút trước`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours} giờ trước`;
-        const days = Math.floor(hours / 24);
-        return `${days} ngày trước`;
-    };
+
 
     return (
         <section className="container mx-auto px-6 py-8 md:py-12 max-w-7xl">
@@ -83,10 +74,6 @@ const ContinueReading = () => {
                                     <span className="text-xs font-semibold truncate">
                                         Ch.{item.chapterNumber}
                                     </span>
-                                </div>
-                                <div className="flex items-center gap-1 mt-1 text-white/50">
-                                    <Clock size={10} />
-                                    <span className="text-[10px] font-medium">{timeAgo(item.timestamp)}</span>
                                 </div>
                             </div>
 

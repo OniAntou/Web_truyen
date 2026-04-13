@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { BookOpen, Clock, ChevronRight, Trash2, History } from 'lucide-react';
+import { BookOpen, ChevronRight, Trash2, History } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import LazyImage from '../components/ui/LazyImage';
@@ -58,17 +58,7 @@ const HistoryPage = () => {
         localStorage.setItem('comicverse_reading_history', JSON.stringify(updated));
     };
 
-    const timeAgo = (timestamp) => {
-        const diff = Date.now() - timestamp;
-        const minutes = Math.floor(diff / 60000);
-        if (minutes < 1) return 'Vừa xong';
-        if (minutes < 60) return `${minutes} phút trước`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours} giờ trước`;
-        const days = Math.floor(hours / 24);
-        if (days < 30) return `${days} ngày trước`;
-        return `${Math.floor(days / 30)} tháng trước`;
-    };
+
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
@@ -142,10 +132,6 @@ const HistoryPage = () => {
                                                     Ch.{item.chapterNumber} — {item.chapterTitle}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-1 mt-1 text-white/50">
-                                                <Clock size={10} />
-                                                <span className="text-[10px] font-medium">{timeAgo(item.timestamp)}</span>
-                                            </div>
                                         </div>
 
                                         {/* Continue overlay */}
@@ -169,7 +155,7 @@ const HistoryPage = () => {
                                         </p>
                                     </Link>
                                     <p className="text-xs md:text-sm mt-0.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
-                                        Ch.{item.chapterNumber} · {timeAgo(item.timestamp)}
+                                        Ch.{item.chapterNumber}
                                     </p>
                                 </div>
                             </div>

@@ -393,6 +393,7 @@ const getReaderData = asyncHandler(async (req, res) => {
     });
   }
 
+  const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 }).lean();
   const pageResults = await resolveR2Urls(pages, 'image_url');
 
   const coverUrl = await resolveR2Url(comic.cover_url);
