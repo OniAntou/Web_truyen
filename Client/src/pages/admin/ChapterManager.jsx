@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { API_BASE_URL } from '../../constants/api';
 
-const MAX_FILES_PER_UPLOAD_BATCH = 3;
-const MAX_BYTES_PER_UPLOAD_BATCH = 18 * 1024 * 1024;
+const MAX_FILES_PER_UPLOAD_BATCH = 2;
+const MAX_BYTES_PER_UPLOAD_BATCH = 3.5 * 1024 * 1024; // 3.5MB to stay safely under Vercel's 4.5MB limit
 
 const splitFilesIntoUploadBatches = (fileList) => {
     const batches = [];
@@ -349,7 +349,48 @@ const ChapterManager = () => {
     };
 
     const uploadImages = async (chapterId, fileList) => {
-        const batches = splitFilesIntoUploadBatches(fileList);
+        setUploadStatus('Đang xử lý và nén ảnh (giảm dung lượng)...');
+        const compressedFileList = await Promise.all(fileList.map(async (file) => {
+            return new Promise((resolve) => {
+                if (file.size < 800 * 1024) return resolve(file); // skip small files
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        URL.revokeObjectURL(url);
+                        if (blob && blob.size < file.size) {
+                            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp' }));
+                        } else {
+                            resolve(file);
+                        }
+                    }, 'image/webp', 0.75); // 75% quality for optimal size
+                };
+                img.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(file);
+                };
+                img.src = url;
+            });
+        }));
+
+        const batches = splitFilesIntoUploadBatches(compressedFileList);
+        
+        // Single file hard limit check
+        const oversizedFile = compressedFileList.find(f => f.size > 4.4 * 1024 * 1024);
+        if (oversizedFile) {
+            return {
+                completed: false,
+                uploadedCount: 0,
+                total: fileList.length,
+                message: `Lỗi: File "${oversizedFile.name}" có dung lượng quá lớn (${(oversizedFile.size / 1024 / 1024).toFixed(2)}MB). Giới hạn tối đa là 4.4MB/file trên server.`
+            };
+        }
+
         let uploadedCount = 0;
         const MAX_RETRIES = 3;
 
