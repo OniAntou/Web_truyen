@@ -114,6 +114,7 @@ const PageSchema = new mongoose.Schema(
   },
   { collection: "pages" },
 );
+PageSchema.index({ chapter_id: 1, page_number: 1 });
 
 const Pages = mongoose.model("Pages", PageSchema);
 
@@ -174,6 +175,8 @@ const RatingSchema = new mongoose.Schema(
   },
   { collection: "ratings" },
 );
+RatingSchema.index({ comic_id: 1 });
+RatingSchema.index({ user_id: 1, comic_id: 1 }, { unique: true });
 
 const Rating = mongoose.model("Rating", RatingSchema);
 

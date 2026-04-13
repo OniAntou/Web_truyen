@@ -1,5 +1,5 @@
 const { Chapter, Pages, Upload, User, ChapterUnlock, Comic } = require('../Database/database');
-const { resolveR2Url, deleteFromR2 } = require('../config/r2');
+const { resolveR2Url, resolveR2Urls, deleteFromR2 } = require('../config/r2');
 const { syncLatestChapter } = require('../utils/helpers');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
@@ -43,23 +43,7 @@ const getChapterPages = asyncHandler(async (req, res) => {
   }
 
   const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 }).lean();
-  const pagesWithUrls = await Promise.all(
-    pages.map(async (p) => {
-      let imageUrl = p.image_url;
-
-      try {
-        imageUrl = await resolveR2Url(p.image_url) || p.image_url;
-      } catch (err) {
-        console.error(`Failed to resolve chapter page URL for page ${p._id}:`, err);
-      }
-
-      return {
-        _id: p._id,
-        page_number: p.page_number,
-        image_url: imageUrl,
-      };
-    })
-  );
+  const pagesWithUrls = await resolveR2Urls(pages, 'image_url');
   res.json(pagesWithUrls);
 });
 

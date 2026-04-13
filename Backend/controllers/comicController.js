@@ -1,6 +1,6 @@
 const { Comic, Genre } = require('../Database/database');
 const { getChapterCounts, processGenres } = require('../utils/helpers');
-const { resolveR2Url, deleteFromR2 } = require('../config/r2');
+const { resolveR2Url, resolveR2Urls, deleteFromR2 } = require('../config/r2');
 const { Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite } = require('../Database/database');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
@@ -219,17 +219,10 @@ const getHomeData = asyncHandler(async (req, res) => {
     Genre.find().sort({ name: 1 }).select('name slug')
   ]);
 
-  const processList = async (list) => {
-    return Promise.all(list.map(async (c) => {
-      const coverUrl = await resolveR2Url(c.cover_url);
-      return { ...c, cover_url: coverUrl || c.cover_url };
-    }));
-  };
-
   const [popular, latest, trending] = await Promise.all([
-    processList(popularResult),
-    processList(latestResult),
-    processList(trendingResult)
+    resolveR2Urls(popularResult, 'cover_url'),
+    resolveR2Urls(latestResult, 'cover_url'),
+    resolveR2Urls(trendingResult, 'cover_url')
   ]);
 
   const responseData = { popular, latest, trending, genres };
@@ -400,11 +393,7 @@ const getReaderData = asyncHandler(async (req, res) => {
     });
   }
 
-  const pages = await Pages.find({ chapter_id: chapter._id }).sort({ page_number: 1 }).lean();
-  const pageResults = await Promise.all(pages.map(async p => ({
-    ...p,
-    image_url: await resolveR2Url(p.image_url)
-  })));
+  const pageResults = await resolveR2Urls(pages, 'image_url');
 
   const coverUrl = await resolveR2Url(comic.cover_url);
   

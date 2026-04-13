@@ -101,6 +101,20 @@ async function resolveR2Url(stored) {
 }
 
 /**
+ * Batch resolve multiple R2 URLs for a list of items.
+ * Reduces overhead by processing all at once.
+ */
+async function resolveR2Urls(items, fieldName = 'image_url') {
+  if (!items || !Array.isArray(items)) return items;
+  
+  return Promise.all(items.map(async (item) => {
+    if (!item || !item[fieldName]) return item;
+    const resolvedUrl = await resolveR2Url(item[fieldName]);
+    return { ...item, [fieldName]: resolvedUrl };
+  }));
+}
+
+/**
  * Xoá file khỏi R2.
  * @param {string} keyOrR2Key - key thuần (covers/...) hoặc "r2:covers/..."
  */
@@ -150,6 +164,7 @@ module.exports = {
   uploadToR2,
   getFileUrl,
   resolveR2Url,
+  resolveR2Urls,
   deleteFromR2,
   downloadFromR2,
   bucket,
