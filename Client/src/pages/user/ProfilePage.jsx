@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
@@ -21,20 +21,32 @@ const ProfilePage = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        if (!token) { navigate('/auth'); return; }
+        if (!token) { 
+            navigate('/auth'); 
+            return; 
+        }
+        
         fetch(`${API_BASE_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(res => {
             if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('token'); localStorage.removeItem('user');
-                navigate('/auth'); return null;
+                window.dispatchEvent(new Event('auth:logout'));
+                // Do not set loading to false here, so we don't render the expired text before unmounting
+                return null;
             }
-            if (!res.ok) throw new Error('Lỗi');
+            if (!res.ok) throw new Error('Lỗi tải dữ liệu');
             return res.json();
         })
-        .then(data => { if (data) { setProfile(data); setLoading(false); } })
-        .catch(() => setLoading(false));
+        .then(data => { 
+            if (data) { 
+                setProfile(data); 
+                setLoading(false); 
+            }
+        })
+        .catch(() => {
+            setLoading(false);
+        });
     }, [navigate, token]);
 
     const showToast = (msg, type = 'ok') => {

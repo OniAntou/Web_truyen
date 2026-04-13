@@ -59,6 +59,7 @@ export const comicService = {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: {
+            chapter_id: chapterId,
             page_number: pageNum
         }
     }),

@@ -82,6 +82,18 @@ const Navbar = () => {
 
         checkAuth();
 
+        // Check auth periodically and when user returns to tab
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                checkAuth();
+            }
+        };
+        const handleFocus = () => checkAuth();
+        
+        window.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+        const authInterval = setInterval(checkAuth, 60000); // Check every minute
+
         // Listen for auth:logout events from apiClient
         const handleLogoutEvent = () => {
             clearReadingHistory();
@@ -96,6 +108,9 @@ const Navbar = () => {
         return () => {
             window.removeEventListener('auth:logout', handleLogoutEvent);
             window.removeEventListener('storage', checkAuth);
+            window.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+            clearInterval(authInterval);
             if (authTimeout) clearTimeout(authTimeout);
         };
     }, [navigate, location.pathname]);
