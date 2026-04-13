@@ -1,9 +1,11 @@
 {
-  "buildCommand": "npm install",
-  "devCommand": "node --watch server.js",
-  "installCommand": "npm install",
-  "env": {
-    "NODE_ENV": "production"
+  "version": 2,
+  "builds": [{ "src": "server.js", "use": "@vercel/node" }],
+  "functions": {
+    "server.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 30
+    }
   },
   "crons": [
     {
@@ -22,10 +24,9 @@
       ]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/server.js"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "server.js" },
+    { "src": "/$", "dest": "server.js" },
+    { "src": "/(.*)", "status": 404 }
   ]
 }

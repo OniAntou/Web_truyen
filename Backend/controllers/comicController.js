@@ -242,6 +242,17 @@ const getHomeData = asyncHandler(async (req, res) => {
 
 const getComicById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const isPublicRequest = !req.user;
+  const publicCacheKey = `detail_public_${id}`;
+
+  if (isPublicRequest) {
+    const cached = apiCache.get(publicCacheKey);
+    if (cached) {
+      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+      return res.json(cached);
+    }
+  }
+
   let comic;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
     comic = await Comic.findById(id).select('-__v').lean();
@@ -303,6 +314,12 @@ const getComicById = asyncHandler(async (req, res) => {
     chapters: chaptersWithoutPages,
     genres: genreNames,
   };
+
+  if (isPublicRequest) {
+    apiCache.set(publicCacheKey, out);
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  }
+
   res.json(out);
 });
 
@@ -311,6 +328,16 @@ const getComicById = asyncHandler(async (req, res) => {
  */
 const getReaderData = asyncHandler(async (req, res) => {
   const { id, chapterId } = req.params;
+  const isPublicRequest = !req.user;
+  const publicCacheKey = `reader_public_${id}_${chapterId}`;
+
+  if (isPublicRequest) {
+    const cached = apiCache.get(publicCacheKey);
+    if (cached) {
+      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+      return res.json(cached);
+    }
+  }
   
   let comic;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -321,10 +348,16 @@ const getReaderData = asyncHandler(async (req, res) => {
 
   if (!comic) throw new AppError("Comic not found", 404);
 
-  const chapters = await Chapter.find({ comic_id: comic._id }).sort({ chapter_number: 1 }).select('chapter_number title created_at price early_access_end_date').lean();
-  const chapter = chapters.find(ch => ch._id.toString() === chapterId || (ch.id && ch.id.toString() === chapterId));
+  const chapter = await Chapter.findOne({ _id: chapterId, comic_id: comic._id })
+    .select('chapter_number title created_at price early_access_end_date')
+    .lean();
   
   if (!chapter) throw new AppError("Chapter not found", 404);
+
+  const chapters = await Chapter.find({ comic_id: comic._id })
+    .sort({ chapter_number: 1 })
+    .select('chapter_number title created_at price early_access_end_date')
+    .lean();
 
   // Check locking logic
   let is_locked = false;
@@ -363,11 +396,18 @@ const getReaderData = asyncHandler(async (req, res) => {
 
   const coverUrl = await resolveR2Url(comic.cover_url);
   
-  res.json({
+  const payload = {
     comic: { ...comic, cover_url: coverUrl },
     chapter: { ...chapter, pages: pageResults },
     all_chapters: chapters.map(ch => ({ _id: ch._id, title: ch.title, chapter_number: ch.chapter_number }))
-  });
+  };
+
+  if (isPublicRequest) {
+    apiCache.set(publicCacheKey, payload);
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  }
+
+  res.json(payload);
 });
 
 const createComic = asyncHandler(async (req, res) => {
