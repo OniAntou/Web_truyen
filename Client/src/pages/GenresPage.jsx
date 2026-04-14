@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Star, Eye, BookOpen, Search, X, Layers } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
@@ -46,12 +46,18 @@ const SkeletonCard = () => (
 );
 
 const GenresPage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [genres, setGenres] = useState([]);
     const [comics, setComics] = useState([]);
     const [loading, setLoading] = useState(true);
     const [comicsLoading, setComicsLoading] = useState(false);
-    const [selectedGenre, setSelectedGenre] = useState(null);
+    const [selectedGenre, setSelectedGenre] = useState(searchParams.get('type') || null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        const type = searchParams.get('type');
+        setSelectedGenre(type || null);
+    }, [searchParams]);
 
     useEffect(() => {
         fetchGenres();
@@ -91,9 +97,9 @@ const GenresPage = () => {
 
     const handleGenreClick = (genreName) => {
         if (selectedGenre === genreName) {
-            setSelectedGenre(null);
+            setSearchParams({});
         } else {
-            setSelectedGenre(genreName);
+            setSearchParams({ type: genreName });
         }
     };
 
@@ -184,7 +190,7 @@ const GenresPage = () => {
                                         Tuyển tập <span className="font-bold" style={{ color: 'var(--accent)' }}>{selectedGenre}</span>
                                     </h2>
                                     <button
-                                        onClick={() => setSelectedGenre(null)}
+                                        onClick={() => setSearchParams({})}
                                         className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-colors border shadow-sm hover:opacity-80"
                                         style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
                                     >

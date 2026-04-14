@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react';
 import { formatViews, translateStatus } from '../../utils/format';
@@ -132,9 +132,13 @@ const ComicInfo = ({ comic }) => {
 
                     <div className="info-genres">
                         {comic.genres.map(genre => (
-                            <span key={genre._id || genre} className="genre-tag">
+                            <Link 
+                                key={genre._id || genre} 
+                                to={`/genres?type=${genre.name || genre}`} 
+                                className="genre-tag"
+                            >
                                 {genre.name || genre}
-                            </span>
+                            </Link>
                         ))}
                     </div>
 
