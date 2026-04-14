@@ -154,9 +154,12 @@ const HistoryPage = () => {
                                             {item.comicTitle}
                                         </p>
                                     </Link>
-                                    <p className="text-xs md:text-sm mt-0.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
-                                        Ch.{item.chapterNumber}
+                                    <p className="text-xs md:text-sm mt-0.5 line-clamp-1 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                                        <span>Ch.{item.chapterNumber}</span>
+                                        <span className="w-1 h-1 rounded-full bg-current opacity-30"></span>
+                                        <span className="text-[var(--accent)] font-medium">Đọc tiếp</span>
                                     </p>
+
                                 </div>
                             </div>
                         ))}

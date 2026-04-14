@@ -71,9 +71,12 @@ const ContinueReading = () => {
                             <div className="absolute bottom-0 inset-x-0 p-3">
                                 <div className="flex items-center gap-1.5 text-white/90">
                                     <BookOpen size={12} />
-                                    <span className="text-xs font-semibold truncate">
+                                    <span className="text-xs font-semibold truncate flex items-center gap-1.5">
                                         Ch.{item.chapterNumber}
+                                        <span className="w-1 h-1 rounded-full bg-current opacity-30"></span>
+                                        <span>Đọc tiếp</span>
                                     </span>
+
                                 </div>
                             </div>
 
