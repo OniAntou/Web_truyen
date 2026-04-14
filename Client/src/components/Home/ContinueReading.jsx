@@ -69,16 +69,13 @@ const ContinueReading = () => {
                             
                             {/* Chapter info badge at bottom */}
                             <div className="absolute bottom-0 inset-x-0 p-3">
-                                <div className="flex items-center gap-1.5 text-white/90">
-                                    <BookOpen size={12} />
-                                    <span className="text-xs font-semibold truncate flex items-center gap-1.5">
-                                        Ch.{item.chapterNumber}
-                                        <span className="w-1 h-1 rounded-full bg-current opacity-30"></span>
-                                        <span>Đọc tiếp</span>
+                                <div className="flex items-center text-white/90">
+                                    <span className="text-xs font-semibold truncate">
+                                        Đọc tiếp Chapter {item.chapterNumber}
                                     </span>
-
                                 </div>
                             </div>
+
 
                             {/* Continue overlay on hover */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
