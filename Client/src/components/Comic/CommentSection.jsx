@@ -5,8 +5,17 @@ import { commentService } from '../../api/commentService';
 // Decode JWT to get user info (id, role)
 const decodeToken = (token) => {
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload;
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const paddedBase64 = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+        
+        return JSON.parse(
+            decodeURIComponent(
+                atob(paddedBase64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join('')
+            )
+        );
     } catch {
         return null;
     }

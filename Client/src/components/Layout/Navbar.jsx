@@ -35,7 +35,18 @@ const Navbar = () => {
             if (token && storedUser) {
                 // Validate token is not expired
                 try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const paddedBase64 = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+                    
+                    const payload = JSON.parse(
+                        decodeURIComponent(
+                            atob(paddedBase64).split('').map(function (c) {
+                                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                            }).join('')
+                        )
+                    );
+
                     const expiryTime = payload.exp ? payload.exp * 1000 : 0;
                     const now = Date.now();
                     const isExpired = expiryTime && (expiryTime < now);
