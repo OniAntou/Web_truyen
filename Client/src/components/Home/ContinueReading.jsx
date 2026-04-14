@@ -70,10 +70,11 @@ const ContinueReading = () => {
                             {/* Chapter info badge at bottom */}
                             <div className="absolute bottom-0 inset-x-0 p-3">
                                 <div className="flex items-center text-white/90">
-                                    <span className="text-xs font-semibold truncate">
+                                    <span className="text-xs font-semibold truncate transition-colors duration-300 group-hover:text-[var(--accent)]">
                                         Đọc tiếp Chapter {item.chapterNumber}
                                     </span>
                                 </div>
+
                             </div>
 
 

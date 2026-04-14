@@ -156,11 +156,11 @@ const HistoryPage = () => {
                                     </Link>
                                     <Link 
                                         to={`/read/${item.comicId}/${item.chapterId}`}
-                                        className="text-xs md:text-sm mt-1.5 block transition-colors hover:text-[var(--accent)] font-medium" 
-                                        style={{ color: 'var(--text-secondary)' }}
+                                        className="text-xs md:text-sm mt-1.5 block transition-colors text-[var(--text-secondary)] hover:text-[var(--accent)] font-medium" 
                                     >
                                         Đọc tiếp Chapter {item.chapterNumber}
                                     </Link>
+
 
 
 
