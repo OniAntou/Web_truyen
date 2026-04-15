@@ -74,8 +74,8 @@ const ComicList = () => {
         <div className="mt-8 space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-end pb-6 border-b border-white/5 gap-4">
                 <div>
-                    <h2 className="text-xl font-bold text-white tracking-tight">Comics Library</h2>
-                    <p className="text-zinc-500 mt-1 text-sm font-medium">Manage and organize your comic collection.</p>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">Comics Library</h2>
+                    <p className="text-zinc-500 mt-1 text-base font-medium">Manage and organize your comic collection.</p>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -104,7 +104,7 @@ const ComicList = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-[0.65rem] font-bold tracking-wider">
+                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-xs font-bold tracking-wider">
                                 <th className="px-6 py-4">Cover</th>
                                 <th className="px-6 py-4">Comic Info</th>
                                 <th className="px-6 py-4">Status</th>
@@ -124,15 +124,15 @@ const ComicList = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="font-bold text-white text-sm mb-1">{comic.title}</div>
-                                        <div className="text-[0.7rem] text-zinc-500 font-medium flex items-center gap-2">
+                                        <div className="font-bold text-white text-base mb-1">{comic.title}</div>
+                                        <div className="text-xs text-zinc-500 font-medium flex items-center gap-2">
                                             <span>{comic.author}</span>
                                             <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
                                             <span className="text-zinc-600">{comic.chapter_count || 0} Ch.</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded text-[0.6rem] font-bold border ${comic.status === 'Ongoing' ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' :
+                                        <span className={`px-2 py-1 rounded text-[0.7rem] font-bold border ${comic.status === 'Ongoing' ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' :
                                                 comic.status === 'Completed' ? 'bg-blue-500/5 text-blue-500 border-blue-500/10' :
                                                     'bg-white/5 text-zinc-600 border-white/10'
                                             }`}>

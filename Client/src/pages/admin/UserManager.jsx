@@ -335,8 +335,8 @@ const UserManager = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-end pb-6 border-b border-white/5 gap-4">
                 <div>
-                    <h2 className="text-xl font-bold text-white tracking-tight">User Registry</h2>
-                    <p className="text-zinc-500 mt-1 text-sm font-medium">Manage and audit platform participants.</p>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">User Registry</h2>
+                    <p className="text-zinc-500 mt-1 text-base font-medium">Manage and audit platform participants.</p>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -420,7 +420,7 @@ const UserManager = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-[0.65rem] font-bold tracking-wider">
+                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-xs font-bold tracking-wider">
                                 <th className="px-6 py-4 font-bold">User</th>
                                 <th className="px-6 py-4 font-bold">Email</th>
                                 <th className="px-6 py-4 font-bold">Role</th>
@@ -448,39 +448,39 @@ const UserManager = () => {
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
-                                                <span className="text-xs font-bold text-white">
+                                            <div className="w-9 h-9 rounded bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
+                                                <span className="text-sm font-bold text-white">
                                                     {user.username?.charAt(0)?.toUpperCase() || '?'}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div className="font-bold text-white text-sm flex items-center gap-2">
+                                                <div className="font-bold text-white text-base flex items-center gap-2">
                                                     {user.username}
                                                     {user.is_vip && (
                                                         <Crown size={12} className="text-amber-500" />
                                                     )}
                                                 </div>
-                                                <div className="text-[10px] text-zinc-600 font-medium">
+                                                <div className="text-xs text-zinc-600 font-medium">
                                                     ID: {user._id.substring(0, 8)}...
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-zinc-500">{user.email}</td>
+                                    <td className="px-6 py-4 text-base text-zinc-500">{user.email}</td>
                                     <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
                                     <td className="px-6 py-4 text-center">
                                         {user.is_vip ? (
-                                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[0.6rem] font-bold border border-amber-500/10 text-amber-500 bg-amber-500/5 uppercase">
+                                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[0.7rem] font-bold border border-amber-500/10 text-amber-500 bg-amber-500/5 uppercase">
                                                 <Crown size={10} /> VIP
                                             </span>
                                         ) : (
-                                            <span className="text-zinc-800 text-[0.6rem] font-bold">—</span>
+                                            <span className="text-zinc-800 text-xs font-bold">—</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span className="text-white text-sm font-bold tabular-nums">{(user.coins || 0).toLocaleString('vi-VN')}</span>
+                                        <span className="text-white text-base font-bold tabular-nums">{(user.coins || 0).toLocaleString('vi-VN')}</span>
                                     </td>
-                                    <td className="px-6 py-4 text-right text-xs text-zinc-600 font-medium tabular-nums">
+                                    <td className="px-6 py-4 text-right text-sm text-zinc-600 font-medium tabular-nums">
                                         {new Date(user.created_at).toLocaleDateString('vi-VN')}
                                     </td>
                                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
@@ -490,7 +490,7 @@ const UserManager = () => {
                                                 className="p-2 text-zinc-600 hover:text-white transition-colors"
                                                 title="Edit User"
                                             >
-                                                <Shield size={18} />
+                                                <Shield size={20} />
                                             </button>
                                         </div>
                                     </td>

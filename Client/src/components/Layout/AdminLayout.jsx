@@ -16,10 +16,10 @@ const AdminLayout = () => {
             {/* Sidebar */}
             <aside className="w-64 bg-black border-r border-white/5 flex flex-col relative z-20">
                 <div className="p-6 border-b border-white/5 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-white flex items-center justify-center font-bold text-black text-sm">
+                    <div className="w-9 h-9 rounded bg-white flex items-center justify-center font-bold text-black text-lg">
                         A
                     </div>
-                    <h1 className="text-sm font-bold tracking-wider uppercase text-white/90">
+                    <h1 className="text-base font-bold tracking-wider uppercase text-white/90">
                         Admin<span className="text-zinc-600 font-medium">Panel</span>
                     </h1>
                 </div>
@@ -64,7 +64,7 @@ const AdminLayout = () => {
                         className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive('/admin/comments')}`}
                     >
                         <MessageSquare size={18} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-300'} />
-                        <span className="text-sm font-medium">Comments</span>
+                        <span className="text-base font-medium">Comments</span>
                     </Link>
                 </nav>
                 

@@ -27,16 +27,16 @@ const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
                 )}
             </div>
             
-            <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider mb-2">{title}</h3>
+            <h3 className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">{title}</h3>
             <div className="flex items-baseline gap-1.5">
-                <p className="text-3xl font-bold text-white tabular-nums">
+                <p className="text-4xl font-bold text-white tabular-nums">
                     {typeof value === 'number' && (title.includes('Revenue') || title.includes('Capital'))
                         ? value.toLocaleString('vi-VN') 
                         : value}
                 </p>
-                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-500 text-xs font-medium">VND</span>}
+                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-500 text-sm font-medium">VND</span>}
             </div>
-            <p className="text-[10px] text-zinc-500 mt-2 font-medium tracking-wide italic">
+            <p className="text-xs text-zinc-500 mt-2 font-medium tracking-wide italic">
                 {subtext}
             </p>
         </div>
@@ -126,8 +126,8 @@ const RevenueChart = ({ data, previousData }) => {
         <div className="bg-[#141414] rounded-2xl border border-white/5 p-8 relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">Revenue Trend</h3>
-                    <p className="text-zinc-500 text-xs mt-1">Daily platform revenue analysis</p>
+                    <h3 className="text-xl font-bold text-white tracking-tight">Revenue Trend</h3>
+                    <p className="text-zinc-500 text-sm mt-1">Daily platform revenue analysis</p>
                 </div>
                 <div className="flex gap-4">
                     <div className="flex items-center gap-1.5">
@@ -176,8 +176,8 @@ const RevenueChart = ({ data, previousData }) => {
                 >
                     <defs>
                         <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#ef4444" />
-                            <stop offset="100%" stopColor="#b91c1c" />
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="100%" stopColor="#059669" />
                         </linearGradient>
                     </defs>
                     
@@ -353,7 +353,7 @@ const Dashboard = () => {
         return (
             <div className="max-w-7xl mx-auto mt-32 flex flex-col items-center justify-center space-y-4">
                 <div className="w-12 h-12 border-2 border-zinc-800 border-t-white rounded-full animate-spin" />
-                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Loading Dashboard</p>
+                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Loading Dashboard</p>
             </div>
         );
     }
@@ -362,13 +362,13 @@ const Dashboard = () => {
         <div className="w-full space-y-10 my-4">
             <div className="flex justify-between items-end pb-8 border-b border-white/5">
                 <div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight">Analytics Overview</h2>
-                    <p className="text-zinc-500 mt-1 text-sm font-medium">Core platform metrics and performance trends.</p>
+                    <h2 className="text-3xl font-bold text-white tracking-tight">Analytics Overview</h2>
+                    <p className="text-zinc-500 mt-1 text-base font-medium">Core platform metrics and performance trends.</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl">
                         <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                        <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">{systemStatus}</span>
+                        <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">{systemStatus}</span>
                     </div>
                 </div>
             </div>
@@ -407,11 +407,11 @@ const Dashboard = () => {
                 </div>
                 <div className="bg-[#141414] rounded-2xl border border-white/5 p-8 overflow-hidden relative">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-3">
-                            <TrendingUp size={18} className="text-red-500" />
+                        <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
+                            <TrendingUp size={20} className="text-red-500" />
                             Top Performing
                         </h3>
-                        <a href="/admin/comics" className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">All</a>
+                        <a href="/admin/comics" className="text-zinc-500 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">All</a>
                     </div>
                     <div className="space-y-4">
                         {stats.topComics?.map((comic, i) => (
@@ -419,12 +419,12 @@ const Dashboard = () => {
                                 <div className="flex items-center gap-4">
                                     <div className="relative w-10 h-14 rounded-lg overflow-hidden border border-white/10 shadow-lg">
                                         <img src={comic.cover} alt="" className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-300" />
-                                        <div className="absolute top-0 left-0 bg-black/80 text-white text-[8px] font-bold px-1.5 py-1 rounded-br-lg">{i + 1}</div>
+                                        <div className="absolute top-0 left-0 bg-black/80 text-white text-[10px] font-bold px-1.5 py-1 rounded-br-lg">{i + 1}</div>
                                     </div>
                                     <div>
-                                        <h4 className="text-white text-sm font-bold truncate max-w-[150px] group-hover:text-red-500 transition-colors">{comic.title}</h4>
+                                        <h4 className="text-white text-base font-bold truncate max-w-[150px] group-hover:text-red-500 transition-colors">{comic.title}</h4>
                                         <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-zinc-600 text-[9px] font-medium uppercase tracking-widest">Views: {comic.views.toLocaleString()}</span>
+                                            <span className="text-zinc-600 text-xs font-medium uppercase tracking-widest">Views: {comic.views.toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>
