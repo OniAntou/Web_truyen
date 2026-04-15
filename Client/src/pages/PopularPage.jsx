@@ -36,7 +36,7 @@ const PopularPage = () => {
     const fetchPopularComics = async () => {
         setLoading(true);
         try {
-            const data = await comicService.getPopular(sortBy, selectedGenre);
+            const data = await comicService.getPopular(sortBy, 12, selectedGenre);
             setComics(data.comics || []);
             if (data.genres) setGenres(data.genres);
         } catch (error) {
