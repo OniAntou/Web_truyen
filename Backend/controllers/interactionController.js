@@ -3,6 +3,7 @@ const { getChapterCounts } = require('../utils/helpers');
 const { resolveR2Url } = require('../config/r2');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
+const apiCache = require('../utils/cache');
 
 // Helper: find comic by ObjectId or legacy numeric id
 const findComic = async (id) => {
@@ -53,6 +54,14 @@ const submitRating = asyncHandler(async (req, res) => {
     { $set: { rating: newAvg, rating_count: newRatingCount } }
   );
 
+  // Flush relevant caches
+  apiCache.flush('homepage');
+  apiCache.flush('popular');
+  apiCache.flush('latest');
+  apiCache.flush('trending');
+  apiCache.flush(`detail_public_${comic.id}`);
+  apiCache.flush(`detail_public_${comic._id}`);
+
   res.json({ message: "Đánh giá thành công", rating: newAvg, user_rating: rating, rating_count: newRatingCount });
 });
 
@@ -67,6 +76,10 @@ const recordView = asyncHandler(async (req, res) => {
     await Comic.updateOne({ _id: comic._id }, { $inc: { views: 1, weekly_views: 1 } });
     comic.views = (comic.views || 0) + 1;
     comic.weekly_views = (comic.weekly_views || 0) + 1;
+
+    // Flush cache occasionally or for homepage
+    apiCache.flush('homepage');
+    apiCache.flush('trending');
   }
   
   res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views, weekly_views: comic.weekly_views });
@@ -176,9 +189,19 @@ const toggleFavorite = asyncHandler(async (req, res) => {
   
   if (existingFavorite) {
     await Favorite.findByIdAndDelete(existingFavorite._id);
+    
+    apiCache.flush('homepage');
+    apiCache.flush(`detail_public_${comic.id}`);
+    apiCache.flush(`detail_public_${comic._id}`);
+
     res.json({ message: "Đã hủy yêu thích", isFavorited: false });
   } else {
     await Favorite.create({ user_id: req.user.id, comic_id: comic._id });
+
+    apiCache.flush('homepage');
+    apiCache.flush(`detail_public_${comic.id}`);
+    apiCache.flush(`detail_public_${comic._id}`);
+
     res.json({ message: "Đã thêm vào yêu thích", isFavorited: true });
   }
 });

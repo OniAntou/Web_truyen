@@ -4,6 +4,7 @@ import { BookOpen, Star, User, Calendar, Tag, Share2, Heart } from 'lucide-react
 import { formatViews, translateStatus } from '../../utils/format';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ComicInfo = ({ comic }) => {
     const [userRating, setUserRating] = useState(0);
@@ -15,6 +16,7 @@ const ComicInfo = ({ comic }) => {
     const [readingProgress, setReadingProgress] = useState(null);
     const [loadingProgress, setLoadingProgress] = useState(true);
     const token = localStorage.getItem('token');
+    const queryClient = useQueryClient();
     
     useEffect(() => {
         if (token && comic) {
@@ -58,6 +60,9 @@ const ComicInfo = ({ comic }) => {
             const data = await comicService.rate(comic.id || comic._id, value, token);
             setUserRating(data.user_rating);
             setAvgRating(data.rating);
+            
+            // Invalidate home data to show new rating
+            queryClient.invalidateQueries({ queryKey: ['comics', 'home'] });
         } catch (err) {
             console.error(err);
             alert(err || 'Lỗi khi đánh giá');
@@ -73,6 +78,9 @@ const ComicInfo = ({ comic }) => {
         try {
             const data = await comicService.toggleFavorite(comic.id || comic._id, token);
             setIsFavorited(data.isFavorited);
+            
+            // Invalidate home data if needed (if favorites affect listings)
+            queryClient.invalidateQueries({ queryKey: ['comics', 'home'] });
         } catch (err) {
             console.error(err);
             alert(err || 'Lỗi khi thao tác');
