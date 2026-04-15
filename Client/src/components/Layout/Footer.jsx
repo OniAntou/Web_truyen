@@ -47,7 +47,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="w-full py-12 border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+        <footer className="w-full py-12 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <div className="container mx-auto px-6 max-w-7xl">
                 <div className="flex flex-col lg:flex-row justify-between gap-10 lg:gap-8">
                     
@@ -58,7 +58,7 @@ const Footer = () => {
                                 Comic<span style={{ color: 'var(--accent)' }}>Verse</span>
                             </h3>
                         </Link>
-                        <p className="text-[0.9rem] leading-relaxed opacity-60" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-[0.9rem] leading-relaxed opacity-80" style={{ color: 'var(--text-secondary)' }}>
                             Nền tảng đọc truyện tranh trực tuyến hiện đại. Cung cấp trải nghiệm đọc mượt mà và nội dung chọn lọc hàng đầu.
                         </p>
                         <div className="flex gap-5 mt-2">
@@ -66,7 +66,7 @@ const Footer = () => {
                                 <a 
                                     key={idx} 
                                     href={social.href} 
-                                    className="opacity-40 hover:opacity-100 transition-opacity"
+                                    className="opacity-60 hover:opacity-100 transition-opacity"
                                     style={{ color: 'var(--text-primary)' }}
                                 >
                                     {social.icon}
@@ -79,7 +79,7 @@ const Footer = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-24">
                         {sections.map((section, idx) => (
                             <div key={idx} className="flex flex-col gap-5">
-                                <h4 className="text-[0.7rem] uppercase tracking-[0.2em] font-bold opacity-40" style={{ color: 'var(--text-primary)' }}>
+                                <h4 className="text-[0.7rem] uppercase tracking-[0.2em] font-bold opacity-60" style={{ color: 'var(--text-primary)' }}>
                                     {section.title}
                                 </h4>
                                 <ul className="flex flex-col gap-3">
@@ -87,7 +87,7 @@ const Footer = () => {
                                         <li key={lIdx}>
                                             <Link 
                                                 to={link.to} 
-                                                className="text-[0.85rem] font-medium opacity-60 hover:opacity-100 transition-opacity"
+                                                className="text-[0.85rem] font-medium opacity-80 hover:opacity-100 transition-opacity"
                                                 style={{ color: 'var(--text-primary)' }}
                                             >
                                                 {link.label}
@@ -101,10 +101,10 @@ const Footer = () => {
                 </div>
 
                 <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: 'var(--border)' }}>
-                    <p className="text-[0.7rem] uppercase tracking-widest opacity-30" style={{ color: 'var(--text-primary)' }}>
+                    <p className="text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
                         © {currentYear} ComicVerse. All rights reserved.
                     </p>
-                    <div className="flex items-center gap-4 text-[0.7rem] uppercase tracking-widest opacity-30" style={{ color: 'var(--text-primary)' }}>
+                    <div className="flex items-center gap-4 text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
                         <Link to="/contact" className="hover:opacity-100 transition-opacity">Liên Hệ</Link>
                         <span className="w-1 h-1 rounded-full bg-current opacity-20"></span>
                         <Link to="/terms" className="hover:opacity-100 transition-opacity">Điều Khoản</Link>
