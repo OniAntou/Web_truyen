@@ -482,11 +482,11 @@ const Dashboard = () => {
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                         {stats.recentComics?.map(comic => (
                             <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="group flex flex-col gap-3">
-                                <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/5 group-hover:border-rose-500 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.2)] transition-all duration-500">
+                                <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/5 group-hover:border-white/20 transition-all duration-500">
                                     <img src={comic.cover} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 </div>
                                 <div className="px-1">
-                                    <h4 className="text-zinc-100 text-[11px] font-bold truncate group-hover:text-rose-500 transition-colors">{comic.title}</h4>
+                                    <h4 className="text-zinc-100 text-[11px] font-bold truncate group-hover:text-white transition-colors">{comic.title}</h4>
                                     <p className="text-zinc-600 text-[9px] font-medium uppercase tracking-tighter mt-0.5">Newly Added</p>
                                 </div>
                             </Link>
