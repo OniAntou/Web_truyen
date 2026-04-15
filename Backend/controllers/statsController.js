@@ -99,7 +99,7 @@ const getStats = asyncHandler(async (req, res) => {
   }));
 
   // Recent Comics
-  const recentComicsRaw = await Comic.collection.find().sort({ createdAt: -1 }).limit(5).toArray();
+  const recentComicsRaw = await Comic.collection.find().sort({ created_at: -1 }).limit(5).toArray();
   const recentComics = await Promise.all(recentComicsRaw.map(async c => {
     try {
       const coverUrl = c.cover_url || c.cover;

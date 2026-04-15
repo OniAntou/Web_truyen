@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
     Library, 
     Eye, 
@@ -411,11 +412,11 @@ const Dashboard = () => {
                             <TrendingUp size={20} className="text-red-500" />
                             Top Performing
                         </h3>
-                        <a href="/admin/comics" className="text-zinc-500 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">All</a>
+                        <Link to="/admin/comics" className="text-zinc-500 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">All</Link>
                     </div>
                     <div className="space-y-4">
                         {stats.topComics?.map((comic, i) => (
-                            <div key={comic._id} className="flex items-center justify-between group">
+                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="flex items-center justify-between group">
                                 <div className="flex items-center gap-4">
                                     <div className="relative w-10 h-14 rounded-lg overflow-hidden border border-white/10 shadow-lg">
                                         <img src={comic.cover} alt="" className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-300" />
@@ -428,7 +429,7 @@ const Dashboard = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -477,12 +478,12 @@ const Dashboard = () => {
                     </h3>
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                         {stats.recentComics?.map(comic => (
-                            <a href={`/comic/${comic._id}`} key={comic._id} className="group flex flex-col gap-2">
+                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="group flex flex-col gap-2">
                                 <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/5 group-hover:border-rose-500/40 transition-colors">
                                     <img src={comic.cover} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                                 <h4 className="text-white text-[10px] font-bold truncate px-1">{comic.title}</h4>
-                            </a>
+                            </Link>
                         ))}
                     </div>
                 </div>
