@@ -7,20 +7,20 @@ const AdminLayout = () => {
 
     const isActive = (path) => {
         return location.pathname === path
-            ? 'bg-white/10 text-white font-medium border border-white/10'
-            : 'text-zinc-500 hover:bg-white/5 hover:text-white transition-all';
+            ? 'bg-white/[0.05] text-white border border-white/10'
+            : 'text-zinc-500 hover:text-zinc-300 transition-colors';
     };
 
     return (
-        <div className="flex h-screen bg-black text-white font-sans overflow-hidden selection:bg-white/20">
+        <div className="flex h-screen bg-[#090909] text-zinc-300 font-sans overflow-hidden">
             {/* Sidebar */}
-            <aside className="w-72 bg-black border-r border-white/5 flex flex-col relative z-20">
-                <div className="p-8 border-b border-white/5 flex items-center gap-4">
-                    <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center font-bold text-black text-lg shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+            <aside className="w-64 bg-black border-r border-white/5 flex flex-col relative z-20">
+                <div className="p-6 border-b border-white/5 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-white flex items-center justify-center font-bold text-black text-sm">
                         A
                     </div>
-                    <h1 className="text-xl font-medium tracking-tight text-white">
-                        Admin<span className="text-zinc-500 font-normal">Panel</span>
+                    <h1 className="text-sm font-bold tracking-wider uppercase text-white/90">
+                        Admin<span className="text-zinc-600 font-medium">Panel</span>
                     </h1>
                 </div>
 
@@ -61,14 +61,14 @@ const AdminLayout = () => {
 
                     <Link
                         to="/admin/comments"
-                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/comments')}`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive('/admin/comments')}`}
                     >
-                        <MessageSquare size={20} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
-                        <span className="font-medium">Comments</span>
+                        <MessageSquare size={18} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-300'} />
+                        <span className="text-sm font-medium">Comments</span>
                     </Link>
                 </nav>
-
-                <div className="p-4 border-t border-white/5 space-y-2">
+                
+                <div className="p-4 border-t border-white/5 space-y-1">
                     <Link
                         to="/"
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 hover:text-white transition-all duration-300"
@@ -91,8 +91,8 @@ const AdminLayout = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-black relative">
-                <div className="w-full max-w-[1600px] mx-auto px-8 lg:px-12 pt-16 pb-12 relative z-10">
+            <main className="flex-1 overflow-y-auto bg-[#0d0d0d]">
+                <div className="w-full max-w-[1440px] mx-auto px-8 lg:px-10 py-12">
                     <Outlet />
                 </div>
             </main>

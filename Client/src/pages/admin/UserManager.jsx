@@ -111,7 +111,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
             
             {/* Modal */}
             <div 
-                className="relative bg-zinc-900 border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-fadeIn"
+                className="relative bg-[#111111] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-fadeIn"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
@@ -233,24 +233,24 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                         <div className="px-8 pb-8 flex items-center justify-between gap-3">
                             <button
                                 onClick={handleDelete}
-                                className="px-5 py-3 rounded-xl text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                                className="px-4 py-2.5 rounded-lg text-red-500 bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 transition-all text-xs font-bold uppercase tracking-tight flex items-center gap-2"
                             >
-                                <Trash2 size={14} />
+                                <Trash2 size={16} />
                                 Delete
                             </button>
                             <div className="flex gap-2">
                                 <button
                                     onClick={onClose}
-                                    className="px-5 py-3 rounded-xl text-zinc-400 bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider"
+                                    className="px-4 py-2.5 rounded-lg text-zinc-500 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all text-xs font-bold uppercase tracking-tight"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="px-6 py-3 rounded-xl text-black bg-white hover:bg-zinc-200 transition-all text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(255,255,255,0.1)] disabled:opacity-50"
+                                    className="px-5 py-2.5 rounded-lg text-black bg-white hover:bg-zinc-200 transition-all text-xs font-bold uppercase tracking-tight disabled:opacity-50 active:scale-95"
                                 >
-                                    {saving ? 'Saving...' : 'Save Changes'}
+                                    {saving ? 'Syncing...' : 'Save Sync'}
                                 </button>
                             </div>
                         </div>
@@ -331,43 +331,39 @@ const UserManager = () => {
     };
 
     return (
-        <div className="mt-12 md:mt-16">
+        <div className="mt-8 space-y-6">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-end pb-6 border-b border-white/5 gap-4">
                 <div>
-                    <h2 className="text-3xl font-medium text-white tracking-tight flex items-center gap-3">
-                        User Management
-                    </h2>
-                    <p className="text-zinc-500 mt-2 text-sm tracking-wide">
-                        Manage {total} registered users on the platform
-                    </p>
+                    <h2 className="text-xl font-bold text-white tracking-tight">User Registry</h2>
+                    <p className="text-zinc-500 mt-1 text-sm font-medium">Manage and audit platform participants.</p>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     {/* Search */}
-                    <div className="relative group flex-1 md:w-72">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-white transition-colors" size={16} strokeWidth={2} />
+                    <div className="relative group flex-1 md:w-64">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-white transition-colors" size={16} />
                         <input
                             type="text"
                             placeholder="Search users..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all placeholder-zinc-600"
+                            className="w-full bg-[#141414] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm focus:outline-none focus:border-white/20 transition-all placeholder-zinc-700 font-medium"
                         />
                     </div>
-
+ 
                     {/* Filter Toggle */}
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`p-3 rounded-2xl border transition-all duration-300 ${showFilters ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900/40 border-white/5 text-zinc-500 hover:text-white hover:bg-white/5'}`}
+                        className={`p-2.5 rounded-lg border transition-all duration-200 ${showFilters ? 'bg-white text-black border-white' : 'bg-black border-white/5 text-zinc-500 hover:text-white hover:bg-white/[0.03]'}`}
                     >
                         <Filter size={18} />
                     </button>
-
+ 
                     {/* Refresh */}
                     <button
                         onClick={fetchUsers}
-                        className="p-3 rounded-2xl bg-zinc-900/40 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/5 transition-all duration-300"
+                        className="p-2.5 rounded-lg bg-black border border-white/5 text-zinc-500 hover:text-white hover:bg-white/[0.03] transition-all duration-300"
                     >
                         <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -420,21 +416,21 @@ const UserManager = () => {
             )}
 
             {/* Table */}
-            <div className="bg-zinc-900/30 rounded-[2rem] border border-white/5 overflow-hidden backdrop-blur-2xl shadow-2xl">
+            <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.6rem] tracking-widest">
-                                <th className="px-6 py-5 font-bold">User</th>
-                                <th className="px-6 py-5 font-bold">Email</th>
-                                <th className="px-6 py-5 font-bold">Role</th>
-                                <th className="px-6 py-5 font-bold text-center">VIP</th>
-                                <th className="px-6 py-5 font-bold text-right">Coins</th>
-                                <th className="px-6 py-5 font-bold text-right">Joined</th>
-                                <th className="px-6 py-5 font-bold text-right">Actions</th>
+                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-[0.65rem] font-bold tracking-wider">
+                                <th className="px-6 py-4 font-bold">User</th>
+                                <th className="px-6 py-4 font-bold">Email</th>
+                                <th className="px-6 py-4 font-bold">Role</th>
+                                <th className="px-6 py-4 text-center">VIP</th>
+                                <th className="px-6 py-4 text-right">Coins</th>
+                                <th className="px-6 py-4 text-right">Joined</th>
+                                <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5 text-zinc-300">
+                        <tbody className="divide-y divide-white/[0.02] text-zinc-400">
                             {loading ? (
                                 <tr>
                                     <td colSpan="7" className="px-6 py-16 text-center">
@@ -447,54 +443,54 @@ const UserManager = () => {
                             ) : users.length > 0 ? users.map(user => (
                                 <tr
                                     key={user._id}
-                                    className="hover:bg-white/[0.03] transition-colors duration-200 group cursor-pointer"
+                                    className="hover:bg-white/[0.01] transition-colors duration-200 group cursor-pointer"
                                     onClick={() => setSelectedUser(user)}
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500/10 to-violet-500/10 border border-white/10 flex items-center justify-center shrink-0">
-                                                <span className="text-sm font-bold text-white">
+                                            <div className="w-8 h-8 rounded bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
+                                                <span className="text-xs font-bold text-white">
                                                     {user.username?.charAt(0)?.toUpperCase() || '?'}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-white text-sm tracking-tight flex items-center gap-2">
+                                                <div className="font-bold text-white text-sm flex items-center gap-2">
                                                     {user.username}
                                                     {user.is_vip && (
-                                                        <Crown size={12} className="text-amber-400" />
+                                                        <Crown size={12} className="text-amber-500" />
                                                     )}
                                                 </div>
-                                                <div className="text-[10px] text-zinc-600 font-medium mt-0.5">
-                                                    {user._id.substring(0, 10)}...
+                                                <div className="text-[10px] text-zinc-600 font-medium">
+                                                    ID: {user._id.substring(0, 8)}...
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-zinc-400 font-medium">{user.email}</td>
+                                    <td className="px-6 py-4 text-sm text-zinc-500">{user.email}</td>
                                     <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
                                     <td className="px-6 py-4 text-center">
                                         {user.is_vip ? (
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.6rem] uppercase tracking-widest font-bold border bg-amber-500/10 text-amber-400 border-amber-500/20">
+                                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[0.6rem] font-bold border border-amber-500/10 text-amber-500 bg-amber-500/5 uppercase">
                                                 <Crown size={10} /> VIP
                                             </span>
                                         ) : (
-                                            <span className="text-zinc-700 text-[0.6rem] font-bold uppercase tracking-widest">—</span>
+                                            <span className="text-zinc-800 text-[0.6rem] font-bold">—</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <span className="text-white text-sm font-bold tabular-nums">{(user.coins || 0).toLocaleString('vi-VN')}</span>
                                     </td>
-                                    <td className="px-6 py-4 text-right text-xs text-zinc-500 font-medium tabular-nums">
+                                    <td className="px-6 py-4 text-right text-xs text-zinc-600 font-medium tabular-nums">
                                         {new Date(user.created_at).toLocaleDateString('vi-VN')}
                                     </td>
                                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-1">
                                             <button
                                                 onClick={() => setSelectedUser(user)}
-                                                className="p-2 text-zinc-500 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
+                                                className="p-2 text-zinc-600 hover:text-white transition-colors"
                                                 title="Edit User"
                                             >
-                                                <Shield size={16} strokeWidth={1.5} />
+                                                <Shield size={18} />
                                             </button>
                                         </div>
                                     </td>

@@ -13,7 +13,7 @@ import {
 import { API_BASE_URL } from '../../constants/api';
 
 const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
-    <div className="bg-zinc-900/40 p-8 rounded-3xl border border-white/5 hover:border-rose-500/30 transition-all duration-300 group relative overflow-hidden">
+    <div className="bg-[#141414] p-6 rounded-xl border border-white/5 hover:border-white/10 transition-colors duration-200 group relative">
         <div className="relative z-10">
             <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-500 group-hover:scale-110 transition-transform duration-300">
@@ -27,16 +27,16 @@ const StatCard = ({ title, value, icon: Icon, trend, subtext }) => (
                 )}
             </div>
             
-            <h3 className="text-zinc-400 text-[10px] font-bold uppercase tracking-wider mb-1">{title}</h3>
+            <h3 className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider mb-2">{title}</h3>
             <div className="flex items-baseline gap-1.5">
                 <p className="text-3xl font-bold text-white tabular-nums">
                     {typeof value === 'number' && (title.includes('Revenue') || title.includes('Capital'))
                         ? value.toLocaleString('vi-VN') 
                         : value}
                 </p>
-                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-400 text-xs font-medium">VND</span>}
+                {(title.includes('Revenue') || title.includes('Capital')) && <span className="text-zinc-500 text-xs font-medium">VND</span>}
             </div>
-            <p className="text-[10px] text-zinc-400 mt-2 font-medium">
+            <p className="text-[10px] text-zinc-500 mt-2 font-medium tracking-wide italic">
                 {subtext}
             </p>
         </div>
@@ -123,11 +123,11 @@ const RevenueChart = ({ data, previousData }) => {
     };
 
     return (
-        <div className="bg-zinc-900 shadow-2xl rounded-3xl border border-white/[0.05] p-8 relative overflow-hidden">
+        <div className="bg-[#141414] rounded-2xl border border-white/5 p-8 relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight">Revenue Trend</h3>
-                    <p className="text-zinc-400 text-xs mt-1">7-day revenue performance chart</p>
+                    <h3 className="text-lg font-bold text-white tracking-tight">Revenue Trend</h3>
+                    <p className="text-zinc-500 text-xs mt-1">Daily platform revenue analysis</p>
                 </div>
                 <div className="flex gap-4">
                     <div className="flex items-center gap-1.5">
@@ -175,13 +175,9 @@ const RevenueChart = ({ data, previousData }) => {
                     onMouseLeave={() => setHoveredIdx(null)}
                 >
                     <defs>
-                        <filter id="bloom" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
                         <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#10b981" />
-                            <stop offset="100%" stopColor="#059669" />
+                            <stop offset="0%" stopColor="#ef4444" />
+                            <stop offset="100%" stopColor="#b91c1c" />
                         </linearGradient>
                     </defs>
                     
@@ -356,26 +352,23 @@ const Dashboard = () => {
     if (loading) {
         return (
             <div className="max-w-7xl mx-auto mt-32 flex flex-col items-center justify-center space-y-4">
-                <div className="w-16 h-16 border-4 border-rose-500/20 border-t-rose-500 rounded-full animate-spin" />
-                <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Administrative Data...</p>
+                <div className="w-12 h-12 border-2 border-zinc-800 border-t-white rounded-full animate-spin" />
+                <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Loading Dashboard</p>
             </div>
         );
     }
 
     return (
         <div className="w-full space-y-10 my-4">
-            <div className="flex justify-between items-end pb-8 border-b border-white/[0.05]">
+            <div className="flex justify-between items-end pb-8 border-b border-white/5">
                 <div>
-                    <h2 className="text-3xl font-bold text-white tracking-tight">Analytics Overview</h2>
-                    <p className="text-zinc-400 mt-1 text-sm">Real-time performance and financial metrics for your platform.</p>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">Analytics Overview</h2>
+                    <p className="text-zinc-500 mt-1 text-sm font-medium">Core platform metrics and performance trends.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-white/[0.05] rounded-xl">
-                        <div className={`w-2 h-2 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-red-500'} animate-pulse`} />
-                        <span className="text-white text-xs font-bold uppercase tracking-wider">Service: {systemStatus}</span>
-                    </div>
-                    <div className="text-zinc-600 text-xs font-medium bg-zinc-900 px-4 py-2 rounded-xl border border-white/[0.05]">
-                        v2.4.0-STABLE
+                    <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl">
+                        <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                        <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">{systemStatus}</span>
                     </div>
                 </div>
             </div>
@@ -412,33 +405,28 @@ const Dashboard = () => {
                 <div className="lg:col-span-2">
                     <RevenueChart data={stats.revenueHistory} previousData={stats.previousRevenueHistory} />
                 </div>
-                <div className="bg-zinc-900 shadow-2xl rounded-3xl border border-white/[0.05] p-10 overflow-hidden">
+                <div className="bg-[#141414] rounded-2xl border border-white/5 p-8 overflow-hidden relative">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
-                            <TrendingUp size={20} className="text-rose-500" />
+                        <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-3">
+                            <TrendingUp size={18} className="text-red-500" />
                             Top Performing
                         </h3>
-                        <a href="/admin/comics" className="text-rose-500 text-[10px] font-bold uppercase tracking-widest hover:underline px-3 py-1 bg-rose-500/10 rounded-lg">View All</a>
+                        <a href="/admin/comics" className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">All</a>
                     </div>
                     <div className="space-y-4">
                         {stats.topComics?.map((comic, i) => (
                             <div key={comic._id} className="flex items-center justify-between group">
                                 <div className="flex items-center gap-4">
-                                    <div className="relative w-10 h-14 rounded-lg overflow-hidden border border-white/10">
-                                        <img src={comic.cover} alt="" className="w-full h-full object-cover" />
-                                        <div className="absolute top-0 left-0 bg-rose-500 text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-br-lg">{i + 1}</div>
+                                    <div className="relative w-10 h-14 rounded-lg overflow-hidden border border-white/10 shadow-lg">
+                                        <img src={comic.cover} alt="" className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-300" />
+                                        <div className="absolute top-0 left-0 bg-black/80 text-white text-[8px] font-bold px-1.5 py-1 rounded-br-lg">{i + 1}</div>
                                     </div>
                                     <div>
-                                        <h4 className="text-white text-sm font-bold truncate max-w-[150px]">{comic.title}</h4>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            <div className="w-1 h-1 rounded-full bg-rose-500" />
-                                            <span className="text-zinc-400 text-[10px] font-medium tracking-wide">ID: {comic._id.substring(0, 8)}...</span>
+                                        <h4 className="text-white text-sm font-bold truncate max-w-[150px] group-hover:text-red-500 transition-colors">{comic.title}</h4>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className="text-zinc-600 text-[9px] font-medium uppercase tracking-widest">Views: {comic.views.toLocaleString()}</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-white text-sm font-bold tabular-nums">{comic.views.toLocaleString()}</div>
-                                    <div className="text-zinc-600 text-[8px] font-black uppercase tracking-widest">Views</div>
                                 </div>
                             </div>
                         ))}
