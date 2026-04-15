@@ -213,8 +213,8 @@ const getHomeData = asyncHandler(async (req, res) => {
   if (cachedData) return res.json(cachedData);
 
   const [popularResult, latestResult, trendingResult, genres] = await Promise.all([
-    Comic.find({}).sort({ views: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating views weekly_views genres chapter_count latest_chapter').lean(),
-    Comic.find({}).sort({ created_at: -1 }).limit(12).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count created_at latest_chapter').lean(),
+    Comic.find({}).sort({ views: -1 }).limit(30).populate('genres', 'name slug').select('title id author status cover_url rating views weekly_views genres chapter_count latest_chapter').lean(),
+    Comic.find({}).sort({ created_at: -1 }).limit(30).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count created_at latest_chapter').lean(),
     Comic.find({}).sort({ weekly_views: -1 }).limit(10).populate('genres', 'name slug').select('title id author status cover_url rating weekly_views genres chapter_count latest_chapter').lean(),
     Genre.find().sort({ name: 1 }).select('name slug')
   ]);

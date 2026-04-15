@@ -4,7 +4,7 @@ import ComicCard from '../ui/ComicCard';
 
 const ComicGrid = ({ title, comics, linkTo = "/popular", showHoverStats = false }) => {
     // Show only standard amount for grids
-    const displayComics = comics.slice(0, 12);
+    const displayComics = comics.slice(0, 30);
     
     return (
         <section className="container mx-auto px-6 py-12 md:py-16 max-w-7xl">
