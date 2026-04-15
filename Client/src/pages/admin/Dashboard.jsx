@@ -416,19 +416,22 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-4">
                         {stats.topComics?.map((comic, i) => (
-                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="flex items-center justify-between group">
+                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="flex items-center justify-between group p-2 hover:bg-white/[0.03] rounded-xl transition-all duration-300">
                                 <div className="flex items-center gap-4">
-                                    <div className="relative w-10 h-14 rounded-lg overflow-hidden border border-white/10 shadow-lg">
-                                        <img src={comic.cover} alt="" className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-300" />
-                                        <div className="absolute top-0 left-0 bg-black/80 text-white text-[10px] font-bold px-1.5 py-1 rounded-br-lg">{i + 1}</div>
+                                    <div className="relative w-12 h-16 rounded-lg overflow-hidden border border-white/10 shadow-2xl">
+                                        <img src={comic.cover} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-br-lg shadow-lg">{i + 1}</div>
                                     </div>
                                     <div>
                                         <h4 className="text-white text-base font-bold truncate max-w-[150px] group-hover:text-red-500 transition-colors">{comic.title}</h4>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-zinc-600 text-xs font-medium uppercase tracking-widest">Views: {comic.views.toLocaleString()}</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Analytics</span>
+                                            <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
+                                            <span className="text-emerald-400 text-xs font-bold">{comic.views.toLocaleString()} views</span>
                                         </div>
                                     </div>
                                 </div>
+                                <ChevronRight size={16} className="text-zinc-800 group-hover:text-white group-hover:translate-x-1 transition-all" />
                             </Link>
                         ))}
                     </div>
@@ -478,11 +481,14 @@ const Dashboard = () => {
                     </h3>
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                         {stats.recentComics?.map(comic => (
-                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="group flex flex-col gap-2">
-                                <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/5 group-hover:border-rose-500/40 transition-colors">
-                                    <img src={comic.cover} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            <Link to={`/admin/comics/edit/${comic._id}`} key={comic._id} className="group flex flex-col gap-3">
+                                <div className="aspect-[3/4] rounded-xl overflow-hidden border border-white/5 group-hover:border-rose-500 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.2)] transition-all duration-500">
+                                    <img src={comic.cover} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 </div>
-                                <h4 className="text-white text-[10px] font-bold truncate px-1">{comic.title}</h4>
+                                <div className="px-1">
+                                    <h4 className="text-zinc-100 text-[11px] font-bold truncate group-hover:text-rose-500 transition-colors">{comic.title}</h4>
+                                    <p className="text-zinc-600 text-[9px] font-medium uppercase tracking-tighter mt-0.5">Newly Added</p>
+                                </div>
                             </Link>
                         ))}
                     </div>
