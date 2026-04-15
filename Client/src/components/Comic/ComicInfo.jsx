@@ -61,7 +61,32 @@ const ComicInfo = ({ comic }) => {
             setUserRating(data.user_rating);
             setAvgRating(data.rating);
             
-            // Invalidate home data to show new rating
+            // OPTIMISTIC UPDATE: Manually update the home query cache for instant feedback
+            const homeData = queryClient.getQueryData(['comics', 'home']);
+            if (homeData) {
+                const updatedHomeData = { ...homeData };
+                const comicId = comic.id || comic._id;
+                
+                // Helper to update rating in a list
+                const updateList = (list) => {
+                    if (!list) return list;
+                    return list.map(c => {
+                        const cId = c.id || c._id;
+                        if (cId === comicId) {
+                            return { ...c, rating: data.rating };
+                        }
+                        return c;
+                    });
+                };
+
+                updatedHomeData.popular = updateList(updatedHomeData.popular);
+                updatedHomeData.latest = updateList(updatedHomeData.latest);
+                updatedHomeData.trending = updateList(updatedHomeData.trending);
+
+                queryClient.setQueryData(['comics', 'home'], updatedHomeData);
+            }
+
+            // Still invalidate to ensure synchronization with server eventually
             queryClient.invalidateQueries({ queryKey: ['comics', 'home'] });
         } catch (err) {
             console.error(err);

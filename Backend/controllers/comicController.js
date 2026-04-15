@@ -61,8 +61,8 @@ const getLatestComics = asyncHandler(async (req, res) => {
   // Cache for 5 minutes in memory
   apiCache.set(cacheKey, responseData);
 
-  // Vercel Edge Cache: 5 mins fresh, 10 mins stale-while-revalidate
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
+  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
   res.json(responseData);
 });
 
@@ -120,8 +120,8 @@ const getPopularComics = asyncHandler(async (req, res) => {
   // Cache for 5 minutes in memory
   if (cacheKey) apiCache.set(cacheKey, responseData);
 
-  // Vercel Edge Cache
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
+  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
   res.json(responseData);
 });
 
@@ -199,8 +199,8 @@ const getTrendingComics = asyncHandler(async (req, res) => {
   const responseData = { comics: results };
   apiCache.set(cacheKey, responseData);
 
-  // Vercel Edge Cache
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
+  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
   res.json(responseData);
 });
 
@@ -228,8 +228,8 @@ const getHomeData = asyncHandler(async (req, res) => {
   const responseData = { popular, latest, trending, genres };
   apiCache.set(cacheKey, responseData, 300); // 5 minutes cache
 
-  // Vercel Edge Cache
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+  // Vercel Edge Cache: 10s fresh. max-age=0 forces browser to always revalidate with the server/CDN.
+  res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=86400');
   res.json(responseData);
 });
 
