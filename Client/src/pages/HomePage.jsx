@@ -12,9 +12,10 @@ import { comicService } from '../api/comicService';
 import HomePageSkeleton from '../components/Home/HomePageSkeleton';
 
 const HomePage = () => {
+    const homeVersion = localStorage.getItem('home_data_version') || '1';
     const { data, isLoading: loading } = useQuery({ 
-        queryKey: ['comics', 'home'], 
-        queryFn: () => comicService.getHomeData() 
+        queryKey: ['comics', 'home', homeVersion], 
+        queryFn: () => comicService.getHomeData(homeVersion) 
     });
     
     const popularComics = data?.popular || [];

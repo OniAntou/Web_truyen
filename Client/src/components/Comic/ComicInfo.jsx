@@ -72,7 +72,8 @@ const ComicInfo = ({ comic }) => {
                     if (!list) return list;
                     return list.map(c => {
                         const cId = c.id || c._id;
-                        if (cId === comicId) {
+                        // Use string comparison to handle Number vs ObjectId
+                        if (String(cId) === String(comicId)) {
                             return { ...c, rating: data.rating };
                         }
                         return c;
@@ -83,10 +84,14 @@ const ComicInfo = ({ comic }) => {
                 updatedHomeData.latest = updateList(updatedHomeData.latest);
                 updatedHomeData.trending = updateList(updatedHomeData.trending);
 
-                queryClient.setQueryData(['comics', 'home'], updatedHomeData);
+                queryClient.setQueryData(['comics', 'home', localStorage.getItem('home_data_version') || '1'], updatedHomeData);
             }
 
-            // Still invalidate to ensure synchronization with server eventually
+            // TRIGGER CACHE BUSTING: Update version to force a fresh fetch from server (bypassing CDN)
+            const newVersion = Date.now().toString();
+            localStorage.setItem('home_data_version', newVersion);
+
+            // Invalidate home queries to trigger the refetch with the new URL
             queryClient.invalidateQueries({ queryKey: ['comics', 'home'] });
         } catch (err) {
             console.error(err);
