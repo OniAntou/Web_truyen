@@ -56,8 +56,12 @@ const GenresPage = () => {
 
     useEffect(() => {
         const type = searchParams.get('type');
-        setSelectedGenre(type || null);
-    }, [searchParams]);
+        if (type) {
+            setSelectedGenre(type);
+        } else if (genres.length > 0) {
+            setSelectedGenre(genres[0].name);
+        }
+    }, [searchParams, genres]);
 
     useEffect(() => {
         fetchGenres();
@@ -71,7 +75,13 @@ const GenresPage = () => {
         setLoading(true);
         try {
             const data = await comicService.getGenres();
-            setGenres(data.genres || []);
+            const fetchedGenres = data.genres || [];
+            setGenres(fetchedGenres);
+            
+            // Set default if not in URL
+            if (!searchParams.get('type') && fetchedGenres.length > 0) {
+                setSelectedGenre(fetchedGenres[0].name);
+            }
         } catch (error) {
             console.error('Error fetching genres:', error);
         } finally {
