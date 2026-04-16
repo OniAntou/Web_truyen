@@ -78,7 +78,7 @@ const ImagePreviewGrid = ({ images, setImages, showRemove = true, onRemove }) =>
     return (
         <div className="mt-4">
             <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-zinc-400 tracking-wide font-medium">
+                <p className="text-sm text-zinc-200 tracking-wide font-medium">
                     <span className="text-white font-bold">{images.length}</span> ảnh đã chọn — kéo thả để sắp xếp
                 </p>
                 {showRemove && !onRemove && (
@@ -164,7 +164,7 @@ const PreviewModal = ({ isOpen, onClose, images, setImages, title, footerActions
                 {/* Header */}
                 <div className="flex items-center justify-between px-8 py-6 border-b border-white/5">
                     <h3 className="text-xl font-medium tracking-tight text-white">{title}</h3>
-                    <button onClick={onClose} className="text-zinc-500 hover:text-white text-2xl transition-colors leading-none">&times;</button>
+                    <button onClick={onClose} className="text-zinc-300 hover:text-white text-2xl transition-colors leading-none">&times;</button>
                 </div>
 
                 {/* Body */}
@@ -179,14 +179,14 @@ const PreviewModal = ({ isOpen, onClose, images, setImages, title, footerActions
                                 onChange={handleFilesSelect}
                                 className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-zinc-300 text-sm focus:border-white/20 outline-none file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 transition-all cursor-pointer"
                             />
-                            <p className="text-xs font-medium tracking-wide text-zinc-500 mt-2 ml-1">Chọn thêm ảnh hoặc kéo thả để sắp xếp thứ tự bên dưới.</p>
+                            <p className="text-xs font-medium tracking-wide text-zinc-300 mt-2 ml-1">Chọn thêm ảnh hoặc kéo thả để sắp xếp thứ tự bên dưới.</p>
                         </div>
                     )}
 
                     <ImagePreviewGrid images={images} setImages={setImages} showRemove={showRemove} onRemove={onRemove} />
 
                     {images.length === 0 && (
-                        <div className="text-center py-20 text-zinc-600">
+                        <div className="text-center py-20 text-zinc-400">
                             <div className="text-5xl mb-4 opacity-50">🖼️</div>
                             <p className="text-sm tracking-wide">Chưa có ảnh nào. Chọn ảnh để bắt đầu.</p>
                         </div>
@@ -723,7 +723,7 @@ const ChapterManager = () => {
                     <>
                         <button
                             onClick={() => setPreviewModalOpen(false)}
-                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
+                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-200 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
                         >
                             Đóng
                         </button>
@@ -743,7 +743,7 @@ const ChapterManager = () => {
                     <>
                         <button
                             onClick={handleExistingModalClose}
-                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
+                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-200 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
                         >
                             Hủy
                         </button>
@@ -775,7 +775,7 @@ const ChapterManager = () => {
                     <>
                         <button
                             onClick={handleReorderModalClose}
-                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
+                            className="px-6 py-2.5 rounded-xl border border-white/10 text-zinc-200 hover:text-white hover:bg-white/5 transition-all text-sm font-semibold tracking-wide uppercase"
                         >
                             Hủy
                         </button>
@@ -796,12 +796,12 @@ const ChapterManager = () => {
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
                 <div className="flex items-center gap-4 w-full md:w-auto">
-                    <Link to={window.location.pathname.startsWith('/studio') ? '/studio' : '/admin/comics'} className="text-zinc-500 hover:text-white transition-colors flex items-center justify-center p-2 rounded-xl border border-zinc-800 hover:border-white/20 bg-zinc-900/30">
+                    <Link to={window.location.pathname.startsWith('/studio') ? '/studio' : '/admin/comics'} className="text-zinc-300 hover:text-white transition-colors flex items-center justify-center p-2 rounded-xl border border-zinc-800 hover:border-white/20 bg-zinc-900/30">
                         &larr;
                     </Link>
                     <div>
                         <h2 className="text-3xl font-medium text-white tracking-tight">Manage Chapters</h2>
-                        <span className="text-zinc-500 text-sm tracking-wide">{comicTitle}</span>
+                        <span className="text-zinc-300 text-sm tracking-wide">{comicTitle}</span>
                     </div>
                 </div>
                 {selectedChapters.size > 0 && (
@@ -826,28 +826,28 @@ const ChapterManager = () => {
                     <h3 className="text-xl font-medium tracking-tight text-white mb-6">Add New Chapter</h3>
                     <form onSubmit={handleAddChapter} className="space-y-6">
                         <div>
-                            <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Chapter Number</label>
+                            <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Chapter Number</label>
                             <input
                                 type="number"
                                 value={newChapter.chapter_number}
                                 onChange={(e) => setNewChapter({ ...newChapter, chapter_number: e.target.value })}
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-600 transition-all"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-500 transition-all"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Title (Optional)</label>
+                            <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Title (Optional)</label>
                             <input
                                 type="text"
                                 value={newChapter.title}
                                 onChange={(e) => setNewChapter({ ...newChapter, title: e.target.value })}
                                 placeholder="e.g. The Beginning"
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-600 transition-all"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-500 transition-all"
                             />
                         </div>
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Giá Mở Khóa (Xu)</label>
+                                <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Giá Mở Khóa (Xu)</label>
                                 <div className="relative">
                                     <input
                                         type="number"
@@ -855,13 +855,13 @@ const ChapterManager = () => {
                                         onChange={(e) => setNewChapter({ ...newChapter, price: e.target.value })}
                                         placeholder="Ví dụ: 10"
                                         min="0"
-                                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-600 transition-all pr-12"
+                                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-white/20 outline-none placeholder-zinc-500 transition-all pr-12"
                                     />
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-bold pointer-events-none">Xu</span>
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-300 text-xs font-bold pointer-events-none">Xu</span>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Thu Phí Đến Ngày</label>
+                                <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Thu Phí Đến Ngày</label>
                                 <input
                                     type="date"
                                     value={newChapter.early_access_end_date}
@@ -872,10 +872,10 @@ const ChapterManager = () => {
                         </div>
 
                         <div>
-                            <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Pages (Images)</label>
+                            <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Pages (Images)</label>
                             <label
                                 htmlFor="new-chapter-files"
-                                className="w-full flex items-center gap-4 bg-black/40 border-2 border-dashed border-white/10 hover:border-white/30 rounded-2xl p-2.5 text-zinc-400 text-sm transition-all cursor-pointer group"
+                                className="w-full flex items-center gap-4 bg-black/40 border-2 border-dashed border-white/10 hover:border-white/30 rounded-2xl p-2.5 text-zinc-200 text-sm transition-all cursor-pointer group"
                             >
                                 <div className="bg-white group-hover:bg-zinc-200 text-black px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors shadow-sm">
                                     Chọn Ảnh
@@ -892,7 +892,7 @@ const ChapterManager = () => {
                                     className="hidden"
                                 />
                             </label>
-                            <p className="text-[0.65rem] font-medium tracking-wide text-zinc-500 mt-2 ml-1">Tải lên hàng loạt ảnh truyện.</p>
+                            <p className="text-[0.65rem] font-medium tracking-wide text-zinc-300 mt-2 ml-1">Tải lên hàng loạt ảnh truyện.</p>
                         </div>
 
                         {/* Preview button — opens popup */}
@@ -923,7 +923,7 @@ const ChapterManager = () => {
                 <div className="md:col-span-2 bg-zinc-900/30 rounded-[2rem] shadow-2xl border border-white/5 overflow-hidden backdrop-blur-2xl flex flex-col">
                     <div className="w-full">
                         <table className="w-full text-left">
-                            <thead className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.65rem] tracking-widest leading-relaxed">
+                            <thead className="bg-white/5 text-zinc-200 border-b border-white/5 uppercase text-[0.65rem] tracking-widest leading-relaxed">
                                 <tr>
                                     <th className="px-6 py-5 w-16">
                                         <input
@@ -939,7 +939,7 @@ const ChapterManager = () => {
                                     <th className="px-6 py-5 font-bold text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5 text-zinc-300">
+                            <tbody className="divide-y divide-white/5 text-zinc-100">
                                 {chapters.map((chapter) => (
                                     <tr key={chapter._id} className="hover:bg-white/5 transition-colors group">
                                         <td className="px-6 py-4">
@@ -958,14 +958,14 @@ const ChapterManager = () => {
                                                     {chapter.price} Xu — tới {new Date(chapter.early_access_end_date).toLocaleDateString('vi-VN')}
                                                 </span>
                                             ) : (
-                                                <span className="text-zinc-500 text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 inline-flex shadow-sm">Miễn phí</span>
+                                                <span className="text-zinc-300 text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 inline-flex shadow-sm">Miễn phí</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2 text-right">
                                                 <button
                                                     onClick={() => handleReorderClick(chapter._id)}
-                                                    className="text-zinc-400 hover:text-white border border-white/10 bg-black/20 hover:bg-white/10 rounded-xl px-3.5 py-2 text-xs transition-colors font-medium tracking-wide whitespace-nowrap shadow-sm"
+                                                    className="text-zinc-200 hover:text-white border border-white/10 bg-black/20 hover:bg-white/10 rounded-xl px-3.5 py-2 text-xs transition-colors font-medium tracking-wide whitespace-nowrap shadow-sm"
                                                 >
                                                     Quản lý ảnh
                                                 </button>
@@ -987,7 +987,7 @@ const ChapterManager = () => {
                                 ))}
                                 {chapters.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-20 text-center text-zinc-500 text-sm tracking-wide">
+                                        <td colSpan="5" className="px-6 py-20 text-center text-zinc-300 text-sm tracking-wide">
                                             No chapters found.
                                         </td>
                                     </tr>

@@ -14,16 +14,16 @@ const DeleteConfirmModal = ({ count, onConfirm, onCancel }) => (
                     <AlertTriangle size={28} className="text-red-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight mb-2">Xác nhận xoá</h3>
-                <p className="text-zinc-400 text-sm">
+                <p className="text-zinc-200 text-sm">
                     Bạn có chắc muốn xoá <span className="text-white font-bold">{count}</span> bình luận?
                     <br />
-                    <span className="text-zinc-500 text-xs">Tất cả replies con cũng sẽ bị xoá. Hành động này không thể hoàn tác.</span>
+                    <span className="text-zinc-300 text-xs">Tất cả replies con cũng sẽ bị xoá. Hành động này không thể hoàn tác.</span>
                 </p>
             </div>
             <div className="px-8 pb-8 flex items-center justify-center gap-3">
                 <button
                     onClick={onCancel}
-                    className="px-6 py-3 rounded-xl text-zinc-400 bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider"
+                    className="px-6 py-3 rounded-xl text-zinc-200 bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider"
                 >
                     Huỷ bỏ
                 </button>
@@ -216,28 +216,26 @@ const CommentManager = () => {
                     <h2 className="text-3xl font-medium text-white tracking-tight flex items-center gap-3">
                         Comment Moderation
                     </h2>
-                    <p className="text-zinc-500 mt-2 text-sm tracking-wide">
-                        Quản lý {total} bình luận trên toàn hệ thống
-                    </p>
+                        Quản lý {total} bình luận trên toàn hệ thống — <span className="text-zinc-300 italic font-medium">Bản ghi quản trị</span>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     {/* Search */}
                     <div className="relative group flex-1 md:w-72">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-white transition-colors" size={16} strokeWidth={2} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-white transition-colors" size={16} strokeWidth={2} />
                         <input
                             type="text"
                             placeholder="Tìm theo nội dung..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all placeholder-zinc-600"
+                            className="w-full bg-zinc-900/40 border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-white text-sm focus:outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all placeholder-zinc-500"
                         />
                     </div>
 
                     {/* Filter Toggle */}
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`p-3 rounded-2xl border transition-all duration-300 ${showFilters ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900/40 border-white/5 text-zinc-500 hover:text-white hover:bg-white/5'}`}
+                        className={`p-3 rounded-2xl border transition-all duration-300 ${showFilters ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-900/40 border-white/5 text-zinc-300 hover:text-white hover:bg-white/5'}`}
                     >
                         <Filter size={18} />
                     </button>
@@ -245,7 +243,7 @@ const CommentManager = () => {
                     {/* Refresh */}
                     <button
                         onClick={fetchComments}
-                        className="p-3 rounded-2xl bg-zinc-900/40 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/5 transition-all duration-300"
+                        className="p-3 rounded-2xl bg-zinc-900/40 border border-white/5 text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-300"
                     >
                         <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -255,11 +253,11 @@ const CommentManager = () => {
             {/* Filter Bar */}
             {showFilters && (
                 <div className="mb-6 flex flex-wrap items-center gap-3 p-5 bg-zinc-900/30 rounded-2xl border border-white/5 animate-fadeIn">
-                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mr-2">Bộ lọc:</span>
+                    <span className="text-zinc-300 text-[10px] font-bold uppercase tracking-widest mr-2">Bộ lọc:</span>
 
                     {/* Comic Filter */}
                     <div className="flex items-center gap-1.5">
-                        <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Truyện:</span>
+                        <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Truyện:</span>
                         <select
                             value={comicFilter}
                             onChange={e => setComicFilter(e.target.value)}
@@ -275,7 +273,7 @@ const CommentManager = () => {
                     {comicFilter && (
                         <button
                             onClick={() => setComicFilter('')}
-                            className="ml-auto text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
+                            className="ml-auto text-zinc-300 hover:text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
                         >
                             <X size={12} /> Xoá bộ lọc
                         </button>
@@ -298,7 +296,7 @@ const CommentManager = () => {
                     </button>
                     <button
                         onClick={() => setSelectedIds(new Set())}
-                        className="px-4 py-2 rounded-xl text-zinc-400 bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider"
+                        className="px-4 py-2 rounded-xl text-zinc-200 bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-wider"
                     >
                         Bỏ chọn
                     </button>
@@ -310,9 +308,9 @@ const CommentManager = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/5 text-zinc-400 border-b border-white/5 uppercase text-[0.6rem] tracking-widest">
+                            <tr className="bg-white/5 text-zinc-200 border-b border-white/5 uppercase text-[0.6rem] tracking-widest">
                                 <th className="px-4 py-5 font-bold w-10">
-                                    <button onClick={toggleSelectAll} className="text-zinc-500 hover:text-white transition-colors">
+                                    <button onClick={toggleSelectAll} className="text-zinc-300 hover:text-white transition-colors">
                                         {selectedIds.size === comments.length && comments.length > 0
                                             ? <CheckSquare size={16} className="text-rose-400" />
                                             : <Square size={16} />
@@ -326,13 +324,13 @@ const CommentManager = () => {
                                 <th className="px-4 py-5 font-bold text-right">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5 text-zinc-300">
+                        <tbody className="divide-y divide-white/5 text-zinc-200">
                             {loading ? (
                                 <tr>
                                     <td colSpan="6" className="px-6 py-16 text-center">
                                         <div className="flex items-center justify-center gap-3">
                                             <div className="w-6 h-6 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin" />
-                                            <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Đang tải bình luận...</span>
+                                            <span className="text-zinc-300 text-xs font-bold uppercase tracking-widest">Đang tải bình luận...</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -343,7 +341,7 @@ const CommentManager = () => {
                                 >
                                     {/* Checkbox */}
                                     <td className="px-4 py-4">
-                                        <button onClick={() => toggleSelect(comment._id)} className="text-zinc-500 hover:text-white transition-colors">
+                                        <button onClick={() => toggleSelect(comment._id)} className="text-zinc-300 hover:text-white transition-colors">
                                             {selectedIds.has(comment._id)
                                                 ? <CheckSquare size={16} className="text-rose-400" />
                                                 : <Square size={16} />
@@ -363,7 +361,7 @@ const CommentManager = () => {
                                                 <div className="font-semibold text-white text-sm tracking-tight truncate max-w-[120px]">
                                                     {comment.user_id?.username || 'Đã xoá'}
                                                 </div>
-                                                <div className="text-[10px] text-zinc-600 font-medium mt-0.5 truncate max-w-[120px]">
+                                                <div className="text-[10px] text-zinc-400 font-medium mt-0.5 truncate max-w-[120px]">
                                                     {comment.user_id?.email || '—'}
                                                 </div>
                                             </div>
@@ -374,7 +372,7 @@ const CommentManager = () => {
                                     <td className="px-4 py-4 max-w-xs">
                                         <div className="space-y-1">
                                             {comment.parent_id && (
-                                                <div className="flex items-center gap-1.5 text-zinc-600">
+                                                <div className="flex items-center gap-1.5 text-zinc-400">
                                                     <Reply size={10} className="shrink-0 rotate-180" />
                                                     <span className="text-[10px] font-medium truncate max-w-[200px] italic">
                                                         {comment.parent_id?.content || 'Reply'}
@@ -397,12 +395,12 @@ const CommentManager = () => {
                                                 </span>
                                             </div>
                                             {comment.chapter_id && (
-                                                <div className="text-[10px] text-zinc-500 font-medium mt-1 pl-[18px]">
+                                                <div className="text-[10px] text-zinc-300 font-medium mt-1 pl-[18px]">
                                                     Ch.{comment.chapter_id.chapter_number} — {comment.chapter_id.title || ''}
                                                 </div>
                                             )}
                                             {!comment.chapter_id && (
-                                                <div className="text-[10px] text-zinc-600 font-medium mt-1 pl-[18px]">
+                                                <div className="text-[10px] text-zinc-400 font-medium mt-1 pl-[18px]">
                                                     Bình luận chung
                                                 </div>
                                             )}
@@ -413,7 +411,7 @@ const CommentManager = () => {
                                     <td className="px-4 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1.5 text-zinc-500">
                                             <Clock size={12} />
-                                            <span className="text-xs font-medium tabular-nums whitespace-nowrap">
+                                            <span className="text-xs font-medium tabular-nums whitespace-nowrap text-zinc-300">
                                                 {timeAgo(comment.created_at)}
                                             </span>
                                         </div>
@@ -426,7 +424,7 @@ const CommentManager = () => {
                                                 e.stopPropagation();
                                                 setDeleteModal({ type: 'single', id: comment._id });
                                             }}
-                                            className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200"
+                                            className="p-2 text-zinc-300 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200"
                                             title="Xoá bình luận"
                                         >
                                             <Trash2 size={16} strokeWidth={1.5} />
@@ -437,7 +435,7 @@ const CommentManager = () => {
                                 <tr>
                                     <td colSpan="6" className="px-6 py-16 text-center">
                                         <MessageSquare size={32} className="mx-auto text-zinc-700 mb-3" />
-                                        <p className="text-zinc-500 text-sm tracking-wide">Không tìm thấy bình luận nào.</p>
+                                        <p className="text-zinc-300 text-sm tracking-wide">Không tìm thấy bình luận nào.</p>
                                     </td>
                                 </tr>
                             )}
@@ -448,14 +446,14 @@ const CommentManager = () => {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-white/5">
-                        <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+                        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
                             Trang {page} / {totalPages} • {total} bình luận
                         </p>
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 <ChevronLeft size={16} />
                             </button>
@@ -479,7 +477,7 @@ const CommentManager = () => {
                                         className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
                                             pageNum === page
                                                 ? 'bg-white text-black'
-                                                : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                                                : 'text-zinc-300 hover:text-white hover:bg-white/5'
                                         }`}
                                     >
                                         {pageNum}
@@ -490,7 +488,7 @@ const CommentManager = () => {
                             <button
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}
-                                className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 <ChevronRight size={16} />
                             </button>

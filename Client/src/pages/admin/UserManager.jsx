@@ -3,7 +3,7 @@ import { Search, Trash2, Shield, Crown, ChevronLeft, ChevronRight, X, Users, Eye
 import { API_BASE_URL } from '../../constants/api';
 
 const ROLES = [
-    { value: 'user', label: 'User', color: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
+    { value: 'user', label: 'User', color: 'bg-zinc-500/10 text-zinc-300 border-zinc-500/20' },
     { value: 'creator', label: 'Creator', color: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
     { value: 'admin', label: 'Admin', color: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
 ];
@@ -125,12 +125,12 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold text-white tracking-tight">{user.username}</h3>
-                                <p className="text-zinc-500 text-xs mt-0.5">{user.email}</p>
+                                <p className="text-zinc-300 text-xs mt-0.5">{user.email}</p>
                             </div>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+                            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
                         >
                             <X size={20} />
                         </button>
@@ -146,7 +146,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                         {/* User Stats */}
                         {details?.stats && (
                             <div className="px-8 pt-6">
-                                <p className="text-[0.6rem] font-bold text-zinc-600 uppercase tracking-widest mb-3">Activity Stats</p>
+                                <p className="text-[0.6rem] font-bold text-zinc-400 uppercase tracking-widest mb-3">Activity Stats</p>
                                 <div className="grid grid-cols-5 gap-2">
                                     {[
                                         { icon: Eye, label: 'Views', val: details.stats.views },
@@ -156,9 +156,9 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                                         { icon: DollarSign, label: 'Spent', val: details.stats.totalSpent?.toLocaleString('vi-VN') || 0 },
                                     ].map(s => (
                                         <div key={s.label} className="bg-white/[0.03] rounded-xl p-3 text-center border border-white/5">
-                                            <s.icon size={14} className="mx-auto text-zinc-500 mb-1" />
+                                            <s.icon size={14} className="mx-auto text-zinc-300 mb-1" />
                                             <div className="text-white text-sm font-bold tabular-nums">{s.val}</div>
-                                            <div className="text-[8px] text-zinc-600 font-bold uppercase tracking-widest mt-0.5">{s.label}</div>
+                                            <div className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest mt-0.5">{s.label}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -167,11 +167,11 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
 
                         {/* Editable Fields */}
                         <div className="p-8 space-y-5">
-                            <p className="text-[0.6rem] font-bold text-zinc-600 uppercase tracking-widest">Edit User</p>
+                            <p className="text-[0.6rem] font-bold text-zinc-400 uppercase tracking-widest">Edit User</p>
                             
                             {/* Role */}
                             <div>
-                                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Role</label>
+                                <label className="text-zinc-200 text-[10px] font-bold uppercase tracking-widest block mb-2">Role</label>
                                 <div className="flex gap-2">
                                     {ROLES.map(r => (
                                         <button
@@ -180,7 +180,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                                             className={`flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all duration-200 ${
                                                 editRole === r.value
                                                     ? r.color + ' ring-1 ring-current'
-                                                    : 'bg-white/[0.03] text-zinc-600 border-white/5 hover:bg-white/5'
+                                                    : 'bg-white/[0.03] text-zinc-400 border-white/5 hover:bg-white/5'
                                             }`}
                                         >
                                             {r.label}
@@ -192,9 +192,9 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                             {/* VIP Status */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest block">VIP Status</label>
+                                    <label className="text-zinc-200 text-[10px] font-bold uppercase tracking-widest block">VIP Status</label>
                                     {user.vip_expiry && (
-                                        <p className="text-zinc-600 text-[9px] mt-0.5">
+                                        <p className="text-zinc-400 text-[9px] mt-0.5">
                                             Expires: {new Date(user.vip_expiry).toLocaleDateString('vi-VN')}
                                         </p>
                                     )}
@@ -209,7 +209,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
 
                             {/* Coins */}
                             <div>
-                                <label className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest block mb-2">
+                                <label className="text-zinc-200 text-[10px] font-bold uppercase tracking-widest block mb-2">
                                     <span className="flex items-center gap-1.5"><Coins size={12} /> Coins Balance</span>
                                 </label>
                                 <input
@@ -222,7 +222,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                             </div>
 
                             {/* Account Info */}
-                            <div className="flex items-center gap-4 text-zinc-600 text-[9px] font-medium pt-2 border-t border-white/5">
+                            <div className="flex items-center gap-4 text-zinc-400 text-[9px] font-medium pt-2 border-t border-white/5">
                                 <span>ID: {user._id}</span>
                                 <span>•</span>
                                 <span>Joined: {new Date(user.created_at).toLocaleDateString('vi-VN')}</span>
@@ -241,7 +241,7 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
                             <div className="flex gap-2">
                                 <button
                                     onClick={onClose}
-                                    className="px-4 py-2.5 rounded-lg text-zinc-500 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all text-xs font-bold uppercase tracking-tight"
+                                    className="px-4 py-2.5 rounded-lg text-zinc-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all text-xs font-bold uppercase tracking-tight"
                                 >
                                     Cancel
                                 </button>
@@ -336,26 +336,26 @@ const UserManager = () => {
             <div className="flex flex-col md:flex-row justify-between items-end pb-6 border-b border-white/5 gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-white tracking-tight">User Registry</h2>
-                    <p className="text-zinc-500 mt-1 text-base font-medium">Manage and audit platform participants.</p>
+                    <p className="text-zinc-300 mt-1 text-base font-medium">Manage and audit platform participants.</p>
                 </div>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     {/* Search */}
                     <div className="relative group flex-1 md:w-64">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-white transition-colors" size={16} />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-white transition-colors" size={16} />
                         <input
                             type="text"
                             placeholder="Search users..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-[#141414] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm focus:outline-none focus:border-white/20 transition-all placeholder-zinc-700 font-medium"
+                            className="w-full bg-[#141414] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm focus:outline-none focus:border-white/20 transition-all placeholder-zinc-500 font-medium"
                         />
                     </div>
  
                     {/* Filter Toggle */}
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`p-2.5 rounded-lg border transition-all duration-200 ${showFilters ? 'bg-white text-black border-white' : 'bg-black border-white/5 text-zinc-500 hover:text-white hover:bg-white/[0.03]'}`}
+                        className={`p-2.5 rounded-lg border transition-all duration-200 ${showFilters ? 'bg-white text-black border-white' : 'bg-black border-white/5 text-zinc-300 hover:text-white hover:bg-white/[0.03]'}`}
                     >
                         <Filter size={18} />
                     </button>
@@ -363,7 +363,7 @@ const UserManager = () => {
                     {/* Refresh */}
                     <button
                         onClick={fetchUsers}
-                        className="p-2.5 rounded-lg bg-black border border-white/5 text-zinc-500 hover:text-white hover:bg-white/[0.03] transition-all duration-300"
+                        className="p-2.5 rounded-lg bg-black border border-white/5 text-zinc-300 hover:text-white hover:bg-white/[0.03] transition-all duration-300"
                     >
                         <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -373,11 +373,11 @@ const UserManager = () => {
             {/* Filter Bar */}
             {showFilters && (
                 <div className="mb-6 flex flex-wrap items-center gap-3 p-5 bg-zinc-900/30 rounded-2xl border border-white/5 animate-fadeIn">
-                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mr-2">Filters:</span>
+                    <span className="text-zinc-300 text-[10px] font-bold uppercase tracking-widest mr-2">Filters:</span>
 
                     {/* Role Filter */}
                     <div className="flex items-center gap-1.5">
-                        <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Role:</span>
+                        <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Role:</span>
                         <select
                             value={roleFilter}
                             onChange={e => setRoleFilter(e.target.value)}
@@ -392,7 +392,7 @@ const UserManager = () => {
 
                     {/* VIP Filter */}
                     <div className="flex items-center gap-1.5">
-                        <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">VIP:</span>
+                        <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">VIP:</span>
                         <select
                             value={vipFilter}
                             onChange={e => setVipFilter(e.target.value)}
@@ -407,7 +407,7 @@ const UserManager = () => {
                     {(roleFilter || vipFilter) && (
                         <button
                             onClick={() => { setRoleFilter(''); setVipFilter(''); }}
-                            className="ml-auto text-zinc-500 hover:text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
+                            className="ml-auto text-zinc-300 hover:text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors"
                         >
                             <X size={12} /> Clear
                         </button>
@@ -420,7 +420,7 @@ const UserManager = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-white/[0.02] text-zinc-500 border-b border-white/5 uppercase text-xs font-bold tracking-wider">
+                            <tr className="bg-white/[0.02] text-zinc-300 border-b border-white/5 uppercase text-xs font-bold tracking-wider">
                                 <th className="px-6 py-4 font-bold">User</th>
                                 <th className="px-6 py-4 font-bold">Email</th>
                                 <th className="px-6 py-4 font-bold">Role</th>
@@ -430,13 +430,13 @@ const UserManager = () => {
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.02] text-zinc-400">
+                        <tbody className="divide-y divide-white/[0.02] text-zinc-200">
                             {loading ? (
                                 <tr>
                                     <td colSpan="7" className="px-6 py-16 text-center">
                                         <div className="flex items-center justify-center gap-3">
                                             <div className="w-6 h-6 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin" />
-                                            <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Loading users...</span>
+                                            <span className="text-zinc-300 text-xs font-bold uppercase tracking-widest">Loading users...</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -460,13 +460,13 @@ const UserManager = () => {
                                                         <Crown size={12} className="text-amber-500" />
                                                     )}
                                                 </div>
-                                                <div className="text-xs text-zinc-600 font-medium">
+                                                <div className="text-xs text-zinc-400 font-medium">
                                                     ID: {user._id.substring(0, 8)}...
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-base text-zinc-500">{user.email}</td>
+                                    <td className="px-6 py-4 text-base text-zinc-300">{user.email}</td>
                                     <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
                                     <td className="px-6 py-4 text-center">
                                         {user.is_vip ? (
@@ -474,20 +474,20 @@ const UserManager = () => {
                                                 <Crown size={10} /> VIP
                                             </span>
                                         ) : (
-                                            <span className="text-zinc-800 text-xs font-bold">—</span>
+                                            <span className="text-zinc-600 text-xs font-bold">—</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <span className="text-white text-base font-bold tabular-nums">{(user.coins || 0).toLocaleString('vi-VN')}</span>
                                     </td>
-                                    <td className="px-6 py-4 text-right text-sm text-zinc-600 font-medium tabular-nums">
+                                    <td className="px-6 py-4 text-right text-sm text-zinc-400 font-medium tabular-nums">
                                         {new Date(user.created_at).toLocaleDateString('vi-VN')}
                                     </td>
                                     <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-1">
                                             <button
                                                 onClick={() => setSelectedUser(user)}
-                                                className="p-2 text-zinc-600 hover:text-white transition-colors"
+                                                className="p-2 text-zinc-400 hover:text-white transition-colors"
                                                 title="Edit User"
                                             >
                                                 <Shield size={20} />
@@ -499,7 +499,7 @@ const UserManager = () => {
                                 <tr>
                                     <td colSpan="7" className="px-6 py-16 text-center">
                                         <Users size={32} className="mx-auto text-zinc-700 mb-3" />
-                                        <p className="text-zinc-500 text-sm tracking-wide">No users found matching your criteria.</p>
+                                        <p className="text-zinc-300 text-sm tracking-wide">No users found matching your criteria.</p>
                                     </td>
                                 </tr>
                             )}
@@ -510,14 +510,14 @@ const UserManager = () => {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-white/5">
-                        <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+                        <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">
                             Page {page} of {totalPages} • {total} total users
                         </p>
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 <ChevronLeft size={16} />
                             </button>
@@ -541,7 +541,7 @@ const UserManager = () => {
                                         className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
                                             pageNum === page
                                                 ? 'bg-white text-black'
-                                                : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                                                : 'text-zinc-300 hover:text-white hover:bg-white/5'
                                         }`}
                                     >
                                         {pageNum}
@@ -552,7 +552,7 @@ const UserManager = () => {
                             <button
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}
-                                className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 <ChevronRight size={16} />
                             </button>

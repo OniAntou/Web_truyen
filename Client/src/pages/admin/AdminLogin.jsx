@@ -63,7 +63,7 @@ const AdminLogin = () => {
                         <BookOpen strokeWidth={1.5} size={22} className="text-black" />
                     </div>
                     <h1 className="text-2xl font-medium text-white tracking-tight">SkyComic</h1>
-                    <p className="text-zinc-500 text-sm mt-1.5 font-medium tracking-wide uppercase">Admin Portal</p>
+                    <p className="text-zinc-300 text-sm mt-1.5 font-medium tracking-wide uppercase">Admin Portal</p>
                 </div>
 
                 {/* Form Wrapper */}
@@ -71,7 +71,7 @@ const AdminLogin = () => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Username */}
                         <div>
-                            <label className="block text-[0.7rem] font-semibold text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+                            <label className="block text-[0.7rem] font-semibold text-zinc-200 uppercase tracking-widest mb-2 ml-1">
                                 Username
                             </label>
                             <input
@@ -82,13 +82,13 @@ const AdminLogin = () => {
                                 disabled={loading}
                                 placeholder="Enter admin username"
                                 autoComplete="username"
-                                className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
+                                className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
                             />
                         </div>
 
                         {/* Password */}
                         <div>
-                            <label className="block text-[0.7rem] font-semibold text-zinc-400 uppercase tracking-widest mb-2 ml-1">
+                            <label className="block text-[0.7rem] font-semibold text-zinc-200 uppercase tracking-widest mb-2 ml-1">
                                 Password
                             </label>
                             <div className="relative">
@@ -100,12 +100,12 @@ const AdminLogin = () => {
                                     disabled={loading}
                                     placeholder="Enter your password"
                                     autoComplete="current-password"
-                                    className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
+                                    className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-white transition-colors"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? <EyeOff strokeWidth={1.5} size={18} /> : <Eye strokeWidth={1.5} size={18} />}
@@ -145,7 +145,7 @@ const AdminLogin = () => {
                     </form>
                 </div>
 
-                <p className="text-center text-zinc-600 text-[0.65rem] uppercase tracking-widest mt-8 font-medium">
+                <p className="text-center text-zinc-400 text-[0.65rem] uppercase tracking-widest mt-8 font-medium">
                     © 2025 SkyComic Administration
                 </p>
             </div>

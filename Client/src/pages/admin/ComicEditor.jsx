@@ -135,13 +135,13 @@ const ComicEditor = () => {
 
                 {/* Title */}
                 <div>
-                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Title</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Title</label>
                     <input
                         type="text"
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
+                        className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-500 rounded-2xl px-5 py-4 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300"
                         required
                     />
                 </div>
@@ -149,7 +149,7 @@ const ComicEditor = () => {
                 {/* Author & Artist */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Author</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Author</label>
                         <input
                             type="text"
                             name="author"
@@ -159,7 +159,7 @@ const ComicEditor = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Artist</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Artist</label>
                         <input
                             type="text"
                             name="artist"
@@ -173,7 +173,7 @@ const ComicEditor = () => {
                 {/* Status & Genres */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Status</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Status</label>
                         <select
                             name="status"
                             value={formData.status}
@@ -186,7 +186,7 @@ const ComicEditor = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Genres (comma separated)</label>
+                        <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Genres (comma separated)</label>
                         <input
                             type="text"
                             name="genres"
@@ -200,7 +200,7 @@ const ComicEditor = () => {
 
                 {/* Cover Image Upload */}
                 <div>
-                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
                     <div className="flex flex-col space-y-4">
                         {/* Preview */}
                         {previewUrl && (
@@ -215,13 +215,13 @@ const ComicEditor = () => {
                             onChange={handleFileChange}
                             className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-zinc-200 transition-all duration-300 cursor-pointer"
                         />
-                        <p className="text-zinc-500 text-[0.7rem] tracking-wide ml-1">Upload an image to replace the current cover.</p>
+                        <p className="text-zinc-300 text-[0.7rem] tracking-wide ml-1">Upload an image to replace the current cover.</p>
                     </div>
                 </div>
 
                 {/* Legacy Cover URL (Optional fallback) */}
                 <div>
-                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Cover URL (Or use upload above)</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover URL (Or use upload above)</label>
                     <input
                         type="text"
                         name="cover_url"
@@ -234,7 +234,7 @@ const ComicEditor = () => {
 
                 {/* Description */}
                 <div>
-                    <label className="block text-[0.7rem] font-bold text-zinc-400 uppercase tracking-widest mb-2 ml-1">Description</label>
+                    <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Description</label>
                     <textarea
                         name="description"
                         value={formData.description}
