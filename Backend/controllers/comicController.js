@@ -447,7 +447,19 @@ const updateComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền chỉnh sửa truyện.", 403);
   }
   const { id } = req.params;
-  let comic;
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    comic = await Comic.findById(id);
+  } else {
+    comic = await Comic.findOne({ id: parseInt(id) });
+  }
+
+  if (!comic) throw new AppError("Comic not found", 404);
+
+  // Ownership check for creators
+  if (req.user.role === 'creator' && comic.uploader_id.toString() !== req.user.id) {
+    throw new AppError("Bạn không có quyền chỉnh sửa truyện này.", 403);
+  }
+
   const payload = { ...req.body };
   delete payload._id;
   delete payload.id;
@@ -458,11 +470,8 @@ const updateComic = asyncHandler(async (req, res) => {
     payload.genres = await processGenres(payload.genres);
   }
 
-  if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    comic = await Comic.findByIdAndUpdate(id, payload, { new: true });
-  } else {
-    comic = await Comic.findOneAndUpdate({ id: parseInt(id) }, payload, { new: true });
-  }
+  Object.assign(comic, payload);
+  await comic.save();
 
   if (!comic) throw new AppError("Comic not found", 404);
   
@@ -484,12 +493,24 @@ const deleteComic = asyncHandler(async (req, res) => {
   let comic;
 
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    comic = await Comic.findByIdAndDelete(id);
+    comic = await Comic.findById(id);
   } else {
-    comic = await Comic.findOneAndDelete({ id: parseInt(id) });
+    comic = await Comic.findOne({ id: parseInt(id) });
   }
 
   if (!comic) throw new AppError("Comic not found", 404);
+
+  // Ownership check for creators
+  if (req.user.role === 'creator' && comic.uploader_id.toString() !== req.user.id) {
+    throw new AppError("Bạn không có quyền xóa truyện này.", 403);
+  }
+
+  // Delete the comic
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    await Comic.findByIdAndDelete(id);
+  } else {
+    await Comic.findOneAndDelete({ id: parseInt(id) });
+  }
 
   if (comic.cover_url && comic.cover_url.startsWith('r2:')) {
     await deleteFromR2(comic.cover_url);

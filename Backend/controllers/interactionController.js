@@ -133,12 +133,13 @@ const deleteComment = asyncHandler(async (req, res) => {
   const comment = await Comment.findById(req.params.commentId);
   if (!comment) throw new AppError("Bình luận không tồn tại", 404);
 
-  // Allow delete if user is the comment owner OR is an admin
+  // Allow delete ONLY if user is the comment owner OR is a system admin.
+  // Note: Creators are NOT permitted to delete comments made by others, even on their own comics.
   const isOwner = comment.user_id.toString() === req.user.id;
   const isAdmin = req.user.role === 'admin';
 
   if (!isOwner && !isAdmin) {
-    throw new AppError("Bạn không có quyền xoá bình luận này", 403);
+    throw new AppError("Bạn không có quyền xoá bình luận này. Chỉ chủ nhân bình luận hoặc Admin mới có quyền xoá.", 403);
   }
 
   await Comment.findByIdAndDelete(comment._id);
