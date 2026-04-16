@@ -47,7 +47,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="w-full py-12 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+        <footer className="w-full py-8 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <div className="container mx-auto px-6 max-w-7xl">
                 <div className="flex flex-col lg:flex-row justify-between gap-10 lg:gap-8">
                     
@@ -100,7 +100,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: 'var(--border)' }}>
+                <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: 'var(--border)' }}>
                     <p className="text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
                         © {currentYear} ComicVerse. All rights reserved.
                     </p>

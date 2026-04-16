@@ -20,6 +20,7 @@ const HistoryPage = lazy(() => import('./pages/HistoryPage'));
 const AboutPage = lazy(() => import('./pages/info/AboutPage'));
 const TermsOfService = lazy(() => import('./pages/info/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/info/PrivacyPolicy'));
+const ContactPage = lazy(() => import('./pages/info/ContactPage'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
@@ -97,6 +98,10 @@ export const router = createBrowserRouter([
     {
         path: '/privacy',
         element: withSuspense(<PrivacyPolicy />),
+    },
+    {
+        path: '/contact',
+        element: withSuspense(<ContactPage />),
     },
     {
         path: '/history',
