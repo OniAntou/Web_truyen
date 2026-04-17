@@ -127,6 +127,15 @@ const getPopularComics = asyncHandler(async (req, res) => {
 
 const getAllComics = asyncHandler(async (req, res) => {
   const { q, genre } = req.query;
+  
+  // Try to get from cache
+  const cacheKey = `search_${q || 'all'}_${genre || 'all'}`;
+  const cachedData = apiCache.get(cacheKey);
+  if (cachedData) {
+    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=300');
+    return res.json(cachedData);
+  }
+
   let filter = {};
 
   if (q) {
@@ -168,7 +177,15 @@ const getAllComics = asyncHandler(async (req, res) => {
       };
     }),
   );
-  res.json({ comics: results });
+  
+  const responseData = { comics: results };
+  
+  // Cache for 2 minutes in memory
+  apiCache.set(cacheKey, responseData, 2 * 60 * 1000);
+
+  // Vercel Edge Cache: 30s fresh, 5m stale-while-revalidate
+  res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=300');
+  res.json(responseData);
 });
 
 const getTrendingComics = asyncHandler(async (req, res) => {

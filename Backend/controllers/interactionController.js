@@ -100,7 +100,8 @@ const getComments = asyncHandler(async (req, res) => {
 
   const comments = await Comment.find(filter)
     .populate('user_id', 'username avatar')
-    .sort({ created_at: -1 });
+    .sort({ created_at: -1 })
+    .lean();
     
   res.json(comments);
 });
@@ -164,7 +165,8 @@ const getUserFavorites = asyncHandler(async (req, res) => {
       path: 'comic_id',
       populate: { path: 'genres', select: 'name slug' }
     })
-    .sort({ created_at: -1 });
+    .sort({ created_at: -1 })
+    .lean();
 
   const comics = favorites.map(f => f.comic_id).filter(c => c != null);
   const comicIds = comics.map(c => c._id);
@@ -173,7 +175,7 @@ const getUserFavorites = asyncHandler(async (req, res) => {
   const results = await Promise.all(comics.map(async (c) => {
     const coverUrl = await resolveR2Url(c.cover_url);
     return {
-      ...c.toObject(),
+      ...c,
       cover_url: coverUrl || c.cover_url,
       chapter_count: chapterCounts[c._id.toString()] || 0,
     };
@@ -276,7 +278,8 @@ const getAllReadingProgress = asyncHandler(async (req, res) => {
     })
     .populate('chapter_id', 'title chapter_number')
     .sort({ updated_at: -1 })
-    .limit(20);
+    .limit(20)
+    .lean();
 
   const results = [];
   for (const progress of progresses) {
@@ -306,24 +309,24 @@ const getChapterReadStatus = asyncHandler(async (req, res) => {
 
   const chapters = await Chapter.find({ comic_id: comic._id })
     .sort({ chapter_number: 1 })
-    .select('_id chapter_number title');
+    .select('_id chapter_number title')
+    .lean();
 
   const progresses = await ReadingProgress.find({ 
     user_id: req.user.id, 
     comic_id: comic._id 
-  }).select('chapter_id page_number');
+  }).select('chapter_id page_number').lean();
 
   const chapterIds = chapters.map(ch => ch._id);
-  const pageCounts = await Promise.all(
-    chapterIds.map(async (chapterId) => {
-      const count = await Pages.countDocuments({ chapter_id: chapterId });
-      return { chapterId, count };
-    })
-  );
+  
+  const pageCountsAgg = await Pages.aggregate([
+    { $match: { chapter_id: { $in: chapterIds } } },
+    { $group: { _id: "$chapter_id", count: { $sum: 1 } } }
+  ]);
 
   const pageCountMap = {};
-  pageCounts.forEach(({ chapterId, count }) => {
-    pageCountMap[chapterId.toString()] = count;
+  pageCountsAgg.forEach(agg => {
+    pageCountMap[agg._id.toString()] = agg.count;
   });
 
   const progressMap = {};
