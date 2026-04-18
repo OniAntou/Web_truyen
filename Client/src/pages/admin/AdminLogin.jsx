@@ -55,11 +55,14 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center px-4 font-sans selection:bg-white/20">
-            <div className="w-full max-w-[380px]">
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 font-sans selection:bg-white/20 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-zinc-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+            
+            <div className="w-full max-w-[380px] relative z-10">
                 {/* Header */}
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(255,255,255,0.15)]">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_25px_rgba(255,255,255,0.3)]">
                         <BookOpen strokeWidth={1.5} size={22} className="text-black" />
                     </div>
                     <h1 className="text-2xl font-medium text-white tracking-tight">SkyComic</h1>
@@ -67,8 +70,9 @@ const AdminLogin = () => {
                 </div>
 
                 {/* Form Wrapper */}
-                <div className="bg-zinc-900/40 rounded-[2rem] p-8 border border-white/[0.04] shadow-2xl backdrop-blur-3xl">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="bg-zinc-800/40 rounded-[2rem] p-8 border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.4)] backdrop-blur-3xl relative">
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-[2rem] pointer-events-none"></div>
+                    <form onSubmit={handleSubmit} className="space-y-6 relative">
                         {/* Username */}
                         <div>
                             <label className="block text-[0.7rem] font-semibold text-zinc-200 uppercase tracking-widest mb-2 ml-1">
@@ -82,7 +86,7 @@ const AdminLogin = () => {
                                 disabled={loading}
                                 placeholder="Enter admin username"
                                 autoComplete="username"
-                                className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
+                                className="w-full bg-zinc-900/60 border border-white/10 text-white placeholder-zinc-400 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/80 focus:border-white/30 focus:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 disabled:opacity-50"
                             />
                         </div>
 
@@ -100,7 +104,7 @@ const AdminLogin = () => {
                                     disabled={loading}
                                     placeholder="Enter your password"
                                     autoComplete="current-password"
-                                    className="w-full bg-black/40 border border-white/5 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/50 focus:border-white/20 transition-all duration-300 disabled:opacity-50"
+                                    className="w-full bg-zinc-900/60 border border-white/10 text-white placeholder-zinc-400 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/80 focus:border-white/30 focus:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 disabled:opacity-50"
                                 />
                                 <button
                                     type="button"
