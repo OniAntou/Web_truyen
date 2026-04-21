@@ -15,7 +15,14 @@ const Navbar = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [searching, setSearching] = useState(false);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('user');
+        try {
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (e) {
+            return null;
+        }
+    });
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('theme') || 'dark';
     });
@@ -141,7 +148,7 @@ const Navbar = () => {
             clearInterval(authInterval);
             if (authTimeout) clearTimeout(authTimeout);
         };
-    }, [navigate, location.pathname]);
+    }, [navigate]);
 
     const handleLogout = () => {
         clearSession();
