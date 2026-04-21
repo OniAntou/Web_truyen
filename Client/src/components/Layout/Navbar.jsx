@@ -28,12 +28,12 @@ const Navbar = () => {
     useEffect(() => {
         let authTimeout;
 
-        const checkAuth = () => {
+        const checkAuth = async (shouldVerifyWithServer = false) => {
             const token = localStorage.getItem('token');
             const storedUser = localStorage.getItem('user');
 
             if (token && storedUser) {
-                // Validate token is not expired
+                // 1. Local validation (fast)
                 try {
                     const base64Url = token.split('.')[1];
                     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -52,38 +52,50 @@ const Navbar = () => {
                     const isExpired = expiryTime && (expiryTime < now);
                     
                     if (isExpired) {
-                        // Token expired — clear session
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
-                        clearReadingHistory();
+                        clearSession();
                         setUser(null);
-                        navigate('/auth');
+                        if (location.pathname.startsWith('/profile') || location.pathname.startsWith('/studio')) {
+                            navigate('/auth');
+                        }
                         return;
                     }
                     
-                    setUser(JSON.parse(storedUser));
+                    // 2. Server validation (robust) - Only if explicitly requested or on mount
+                    if (shouldVerifyWithServer) {
+                        try {
+                            const latestUser = await userService.getMe(token);
+                            setUser(latestUser);
+                            localStorage.setItem('user', JSON.stringify(latestUser));
+                        } catch (err) {
+                            // If err contains status 401/403, apiClient.js will have called clearSession
+                            // We just ensure UI update
+                            if (!localStorage.getItem('token')) {
+                                setUser(null);
+                                if (location.pathname.startsWith('/profile') || location.pathname.startsWith('/studio')) {
+                                    navigate('/auth');
+                                }
+                            }
+                            return;
+                        }
+                    } else {
+                        setUser(JSON.parse(storedUser));
+                    }
 
                     // Schedule automatic logout when token expires
                     if (expiryTime) {
                         const timeUntilExpiry = expiryTime - now;
                         if (authTimeout) clearTimeout(authTimeout);
                         
-                        // Max setTimeout delay is ~24.8 days
                         if (timeUntilExpiry > 0 && timeUntilExpiry < 2147483647) {
                             authTimeout = setTimeout(() => {
-                                localStorage.removeItem('token');
-                                localStorage.removeItem('user');
-                                clearReadingHistory();
+                                clearSession();
                                 setUser(null);
                                 navigate('/auth');
                             }, timeUntilExpiry);
                         }
                     }
                 } catch (e) {
-                    // Invalid token format — clear session
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    clearReadingHistory();
+                    clearSession();
                     setUser(null);
                     navigate('/auth');
                 }
@@ -92,19 +104,20 @@ const Navbar = () => {
             }
         };
 
-        checkAuth();
+        // Initial check on mount - do a full server verification
+        checkAuth(true);
 
         // Check auth periodically and when user returns to tab
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                checkAuth();
+                checkAuth(true); // Re-verify with server when returning to the tab
             }
         };
-        const handleFocus = () => checkAuth();
+        const handleFocus = () => checkAuth(true);
         
         window.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleFocus);
-        const authInterval = setInterval(checkAuth, 60000); // Check every minute
+        const authInterval = setInterval(() => checkAuth(false), 60000); // Local check every minute
 
         // Listen for auth:logout events from apiClient or other components
         const handleLogoutEvent = () => {
