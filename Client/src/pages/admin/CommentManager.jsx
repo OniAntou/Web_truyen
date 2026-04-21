@@ -76,14 +76,14 @@ const CommentManager = () => {
 
     // Fetch comics list for filter dropdown
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         fetch(`${API_BASE_URL}/admin/comments/comics`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => {
                 if (res.status === 401 || res.status === 403) {
                     localStorage.removeItem('admin');
-                    localStorage.removeItem('token');
+                    localStorage.removeItem('adminToken');
                     window.location.href = '/admin/login';
                     return;
                 }
@@ -97,7 +97,7 @@ const CommentManager = () => {
 
     const fetchComments = useCallback(async () => {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const params = new URLSearchParams();
         if (debouncedSearch) params.set('search', debouncedSearch);
         if (comicFilter) params.set('comicId', comicFilter);
@@ -110,7 +110,7 @@ const CommentManager = () => {
             });
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
                 return;
             }
@@ -155,7 +155,7 @@ const CommentManager = () => {
     // Delete handlers
     const handleDeleteSingle = async (id) => {
         setDeleting(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/admin/comments/${id}`, {
                 method: 'DELETE',
@@ -182,7 +182,7 @@ const CommentManager = () => {
 
     const handleBulkDelete = async () => {
         setDeleting(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         const ids = Array.from(selectedIds);
         try {
             const res = await fetch(`${API_BASE_URL}/admin/comments/bulk`, {

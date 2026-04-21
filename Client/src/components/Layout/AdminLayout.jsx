@@ -80,6 +80,7 @@ const AdminLayout = () => {
                     <button
                         onClick={() => {
                             localStorage.removeItem('admin');
+                            localStorage.removeItem('adminToken');
                             window.location.href = '/admin/login';
                         }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 text-left"

@@ -72,9 +72,9 @@ const ComicEditor = () => {
                 : `${API_BASE_URL}/comics`;
             const method = isEditing ? 'PUT' : 'POST';
 
-            const token = localStorage.getItem('token');
-            const adminData = localStorage.getItem('admin');
-            const authHeader = token ? `Bearer ${token}` : ''; // Ideally admins get a token too, but we fallback
+            const isAdminContext = window.location.pathname.startsWith('/admin');
+            const token = localStorage.getItem(isAdminContext ? 'adminToken' : 'token');
+            const authHeader = token ? `Bearer ${token}` : '';
 
             const response = await fetch(url, {
                 method,

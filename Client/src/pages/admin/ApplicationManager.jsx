@@ -8,7 +8,7 @@ const ApplicationManager = () => {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         fetch(`${API_BASE_URL}/applications/admin`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -17,7 +17,7 @@ const ApplicationManager = () => {
             .then(res => {
                 if (res.status === 401 || res.status === 403) {
                     localStorage.removeItem('admin');
-                    localStorage.removeItem('token');
+                    localStorage.removeItem('adminToken');
                     window.location.href = '/admin/login';
                     return;
                 }
@@ -44,7 +44,7 @@ const ApplicationManager = () => {
     }, []);
 
     const handleApprove = async (id) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
@@ -58,7 +58,7 @@ const ApplicationManager = () => {
                 setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'approved' } : app));
             } else if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
             }
         } catch (err) {
@@ -67,7 +67,7 @@ const ApplicationManager = () => {
     };
 
     const handleReject = async (id) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
                 method: 'PUT',
@@ -81,7 +81,7 @@ const ApplicationManager = () => {
                 setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'rejected' } : app));
             } else if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
             }
         } catch (err) {
@@ -92,7 +92,7 @@ const ApplicationManager = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa đơn ứng tuyển này? Thao tác này không thể hoàn tác.')) return;
         
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/applications/admin/${id}`, {
                 method: 'DELETE',
@@ -104,7 +104,7 @@ const ApplicationManager = () => {
                 setApplications(apps => apps.filter(app => app.id !== id));
             } else if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
             }
         } catch (err) {

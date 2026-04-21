@@ -322,7 +322,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('adminToken');
         fetch(`${API_BASE_URL}/stats`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -331,7 +331,7 @@ const Dashboard = () => {
             .then(res => {
                 if (res.status === 401 || res.status === 403) {
                     localStorage.removeItem('admin');
-                    localStorage.removeItem('token');
+                    localStorage.removeItem('adminToken');
                     window.location.href = '/admin/login';
                     return;
                 }

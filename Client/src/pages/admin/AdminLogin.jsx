@@ -41,7 +41,7 @@ const AdminLogin = () => {
 
             if (response.ok) {
                 localStorage.setItem('admin', JSON.stringify(data.admin));
-                if (data.token) localStorage.setItem('token', data.token);
+                if (data.token) localStorage.setItem('adminToken', data.token);
                 navigate('/admin', { replace: true });
             } else {
                 setError(data.message || 'Sai tên đăng nhập hoặc mật khẩu');
@@ -150,7 +150,7 @@ const AdminLogin = () => {
                 </div>
 
                 <p className="text-center text-zinc-400 text-[0.65rem] uppercase tracking-widest mt-8 font-medium">
-                    © 2025 SkyComic Administration
+                    © 2026 SkyComic Administration
                 </p>
             </div>
         </div>

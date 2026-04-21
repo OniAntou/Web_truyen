@@ -17,7 +17,7 @@ const decodeToken = (token) => {
 
 const ProtectedAdminRoute = () => {
     const admin = localStorage.getItem('admin');
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     
     // Check for admin presence
     if (!admin || !token) {

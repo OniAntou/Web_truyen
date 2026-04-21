@@ -5,6 +5,12 @@ import { API_BASE_URL } from '../../constants/api';
 const MAX_FILES_PER_UPLOAD_BATCH = 2;
 const MAX_BYTES_PER_UPLOAD_BATCH = 3.5 * 1024 * 1024; // 3.5MB to stay safely under Vercel's 4.5MB limit
 
+// Helper: pick correct token based on admin vs studio context
+const getAuthToken = () => {
+    const isAdmin = window.location.pathname.startsWith('/admin');
+    return localStorage.getItem(isAdmin ? 'adminToken' : 'token');
+};
+
 const splitFilesIntoUploadBatches = (fileList) => {
     const batches = [];
     let currentBatch = [];
@@ -234,7 +240,7 @@ const ChapterManager = () => {
     const reorderChapterIdRef = useRef(null);
 
     const fetchData = async () => {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         try {
             const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 headers: {
@@ -243,7 +249,7 @@ const ChapterManager = () => {
             });
             if (response.status === 401 || response.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
                 return;
             }
@@ -280,7 +286,7 @@ const ChapterManager = () => {
 
     const handleAddChapter = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         try {
             // 1. Get Comic ID (ensure MongoDB _id)
             const comicRes = await fetch(`${API_BASE_URL}/comics/${id}`, {
@@ -290,7 +296,7 @@ const ChapterManager = () => {
             });
             if (comicRes.status === 401 || comicRes.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
                 return;
             }
@@ -407,7 +413,7 @@ const ChapterManager = () => {
                         `Đang upload ${uploadedCount + 1}-${uploadedCount + batch.length}/${fileList.length} ảnh${attempt > 1 ? ` (retry ${attempt}/${MAX_RETRIES})` : ''}...`
                     );
 
-                    const token = localStorage.getItem('token');
+                    const token = getAuthToken();
                     const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${token}` },
@@ -457,7 +463,7 @@ const ChapterManager = () => {
         };
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             for (let i = 0; i < batches.length; i++) {
                 const batch = batches[i];
                 const result = await uploadBatchWithRetry(batch, i);
@@ -496,7 +502,7 @@ const ChapterManager = () => {
     const handleDelete = async (chapterId) => {
         if (!confirm('Delete this chapter?')) return;
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -519,7 +525,7 @@ const ChapterManager = () => {
         if (!confirm(`Delete ${selectedChapters.size} chapters?`)) return;
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             const response = await fetch(`${API_BASE_URL}/chapters/bulk-delete`, {
                 method: 'POST',
                 headers: { 
@@ -581,7 +587,7 @@ const ChapterManager = () => {
         reorderChapterIdRef.current = chapterId;
         setReorderLoading(true);
         setReorderModalOpen(true);
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         try {
             const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`, {
                 headers: {
@@ -590,7 +596,7 @@ const ChapterManager = () => {
             });
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
                 return;
             }
@@ -626,7 +632,7 @@ const ChapterManager = () => {
                 pageId: p._id,
                 page_number: idx + 1,
             }));
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
                 method: 'PUT',
                 headers: { 
@@ -665,7 +671,7 @@ const ChapterManager = () => {
         if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn trang ${idx + 1} này không?\nHành động này sẽ xóa file gốc trên Cloudflare R2 và không thể hoàn tác.`)) return;
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
