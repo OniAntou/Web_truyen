@@ -14,8 +14,13 @@ const AdminLogin = () => {
 
     // Nếu đã đăng nhập thì redirect luôn về dashboard
     useEffect(() => {
-        if (localStorage.getItem('admin')) {
+        const hasAdmin = localStorage.getItem('admin');
+        const hasAdminToken = localStorage.getItem('adminToken');
+        if (hasAdmin && hasAdminToken) {
             navigate('/admin', { replace: true });
+        } else if (hasAdmin && !hasAdminToken) {
+            // Stale admin data from before migration — clear it
+            localStorage.removeItem('admin');
         }
     }, [navigate]);
 
