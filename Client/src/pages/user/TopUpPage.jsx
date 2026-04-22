@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Layout/Navbar';
 import Footer from '../../components/Layout/Footer';
@@ -48,39 +48,41 @@ const TopUpPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0E0E0E] flex flex-col font-sans">
+        <div className="min-h-screen flex flex-col font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
             <Navbar />
             <div className="flex-1 w-full max-w-5xl mx-auto px-4 pt-24 pb-16">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2 pb-4 border-b border-white/5">Nạp Xu</h1>
-                    <p className="text-zinc-500 text-sm mt-3">Mua Xu để mở khóa truy cập sớm các chapter truyện đặc quyền.</p>
+                    <h1 className="text-3xl font-bold mb-2 pb-4" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}>Nạp Xu</h1>
+                    <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>Mua Xu để mở khóa truy cập sớm các chapter truyện đặc quyền.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column: Bundles & Custom */}
                     <div className="lg:col-span-2 space-y-8">
                         <div>
-                            <h2 className="text-white font-semibold mb-4">Các gói Xu ưu đãi</h2>
+                            <h2 className="font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Các gói Xu ưu đãi</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {amounts.map((val) => (
                                     <button
                                         key={val}
                                         onClick={() => setAmount(val)}
-                                        className={`relative p-5 rounded-2xl border text-center transition-colors ${
-                                            amount === val 
-                                            ? 'border-yellow-500 bg-yellow-500/5' 
-                                            : 'border-white/5 bg-[#151515] hover:border-white/20'
-                                        }`}
+                                        className="relative p-5 rounded-2xl border text-center transition-colors"
+                                        style={{
+                                            borderColor: amount === val ? '#eab308' : 'var(--border)',
+                                            backgroundColor: amount === val ? 'rgba(234, 179, 8, 0.05)' : 'var(--bg-secondary)',
+                                        }}
+                                        onMouseEnter={(e) => { if (amount !== val) e.currentTarget.style.borderColor = 'var(--text-secondary)'; }}
+                                        onMouseLeave={(e) => { if (amount !== val) e.currentTarget.style.borderColor = 'var(--border)'; }}
                                     >
                                         <div className="flex justify-center mb-2">
                                             <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500">
                                                 <CreditCard size={18} />
                                             </div>
                                         </div>
-                                        <div className="text-lg font-bold text-white mb-1">
+                                        <div className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
                                             {(val / 10).toLocaleString()} <span className="text-xs text-yellow-500">Xu</span>
                                         </div>
-                                        <div className="text-sm text-zinc-500 font-medium">
+                                        <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                                             {val.toLocaleString()}đ
                                         </div>
                                         {amount === val && (
@@ -97,18 +99,18 @@ const TopUpPage = () => {
 
                     {/* Right Column: Checkout Summary */}
                     <div>
-                        <div className="bg-[#151515] border border-white/5 rounded-2xl p-6 sticky top-24">
-                            <h3 className="text-lg font-bold text-white mb-6">Chi tiết thanh toán</h3>
+                        <div className="rounded-2xl p-6 sticky top-24" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                            <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Chi tiết thanh toán</h3>
                             
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-zinc-500 font-medium">Tỷ giá quy đổi</span>
-                                    <span className="text-zinc-300 font-medium">1,000đ = 100 Xu</span>
+                                    <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Tỷ giá quy đổi</span>
+                                    <span className="font-medium" style={{ color: 'var(--text-primary)' }}>1,000đ = 100 Xu</span>
                                 </div>
-                                <div className="h-px bg-white/5"></div>
+                                <div className="h-px" style={{ backgroundColor: 'var(--border)' }}></div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-white font-semibold">Tổng thanh toán</span>
-                                    <span className="text-lg font-bold text-white">
+                                    <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Tổng thanh toán</span>
+                                    <span className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                                         {amount.toLocaleString()}đ
                                     </span>
                                 </div>
@@ -132,13 +134,14 @@ const TopUpPage = () => {
                                 disabled={loading || amount < 10000}
                                 className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wide transition-colors flex items-center justify-center gap-2 ${
                                     loading || amount < 10000 
-                                    ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
+                                    ? 'cursor-not-allowed' 
                                     : 'bg-yellow-500 hover:bg-yellow-400 text-black'
                                 }`}
+                                style={loading || amount < 10000 ? { backgroundColor: 'var(--border)', color: 'var(--text-secondary)' } : {}}
                             >
                                 {loading ? 'Đang khởi tạo VNPay...' : 'Thanh Toán Ngay'}
                             </button>
-                            <p className="text-xs text-center text-zinc-600 mt-5 px-4 font-medium leading-relaxed">
+                            <p className="text-xs text-center mt-5 px-4 font-medium leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                                 Giao dịch được mã hóa bảo mật 100% qua cổng thanh toán quốc gia VNPay.
                             </p>
                         </div>
