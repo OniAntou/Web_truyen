@@ -14,4 +14,5 @@ export const authService = {
         body: { password }
     }),
     logout: () => apiClient('/auth/logout', { method: 'POST' }),
+    adminLogout: () => apiClient('/auth/admin/logout', { method: 'POST' }),
 };

@@ -8,7 +8,7 @@ const AdminLayout = () => {
 
     const handleLogout = async () => {
         try {
-            await authService.logout();
+            await authService.adminLogout();
         } catch (err) {
             console.error('Logout failed:', err);
         }

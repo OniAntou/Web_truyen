@@ -84,9 +84,21 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  res.clearCookie('token');
-  res.clearCookie('adminToken');
-  res.json({ message: "Đăng xuất thành công" });
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  });
+  res.json({ message: "Đăng xuất người dùng thành công" });
+});
+
+const adminLogout = asyncHandler(async (req, res) => {
+  res.clearCookie('adminToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  });
+  res.json({ message: "Đăng xuất Admin thành công" });
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
