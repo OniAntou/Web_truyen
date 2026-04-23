@@ -11,18 +11,11 @@ const FollowingPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-
     useEffect(() => {
         window.scrollTo(0, 0);
         
-        if (!token) {
-            navigate('/auth');
-            return;
-        }
-
         fetch(`${API_BASE_URL}/users/favorites`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch favorites');
@@ -37,7 +30,7 @@ const FollowingPage = () => {
                 setError(err.message);
                 setLoading(false);
             });
-    }, [navigate, token]);
+    }, [navigate]);
 
     if (loading) return <div style={{ paddingTop: '8rem', textAlign: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Loading...</div>;
     if (error) return <div style={{ paddingTop: '8rem', textAlign: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: '#ef4444' }}>Error: {error}</div>;

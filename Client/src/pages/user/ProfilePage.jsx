@@ -18,17 +18,11 @@ const ProfilePage = () => {
     const [transactions, setTransactions] = useState({ payments: [], unlocks: [] });
     const [loadingHistory, setLoadingHistory] = useState(false);
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-
     useEffect(() => {
         window.scrollTo(0, 0);
-        if (!token) { 
-            navigate('/auth'); 
-            return; 
-        }
         
         fetch(`${API_BASE_URL}/users/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         })
         .then(res => {
             if (res.status === 401 || res.status === 403) {
@@ -48,7 +42,7 @@ const ProfilePage = () => {
         .catch(() => {
             setLoading(false);
         });
-    }, [navigate, token]);
+    }, [navigate]);
 
     const showToast = (msg, type = 'ok') => {
         setToast({ msg, type });
@@ -66,7 +60,8 @@ const ProfilePage = () => {
         try {
             const res = await fetch(`${API_BASE_URL}/users/me`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ [editing]: trimmed })
             });
             const data = await res.json();
@@ -84,7 +79,7 @@ const ProfilePage = () => {
         try {
             const res = await fetch(`${API_BASE_URL}/users/me`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (!res.ok) {
                 const data = await res.json();
@@ -104,7 +99,7 @@ const ProfilePage = () => {
         setLoadingHistory(true);
         try {
             const res = await fetch(`${API_BASE_URL}/users/transactions`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (res.ok) {
                 const data = await res.json();

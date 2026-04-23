@@ -13,4 +13,5 @@ export const authService = {
     resetPassword: (token, password) => apiClient(`/auth/reset-password/${token}`, {
         body: { password }
     }),
+    logout: () => apiClient('/auth/logout', { method: 'POST' }),
 };

@@ -27,14 +27,12 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
 
     useEffect(() => {
         if (!user) return;
-        const token = localStorage.getItem('adminToken');
         fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         })
             .then(res => {
                 if (res.status === 401 || res.status === 403) {
                     localStorage.removeItem('admin');
-                    localStorage.removeItem('adminToken');
                     window.location.href = '/admin/login';
                     return;
                 }
@@ -54,14 +52,13 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
 
     const handleSave = async () => {
         setSaving(true);
-        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     role: editRole,
                     is_vip: editVip,
@@ -84,11 +81,10 @@ const UserDetailModal = ({ user, onClose, onUpdate, onDelete }) => {
 
     const handleDelete = async () => {
         if (!window.confirm(`Bạn có chắc muốn xoá user "${user.username}"? Hành động này không thể hoàn tác.`)) return;
-        const token = localStorage.getItem('adminToken');
         try {
             const res = await fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (res.ok) {
                 onDelete(user._id);
@@ -282,7 +278,6 @@ const UserManager = () => {
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
-        const token = localStorage.getItem('adminToken');
         const params = new URLSearchParams();
         if (debouncedSearch) params.set('search', debouncedSearch);
         if (roleFilter) params.set('role', roleFilter);
@@ -294,11 +289,10 @@ const UserManager = () => {
 
         try {
             const res = await fetch(`${API_BASE_URL}/admin/users?${params.toString()}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                localStorage.removeItem('adminToken');
                 window.location.href = '/admin/login';
                 return;
             }

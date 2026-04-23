@@ -16,15 +16,13 @@ const TopUpPage = () => {
     const handleTopUp = async () => {
         setLoading(true);
         setError('');
-        const token = localStorage.getItem('token');
-
         try {
             const response = await fetch(`${API_BASE_URL}/payment/create`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     amount: amount,
                     bankCode: '', // Leave empty for VNPay bank selection page

@@ -72,16 +72,12 @@ const ComicEditor = () => {
                 : `${API_BASE_URL}/comics`;
             const method = isEditing ? 'PUT' : 'POST';
 
-            const isAdminContext = window.location.pathname.startsWith('/admin');
-            const token = localStorage.getItem(isAdminContext ? 'adminToken' : 'token');
-            const authHeader = token ? `Bearer ${token}` : '';
-
             const response = await fetch(url, {
                 method,
                 headers: { 
-                    'Content-Type': 'application/json',
-                    ...(authHeader && { 'Authorization': authHeader })
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
 
@@ -104,9 +100,7 @@ const ComicEditor = () => {
 
                 const uploadResponse = await fetch(`${API_BASE_URL}/upload/cover/${comicIdToUpload}`, {
                     method: 'POST',
-                    headers: {
-                        ...(authHeader && { 'Authorization': authHeader })
-                    },
+                    credentials: 'include',
                     body: uploadFormData
                 });
 

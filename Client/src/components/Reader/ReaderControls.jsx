@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { comicService } from "../../api/comicService";
@@ -8,14 +8,15 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
   const [chaptersWithStatus, setChaptersWithStatus] = useState([]);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const activeChapterRef = useRef(null);
-  const token = localStorage.getItem('token');
+  const storedUser = localStorage.getItem('user');
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   const currentChapter = chapters?.find(ch => (ch._id || ch.id) === currentChapterId);
 
   // Fetch chapter read status when modal opens
   useEffect(() => {
-    if (showChapters && token && comicId && chapters) {
-      comicService.getChaptersReadStatus(comicId, token)
+    if (showChapters && user && comicId && chapters) {
+      comicService.getChaptersReadStatus(comicId)
       .then(data => {
         setChaptersWithStatus(data);
         setLoadingStatus(false);
@@ -25,7 +26,7 @@ const ReaderControls = ({ comicId, chapters, currentChapterId, onPrev, onNext })
         setLoadingStatus(false);
       });
     }
-  }, [showChapters, comicId, chapters, token]);
+  }, [showChapters, comicId, chapters, user]);
 
   // Merge chapters with status info
   const displayChapters = chapters ? chapters.map(chapter => {

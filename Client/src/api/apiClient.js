@@ -9,6 +9,7 @@ const apiClient = async (endpoint, options = {}) => {
         method: body ? 'POST' : 'GET',
         ...customConfig,
         headers,
+        credentials: 'include',
     };
 
     if (body) {
@@ -27,11 +28,9 @@ const apiClient = async (endpoint, options = {}) => {
 
         // Global handling of expired/invalid tokens
         if (response.status === 401 || response.status === 403) {
-            const token = localStorage.getItem('token');
-            const authHeader = config.headers && Object.keys(config.headers).find(key => key.toLowerCase() === 'authorization');
-            // Only auto-logout if there IS a token, the request was authenticated,
-            // and the response is not a specific "chapter locked" payload.
-            if (token && authHeader && !data.is_locked) {
+            const user = localStorage.getItem('user');
+            // Only auto-logout if there IS a user session and the response is not a specific "chapter locked" payload.
+            if (user && !data.is_locked) {
                 clearSession();
             }
         }

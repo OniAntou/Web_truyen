@@ -15,7 +15,9 @@ const PaymentReturnPage = () => {
         const verifyPayment = async () => {
             try {
                 // Send VNPay parameters to our backend to verify
-                const response = await fetch(`${API_BASE_URL}/payment/vnpay_return?${searchParams.toString()}`);
+                const response = await fetch(`${API_BASE_URL}/payment/vnpay_return?${searchParams.toString()}`, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
 
                 if (data.success) {

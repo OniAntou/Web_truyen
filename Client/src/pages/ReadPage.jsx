@@ -34,7 +34,7 @@ const ReadPage = () => {
     
     const theme = useThemeStore(state => state.theme);
     const isDarkTheme = theme !== 'light';
-    const token = useAuthStore(state => state.token);
+    const user = useAuthStore(state => state.user);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -61,7 +61,7 @@ const ReadPage = () => {
 
     // Mark chapter as read
     useEffect(() => {
-        if (token && comic && chapter && chapter.pages && chapter.pages.length > 0) {
+        if (user && comic && chapter && chapter.pages && chapter.pages.length > 0) {
             saveReadingHistory({
                 comicId: comicId,
                 comicTitle: comic.title,
@@ -72,12 +72,12 @@ const ReadPage = () => {
             });
             updateReadingProgress(1);
         }
-    }, [chapter?._id, chapter?.pages?.length, token]);
+    }, [chapter?._id, chapter?.pages?.length, user]);
 
     const updateReadingProgress = async (pageNum) => {
-        if (!token || !comic || !chapter) return;
+        if (!user || !comic || !chapter) return;
         try {
-            await comicService.updateReadingProgress(comicId, chapter._id, pageNum, token);
+            await comicService.updateReadingProgress(comicId, chapter._id, pageNum);
         } catch (err) {
             console.error('Error updating reading progress:', err);
         }
@@ -85,11 +85,11 @@ const ReadPage = () => {
 
     // Track views
     useEffect(() => {
-        if (token && comicId && viewedRef.current !== comicId) {
+        if (user && comicId && viewedRef.current !== comicId) {
             viewedRef.current = comicId;
-            comicService.updateView(comicId, token).catch(console.error);
+            comicService.updateView(comicId).catch(console.error);
         }
-    }, [comicId, token]);
+    }, [comicId, user]);
 
     const currentIndex = comic?.chapters?.findIndex(c => c._id === chapter?._id) ?? -1;
     const hasPrev = currentIndex > 0;
@@ -119,7 +119,7 @@ const ReadPage = () => {
     };
 
     const handleUnlock = () => {
-        if (!token) return navigate('/login');
+        if (!user) return navigate('/login');
         setConfirmModal({ 
             isOpen: true, 
             type: 'unlock', 
@@ -129,7 +129,7 @@ const ReadPage = () => {
     };
 
     const handleUpgradeVip = () => {
-        if (!token) return navigate('/login');
+        if (!user) return navigate('/login');
         setConfirmModal({ 
             isOpen: true, 
             type: 'vip', 
@@ -142,7 +142,7 @@ const ReadPage = () => {
         setIsProcessing(true);
         try {
             if (confirmModal.type === 'unlock') {
-                await chapterService.unlockChapter(chapter?._id || chapterId, token);
+                await chapterService.unlockChapter(chapter?._id || chapterId);
                 setConfirmModal({ ...confirmModal, isOpen: false });
                 setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true });
                 // Invalidate query to refresh data instead of full page reload
@@ -150,7 +150,8 @@ const ReadPage = () => {
             } else if (confirmModal.type === 'vip') {
                 const response = await fetch(`${API_BASE_URL}/users/upgrade-vip`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
                 });
                 
                 if (response.status === 401) {

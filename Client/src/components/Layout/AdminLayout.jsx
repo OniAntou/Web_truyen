@@ -1,9 +1,20 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users, MessageSquare, Flag } from 'lucide-react';
+import { authService } from '../../api/authService';
 
 const AdminLayout = () => {
     const location = useLocation();
+
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+        localStorage.removeItem('admin');
+        window.location.href = '/admin/login';
+    };
 
     const isActive = (path) => {
         return location.pathname === path
@@ -86,11 +97,7 @@ const AdminLayout = () => {
                     </Link>
 
                     <button
-                        onClick={() => {
-                            localStorage.removeItem('admin');
-                            localStorage.removeItem('adminToken');
-                            window.location.href = '/admin/login';
-                        }}
+                        onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 text-left"
                     >
                         <LogOut size={20} className="stroke-[1.5]" />

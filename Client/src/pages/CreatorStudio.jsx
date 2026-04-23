@@ -12,17 +12,9 @@ const CreatorStudio = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/auth');
-            return;
-        }
-
         // Add a check in a real app to ensure role === 'creator' from context
         fetch(`${API_BASE_URL}/studio/comics`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            credentials: 'include'
         })
         .then(res => {
             if (res.status === 401) {
@@ -52,12 +44,9 @@ const CreatorStudio = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa truyện này? Hành động này không thể hoàn tác.')) return;
         
         try {
-            const token = localStorage.getItem('token');
             const res = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                credentials: 'include'
             });
             if (res.ok) {
                 setComics(comics.filter(c => (c._id || c.id) !== id));

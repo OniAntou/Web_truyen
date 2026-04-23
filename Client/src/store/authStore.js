@@ -10,20 +10,17 @@ export const useAuthStore = create((set) => ({
           return null;
       }
   })(),
-  token: localStorage.getItem('token') || null,
-  login: (userData, tokenData) => set(() => {
+  login: (userData) => set(() => {
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', tokenData);
-      return { user: userData, token: tokenData };
+      return { user: userData };
   }),
   updateUser: (userData) => set(() => {
       localStorage.setItem('user', JSON.stringify(userData));
       return { user: userData };
   }),
   logout: () => set(() => {
-      localStorage.removeItem('token');
       localStorage.removeItem('user');
       clearReadingHistory();
-      return { user: null, token: null };
+      return { user: null };
   }),
 }));

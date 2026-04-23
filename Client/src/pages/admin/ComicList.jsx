@@ -37,25 +37,16 @@ const ComicList = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this comic?')) return;
 
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
-            alert('Bạn cần đăng nhập để xóa truyện.');
-            return;
-        }
-
         try {
             const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+                credentials: 'include'
             });
 
             if (response.ok) {
                 setComics(comics.filter(comic => comic._id !== id && comic.id !== id));
             } else if (response.status === 401 || response.status === 403) {
                 alert('Không có quyền xóa truyện. Vui lòng đăng nhập lại.');
-                localStorage.removeItem('adminToken');
                 localStorage.removeItem('admin');
                 window.location.href = '/admin/login';
             } else {

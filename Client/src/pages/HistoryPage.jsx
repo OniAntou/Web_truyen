@@ -13,18 +13,11 @@ const HistoryPage = () => {
     const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-
     useEffect(() => {
-        if (!token) {
-            navigate('/auth');
-            return;
-        }
-
         const fetchHistory = async () => {
             setLoading(true);
             try {
-                const data = await comicService.getUserReadingHistory(token);
+                const data = await comicService.getUserReadingHistory();
                 // Map backend data format to component format
                 const mappedHistory = (data || []).map(item => ({
                     comicId: item.comic_id,
@@ -44,7 +37,7 @@ const HistoryPage = () => {
         };
 
         fetchHistory();
-    }, [navigate, token]);
+    }, [navigate]);
 
     const handleClear = () => {
         if (!window.confirm('Xóa toàn bộ lịch sử đọc truyện?')) return;

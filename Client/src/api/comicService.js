@@ -15,31 +15,19 @@ export const comicService = {
     getTrending: (limit = 10) => apiClient(`/comics/trending?limit=${limit}`),
     getHomeData: (version) => apiClient(`/comics/home${version ? `?v=${version}` : ''}`),
     getById: (id) => {
-        const token = localStorage.getItem('token');
-        const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
-        return apiClient(`/comics/${id}`, options);
+        return apiClient(`/comics/${id}`);
     },
-    getUserRating: (id, token) => apiClient(`/comics/${id}/user-rating`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    }),
-    getFavoriteStatus: (id, token) => apiClient(`/comics/${id}/favorite`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    }),
-    getReadingProgress: (id, token) => apiClient(`/comics/${id}/reading-progress`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    }),
-    rate: (id, rating, token) => apiClient(`/comics/${id}/rate`, {
+    getUserRating: (id) => apiClient(`/comics/${id}/user-rating`),
+    getFavoriteStatus: (id) => apiClient(`/comics/${id}/favorite`),
+    getReadingProgress: (id) => apiClient(`/comics/${id}/reading-progress`),
+    rate: (id, rating) => apiClient(`/comics/${id}/rate`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
         body: { rating }
     }),
-    toggleFavorite: (id, token) => apiClient(`/comics/${id}/favorite`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+    toggleFavorite: (id) => apiClient(`/comics/${id}/favorite`, {
+        method: 'POST'
     }),
-    getChaptersReadStatus: (id, token) => apiClient(`/comics/${id}/chapters/read-status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    }),
+    getChaptersReadStatus: (id) => apiClient(`/comics/${id}/chapters/read-status`),
     getPopular: (sortBy = 'views', limit = 12, genre = '') => {
         let endpoint = `/comics/popular?sort=${sortBy}&limit=${limit}`;
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;
@@ -51,26 +39,20 @@ export const comicService = {
         return apiClient(endpoint);
     },
     getGenres: () => apiClient('/genres'),
-    updateView: (id, token) => apiClient(`/comics/${id}/view`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+    updateView: (id) => apiClient(`/comics/${id}/view`, {
+        method: 'POST'
     }),
-    updateReadingProgress: (id, chapterId, pageNum, token) => apiClient(`/comics/${id}/reading-progress`, {
+    updateReadingProgress: (id, chapterId, pageNum) => apiClient(`/comics/${id}/reading-progress`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
         body: {
             chapter_id: chapterId,
             page_number: pageNum
         }
     }),
     getReaderData: (id, chapterId) => {
-        const token = localStorage.getItem('token');
-        const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
-        return apiClient(`/comics/${id}/reader/${chapterId}`, options);
+        return apiClient(`/comics/${id}/reader/${chapterId}`);
     },
-    getUserReadingHistory: (token) => apiClient('/users/reading-progress', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    }),
+    getUserReadingHistory: () => apiClient('/users/reading-progress'),
     testConnection: () => apiClient('/test'),
     warmup: () => apiClient('/health').catch(() => {}) // Lightweight ping to wake up server
 };

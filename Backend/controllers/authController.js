@@ -20,7 +20,15 @@ const adminLogin = asyncHandler(async (req, res) => {
     throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
   }
   const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-  res.json({ message: "Đăng nhập thành công", admin: { username: admin.username }, token });
+  
+  res.cookie('adminToken', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  res.json({ message: "Đăng nhập thành công", admin: { username: admin.username } });
 });
 
 const register = asyncHandler(async (req, res) => {
@@ -38,7 +46,15 @@ const register = asyncHandler(async (req, res) => {
   await newUser.save();
   
   const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-  res.status(201).json({ message: "Đăng ký thành công", token, user: { username: newUser.username, email: newUser.email, role: newUser.role } });
+  
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  res.status(201).json({ message: "Đăng ký thành công", user: { username: newUser.username, email: newUser.email, role: newUser.role } });
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -56,7 +72,21 @@ const login = asyncHandler(async (req, res) => {
   }
   
   const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
-  res.json({ message: "Đăng nhập thành công", token, user: { username: user.username, email: user.email, role: user.role } });
+  
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+
+  res.json({ message: "Đăng nhập thành công", user: { username: user.username, email: user.email, role: user.role } });
+});
+
+const logout = asyncHandler(async (req, res) => {
+  res.clearCookie('token');
+  res.clearCookie('adminToken');
+  res.json({ message: "Đăng xuất thành công" });
 });
 
 const forgotPassword = asyncHandler(async (req, res) => {
@@ -130,6 +160,7 @@ module.exports = {
   adminLogin,
   register,
   login,
+  logout,
   forgotPassword,
   resetPassword
 };

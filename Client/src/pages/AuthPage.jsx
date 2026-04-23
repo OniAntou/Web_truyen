@@ -42,7 +42,6 @@ const AuthPage = () => {
         ? await authService.login(data.email, data.password)
         : await authService.register(data.username, data.email, data.password);
         
-      localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
       navigate("/");
     } catch (err) {

@@ -4,25 +4,6 @@ import { commentService } from '../../api/commentService';
 import ReportModal from '../common/ReportModal';
 import { Flag } from 'lucide-react';
 
-// Decode JWT to get user info (id, role)
-const decodeToken = (token) => {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const paddedBase64 = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
-        
-        return JSON.parse(
-            decodeURIComponent(
-                atob(paddedBase64).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join('')
-            )
-        );
-    } catch {
-        return null;
-    }
-};
-
 const CommentSection = ({ comicId, chapterId }) => {
     const [comments, setComments] = React.useState([]);
     const [newComment, setNewComment] = React.useState("");
@@ -31,8 +12,8 @@ const CommentSection = ({ comicId, chapterId }) => {
     const [replyingTo, setReplyingTo] = React.useState(null); // id of root comment
     const [reportModal, setReportModal] = React.useState({ isOpen: false, targetId: null });
     
-    const token = localStorage.getItem('token');
-    const currentUser = token ? decodeToken(token) : null;
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
 
     const fetchComments = () => {
         commentService.getByComic(comicId, chapterId)
@@ -52,7 +33,7 @@ const CommentSection = ({ comicId, chapterId }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!newComment.trim()) return;
-        if (!token) return alert('Vui lòng đăng nhập để bình luận');
+        if (!user) return alert('Vui lòng đăng nhập để bình luận');
         
         setIsSubmitting(true);
         try {
@@ -63,7 +44,7 @@ const CommentSection = ({ comicId, chapterId }) => {
             };
             const actualParentId = getTargetParentId(replyingTo);
             
-            await commentService.create(comicId, newComment, chapterId, actualParentId, token);
+            await commentService.create(comicId, newComment, chapterId, actualParentId);
             setNewComment("");
             setReplyingTo(null);
             fetchComments();
@@ -79,7 +60,7 @@ const CommentSection = ({ comicId, chapterId }) => {
         if (!window.confirm('Bạn có chắc muốn xoá bình luận này?')) return;
         setDeletingId(commentId);
         try {
-            await commentService.delete(comicId, commentId, token);
+            await commentService.delete(comicId, commentId);
             fetchComments();
         } catch (err) {
             console.error(err);
@@ -90,9 +71,9 @@ const CommentSection = ({ comicId, chapterId }) => {
     };
 
     const canDelete = (comment) => {
-        if (!currentUser) return false;
-        const isOwner = comment.user_id?._id === currentUser.id;
-        const isAdmin = currentUser.role === 'admin';
+        if (!user) return false;
+        const isOwner = comment.user_id?._id === user.id;
+        const isAdmin = user.role === 'admin';
         return isOwner || isAdmin;
     };
 
@@ -180,7 +161,7 @@ const CommentSection = ({ comicId, chapterId }) => {
                 {/* Reply Form */}
                 {isBeingReplied && (
                     <div style={{ marginTop: '0.5rem', padding: '1rem', borderRadius: '0.5rem', background: 'var(--bg-primary)', border: '1px solid var(--border)' }}>
-                        {token ? (
+                        {user ? (
                             <form onSubmit={handleSubmit}>
                                 <textarea 
                                     value={newComment}
@@ -222,7 +203,7 @@ const CommentSection = ({ comicId, chapterId }) => {
         <div className="container" style={{ marginTop: '1rem', paddingBottom: '3rem' }}>
             <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Bình luận</h3>
             <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
-                {token && !replyingTo ? (
+                {user && !replyingTo ? (
                     <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
                         <textarea 
                             value={newComment}
@@ -243,7 +224,7 @@ const CommentSection = ({ comicId, chapterId }) => {
                             </button>
                         </div>
                     </form>
-                ) : (!token && !replyingTo && (
+                ) : (!user && !replyingTo && (
                     <div style={{ padding: '1rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '0.5rem', marginBottom: '2rem', border: '1px solid var(--border)' }}>
                         <p style={{ color: 'var(--text-secondary)' }}>Vui lòng <Link to="/auth" style={{ color: '#eab308', textDecoration: 'none' }}>đăng nhập</Link> để tham gia bình luận.</p>
                     </div>

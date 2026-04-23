@@ -31,105 +31,48 @@ const Navbar = () => {
     const debounceRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
-    // Validate token and check authentication
+    // Validate user session and check authentication
     useEffect(() => {
-        let authTimeout;
-
         const checkAuth = async (shouldVerifyWithServer = false) => {
-            const token = localStorage.getItem('token');
             const storedUser = localStorage.getItem('user');
 
-            if (token && storedUser) {
-                // 1. Local validation (fast)
-                try {
-                    const base64Url = token.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const paddedBase64 = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
-                    
-                    const payload = JSON.parse(
-                        decodeURIComponent(
-                            atob(paddedBase64).split('').map(function (c) {
-                                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                            }).join('')
-                        )
-                    );
-
-                    const expiryTime = payload.exp ? payload.exp * 1000 : 0;
-                    const now = Date.now();
-                    const isExpired = expiryTime && (expiryTime < now);
-                    
-                    if (isExpired) {
-                        clearSession();
-                        setUser(null);
-                        if (location.pathname.startsWith('/profile') || location.pathname.startsWith('/studio')) {
-                            navigate('/auth');
-                        }
-                        return;
+            if (storedUser) {
+                // 1. Local sync
+                setUser(JSON.parse(storedUser));
+                
+                // 2. Server validation (robust) - Only if explicitly requested or on mount
+                if (shouldVerifyWithServer) {
+                    try {
+                        const latestUser = await userService.getMe();
+                        setUser(latestUser);
+                        localStorage.setItem('user', JSON.stringify(latestUser));
+                    } catch (err) {
+                        // If error (401/403), apiClient.js will call clearSession
+                        // which triggers the 'auth:logout' event handled below
                     }
-                    
-                    // 2. Server validation (robust) - Only if explicitly requested or on mount
-                    if (shouldVerifyWithServer) {
-                        try {
-                            const latestUser = await userService.getMe(token);
-                            setUser(latestUser);
-                            localStorage.setItem('user', JSON.stringify(latestUser));
-                        } catch (err) {
-                            // If err contains status 401/403, apiClient.js will have called clearSession
-                            // We just ensure UI update
-                            if (!localStorage.getItem('token')) {
-                                setUser(null);
-                                if (location.pathname.startsWith('/profile') || location.pathname.startsWith('/studio')) {
-                                    navigate('/auth');
-                                }
-                            }
-                            return;
-                        }
-                    } else {
-                        setUser(JSON.parse(storedUser));
-                    }
-
-                    // Schedule automatic logout when token expires
-                    if (expiryTime) {
-                        const timeUntilExpiry = expiryTime - now;
-                        if (authTimeout) clearTimeout(authTimeout);
-                        
-                        if (timeUntilExpiry > 0 && timeUntilExpiry < 2147483647) {
-                            authTimeout = setTimeout(() => {
-                                clearSession();
-                                setUser(null);
-                                navigate('/auth');
-                            }, timeUntilExpiry);
-                        }
-                    }
-                } catch (e) {
-                    clearSession();
-                    setUser(null);
-                    navigate('/auth');
                 }
             } else {
                 setUser(null);
             }
         };
 
-        // Initial check on mount - do a full server verification
+        // Initial check on mount
         checkAuth(true);
 
         // Check auth periodically and when user returns to tab
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                checkAuth(true); // Re-verify with server when returning to the tab
+                checkAuth(true);
             }
         };
         const handleFocus = () => checkAuth(true);
         
         window.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleFocus);
-        const authInterval = setInterval(() => checkAuth(false), 60000); // Local check every minute
+        const authInterval = setInterval(() => checkAuth(false), 60000);
 
-        // Listen for auth:logout events from apiClient or other components
+        // Listen for auth:logout events
         const handleLogoutEvent = () => {
-            // Ensure storage is cleared to prevent checkAuth from restoring session
-            localStorage.removeItem('token');
             localStorage.removeItem('user');
             clearReadingHistory();
             setUser(null);
@@ -137,7 +80,6 @@ const Navbar = () => {
             navigate('/auth');
         };
         window.addEventListener('auth:logout', handleLogoutEvent);
-        // Also re-check when localStorage changes (e.g. from another tab)
         window.addEventListener('storage', checkAuth);
 
         return () => {
@@ -146,7 +88,6 @@ const Navbar = () => {
             window.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
             clearInterval(authInterval);
-            if (authTimeout) clearTimeout(authTimeout);
         };
     }, [navigate]);
 

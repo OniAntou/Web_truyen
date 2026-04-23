@@ -2,12 +2,11 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const ProtectedCreatorRoute = () => {
-    // Check if token and user exist
-    const token = localStorage.getItem('token');
+    // Check if user exists
     const userStr = localStorage.getItem('user');
 
     // If auth failed, redirect to login
-    if (!token || !userStr) {
+    if (!userStr) {
         return <Navigate to="/auth" replace />;
     }
 

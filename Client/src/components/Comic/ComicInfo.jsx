@@ -15,28 +15,29 @@ const ComicInfo = ({ comic }) => {
     const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
     const [readingProgress, setReadingProgress] = useState(null);
     const [loadingProgress, setLoadingProgress] = useState(true);
-    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
     const queryClient = useQueryClient();
     
     useEffect(() => {
-        if (token && comic) {
+        if (user && comic) {
             const id = comic.id || comic._id;
             // Fetch user rating
-            comicService.getUserRating(id, token)
+            comicService.getUserRating(id)
             .then(data => {
                 if (data.rating) setUserRating(data.rating);
             })
             .catch(console.error);
 
             // Fetch favorite status
-            comicService.getFavoriteStatus(id, token)
+            comicService.getFavoriteStatus(id)
             .then(data => {
                 if (data.isFavorited !== undefined) setIsFavorited(data.isFavorited);
             })
             .catch(console.error);
 
             // Fetch reading progress
-            comicService.getReadingProgress(id, token)
+            comicService.getReadingProgress(id)
             .then(data => {
                 if (data.hasProgress) {
                     setReadingProgress(data);
@@ -50,14 +51,14 @@ const ComicInfo = ({ comic }) => {
         } else {
             setLoadingProgress(false);
         }
-    }, [comic, token]);
+    }, [comic, user]);
 
     const handleRate = async (value) => {
-        if (!token) return alert('Vui lòng đăng nhập để đánh giá truyện');
+        if (!user) return alert('Vui lòng đăng nhập để đánh giá truyện');
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const data = await comicService.rate(comic.id || comic._id, value, token);
+            const data = await comicService.rate(comic.id || comic._id, value);
             setUserRating(data.user_rating);
             setAvgRating(data.rating);
             
@@ -102,11 +103,11 @@ const ComicInfo = ({ comic }) => {
     };
 
     const handleFavorite = async () => {
-        if (!token) return alert('Vui lòng đăng nhập để yêu thích truyện');
+        if (!user) return alert('Vui lòng đăng nhập để yêu thích truyện');
         if (isTogglingFavorite) return;
         setIsTogglingFavorite(true);
         try {
-            const data = await comicService.toggleFavorite(comic.id || comic._id, token);
+            const data = await comicService.toggleFavorite(comic.id || comic._id);
             setIsFavorited(data.isFavorited);
             
             // Invalidate home data if needed (if favorites affect listings)
@@ -145,15 +146,15 @@ const ComicInfo = ({ comic }) => {
                         <span className="flex items-center gap-4">
                             <User size={16} /> {comic.author}
                         </span>
-                        <span className="flex items-center gap-1" style={{ cursor: token ? 'pointer' : 'default' }} title={token ? "Đánh giá truyện này" : "Đăng nhập để đánh giá"}>
+                        <span className="flex items-center gap-1" style={{ cursor: user ? 'pointer' : 'default' }} title={user ? "Đánh giá truyện này" : "Đăng nhập để đánh giá"}>
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Star 
                                     key={star} 
                                     size={18} 
                                     fill={(hoverRating || userRating) >= star ? "#eab308" : "transparent"} 
                                     color={(hoverRating || userRating) >= star ? "#eab308" : "var(--text-secondary)"}
-                                    onMouseEnter={() => token && setHoverRating(star)}
-                                    onMouseLeave={() => token && setHoverRating(0)}
+                                    onMouseEnter={() => user && setHoverRating(star)}
+                                    onMouseLeave={() => user && setHoverRating(0)}
                                     onClick={() => handleRate(star)}
                                     style={{ transition: 'all 0.2s', transform: hoverRating === star ? 'scale(1.2)' : 'none' }}
                                 />

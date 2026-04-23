@@ -15,12 +15,8 @@ const AdminLogin = () => {
     // Nếu đã đăng nhập thì redirect luôn về dashboard
     useEffect(() => {
         const hasAdmin = localStorage.getItem('admin');
-        const hasAdminToken = localStorage.getItem('adminToken');
-        if (hasAdmin && hasAdminToken) {
+        if (hasAdmin) {
             navigate('/admin', { replace: true });
-        } else if (hasAdmin && !hasAdminToken) {
-            // Stale admin data from before migration — clear it
-            localStorage.removeItem('admin');
         }
     }, [navigate]);
 
@@ -40,13 +36,13 @@ const AdminLogin = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
+                credentials: 'include',
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 localStorage.setItem('admin', JSON.stringify(data.admin));
-                if (data.token) localStorage.setItem('adminToken', data.token);
                 navigate('/admin', { replace: true });
             } else {
                 setError(data.message || 'Sai tên đăng nhập hoặc mật khẩu');

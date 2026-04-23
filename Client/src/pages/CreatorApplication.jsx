@@ -16,11 +16,12 @@ const CreatorApplication = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    const user = storedUser ? JSON.parse(storedUser) : null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!token) {
+        if (!user) {
             setError('Vui lòng đăng nhập trước khi nộp đơn.');
             return;
         }
@@ -32,9 +33,9 @@ const CreatorApplication = () => {
             const res = await fetch(`${API_BASE_URL}/applications`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             });
 
@@ -100,7 +101,7 @@ const CreatorApplication = () => {
                     </div>
 
                     {/* Right Column: Clean Form */}
-                    {!token ? (
+                    {!user ? (
                         <div className="p-8 md:p-12 rounded-[2rem] shadow-2xl relative text-center" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                             <h3 className="text-2xl font-medium text-white mb-4">Bạn chưa đăng nhập!</h3>
                             <p className="text-zinc-400 mb-8">Vui lòng đăng nhập vào tài khoản của bạn để có thể nộp đơn xin cấp quyền Tác giả.</p>

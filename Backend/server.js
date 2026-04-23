@@ -29,12 +29,14 @@ const seoRoutes = require('./routes/seoRoutes');
 const cronRoutes = require('./routes/cronRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Configure limits and timeout for large file uploads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cookieParser());
 
 if (process.env.TRUST_PROXY) {
   const trustProxyValue = Number(process.env.TRUST_PROXY);
