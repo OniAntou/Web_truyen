@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Star, Eye, TrendingUp, Filter, ChevronDown, Flame } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
@@ -10,13 +11,9 @@ import { comicService } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
 
 const PopularPage = () => {
-    const [comics, setComics] = useState([]);
-    const [genres, setGenres] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [selectedGenre, setSelectedGenre] = useState('');
     const [sortBy, setSortBy] = useState('views');
     const [showGenreDropdown, setShowGenreDropdown] = useState(false);
-    
     // Close dropdown on outside click
     const dropdownRef = useRef(null);
     useEffect(() => {
@@ -29,22 +26,14 @@ const PopularPage = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [dropdownRef]);
 
-    useEffect(() => {
-        fetchPopularComics();
-    }, [selectedGenre, sortBy]);
+    const { data, isLoading: loading } = useQuery({
+        queryKey: ['popularComics', sortBy, selectedGenre],
+        queryFn: () => comicService.getPopular(sortBy, 12, selectedGenre),
+        keepPreviousData: true,
+    });
 
-    const fetchPopularComics = async () => {
-        setLoading(true);
-        try {
-            const data = await comicService.getPopular(sortBy, 12, selectedGenre);
-            setComics(data.comics || []);
-            if (data.genres) setGenres(data.genres);
-        } catch (error) {
-            console.error('Error fetching popular comics:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const comics = data?.comics || [];
+    const genres = data?.genres || [];
 
     const sortOptions = [
         { value: 'views', label: 'Xem Nhiều Nhất', icon: <Eye size={14} /> },

@@ -2,80 +2,62 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, ChevronLeft, BookOpen, Home, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 import Navbar from '../components/Layout/Navbar';
 import ReaderControls from '../components/Reader/ReaderControls';
 import LazyImage from '../components/ui/LazyImage';
 import Footer from '../components/Layout/Footer';
 import CommentSection from '../components/Comic/CommentSection';
+import ReadPageSkeleton from '../components/ui/ReadPageSkeleton';
+
 import { comicService } from '../api/comicService';
 import { chapterService } from '../api/chapterService';
 import { API_BASE_URL } from '../constants/api';
 import { clearSession } from '../utils/auth';
 import { saveReadingHistory } from '../utils/readingHistory';
 
+import { useThemeStore } from '../store/themeStore';
+import { useAuthStore } from '../store/authStore';
+
 const ReadPage = () => {
     const { comicId, chapterId } = useParams();
     const navigate = useNavigate();
-    const [comic, setComic] = useState(null);
-    const [chapter, setChapter] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-
+    const queryClient = useQueryClient();
+    
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', message: '', price: 0 });
     const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', isSuccess: false });
     const [isProcessing, setIsProcessing] = useState(false);
-    const [isDarkTheme, setIsDarkTheme] = useState(true);
-    const token = localStorage.getItem('token');
-
-    useEffect(() => {
-        const checkTheme = () => {
-            setIsDarkTheme(document.documentElement.getAttribute('data-theme') !== 'light');
-        };
-        checkTheme();
-        const observer = new MutationObserver(checkTheme);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-        return () => observer.disconnect();
-    }, []);
+    
+    const theme = useThemeStore(state => state.theme);
+    const isDarkTheme = theme !== 'light';
+    const token = useAuthStore(state => state.token);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        setLoading(true);
-        setError(null);
+    }, [chapterId]);
 
-        comicService.getReaderData(comicId, chapterId)
-            .then(data => {
-                setComic({ 
-                    ...data.comic, 
-                    chapters: data.all_chapters 
-                });
-                setChapter(data.chapter);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error('Error fetching reader data:', err);
-                if (err.is_locked) {
-                    setError({ 
-                        type: 'locked', 
-                        message: err.message, 
-                        price: err.price, 
-                        early_access_end_date: err.early_access_end_date 
-                    });
-                    if (err.comic) setComic(err.comic);
-                } else {
-                    setError(err.message || 'Failed to load chapter');
-                }
-                setLoading(false);
-            });
-    }, [comicId, chapterId]);
+    const { data, isLoading, error: queryError } = useQuery({
+        queryKey: ['readerData', comicId, chapterId],
+        queryFn: () => comicService.getReaderData(comicId, chapterId),
+        retry: false,
+    });
 
+    const comic = data?.comic ? { ...data.comic, chapters: data?.all_chapters } : null;
+    const chapter = data?.chapter;
 
+    const error = queryError?.is_locked ? {
+        type: 'locked',
+        message: queryError.message,
+        price: queryError.price,
+        early_access_end_date: queryError.early_access_end_date,
+        comic: queryError.comic
+    } : queryError;
 
     const viewedRef = React.useRef(null);
 
-    // Mark chapter as read only when user can actually view pages (not locked)
+    // Mark chapter as read
     useEffect(() => {
-        // Save to local reading history as fallback
         if (token && comic && chapter && chapter.pages && chapter.pages.length > 0) {
             saveReadingHistory({
                 comicId: comicId,
@@ -85,39 +67,41 @@ const ReadPage = () => {
                 chapterTitle: chapter.title,
                 chapterNumber: chapter.chapter_number
             });
-            
-            // Sync to backend
             updateReadingProgress(1);
         }
-    }, [chapter?._id, chapter?.pages?.length, token]); // Only run when chapter or its pages change
+    }, [chapter?._id, chapter?.pages?.length, token]);
 
-    // Track reading progress
     const updateReadingProgress = async (pageNum) => {
         if (!token || !comic || !chapter) return;
-        
         try {
-            console.log('Updating reading progress:', { chapter_id: chapter._id, page_number: pageNum });
             await comicService.updateReadingProgress(comicId, chapter._id, pageNum, token);
-            console.log('Reading progress updated successfully');
         } catch (err) {
             console.error('Error updating reading progress:', err);
         }
     };
 
-
-
-    // Track comic view for authenticated users
+    // Track views
     useEffect(() => {
-        const token = localStorage.getItem('token');
         if (token && comicId && viewedRef.current !== comicId) {
             viewedRef.current = comicId;
             comicService.updateView(comicId, token).catch(console.error);
         }
-    }, [comicId]);
+    }, [comicId, token]);
 
     const currentIndex = comic?.chapters?.findIndex(c => c._id === chapter?._id) ?? -1;
     const hasPrev = currentIndex > 0;
     const hasNext = comic?.chapters && currentIndex < comic.chapters.length - 1;
+
+    // PREFETCH NEXT CHAPTER
+    useEffect(() => {
+        if (hasNext) {
+            const nextChapter = comic.chapters[currentIndex + 1];
+            queryClient.prefetchQuery({
+                queryKey: ['readerData', comicId, nextChapter._id],
+                queryFn: () => comicService.getReaderData(comicId, nextChapter._id)
+            });
+        }
+    }, [hasNext, comicId, currentIndex, comic?.chapters, queryClient]);
 
     const handleNextChapter = () => {
         if (!comic || !chapter || !hasNext) return;
@@ -158,7 +142,8 @@ const ReadPage = () => {
                 await chapterService.unlockChapter(chapter?._id || chapterId, token);
                 setConfirmModal({ ...confirmModal, isOpen: false });
                 setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true });
-                setTimeout(() => window.location.reload(), 1500);
+                // Invalidate query to refresh data instead of full page reload
+                queryClient.invalidateQueries(['readerData', comicId, chapterId]);
             } else if (confirmModal.type === 'vip') {
                 const response = await fetch(`${API_BASE_URL}/users/upgrade-vip`, {
                     method: 'POST',
@@ -174,7 +159,7 @@ const ReadPage = () => {
                 if (!response.ok) throw new Error(data.message);
                 setConfirmModal({ ...confirmModal, isOpen: false });
                 setAlertModal({ isOpen: true, title: 'Thành công', message: 'Nâng cấp VIP thành công! Hệ thống sẽ tự động tải lại trang.', isSuccess: true });
-                setTimeout(() => window.location.reload(), 2000);
+                queryClient.invalidateQueries(['readerData', comicId, chapterId]);
             }
         } catch (err) {
             setConfirmModal({ ...confirmModal, isOpen: false });
@@ -184,7 +169,7 @@ const ReadPage = () => {
         }
     };
 
-    if (loading) return <div style={{ paddingTop: '5rem', textAlign: 'center', color: 'white' }}>Loading...</div>;
+    if (isLoading) return <ReadPageSkeleton />;
 
     if (error && error.type === 'locked') {
         return (

@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import ComicInfo from '../components/Comic/ComicInfo';
@@ -11,21 +12,14 @@ import ComicInfoSkeleton from '../components/Comic/ComicInfoSkeleton';
 
 const ComicInfoPage = () => {
     const { id } = useParams();
-    const [comic, setComic] = React.useState(null);
-    const [loading, setLoading] = React.useState(true);
+    
+    const { data: comic, isLoading: loading } = useQuery({
+        queryKey: ['comic', id],
+        queryFn: () => comicService.getById(id)
+    });
 
-    useEffect(() => {
+    React.useEffect(() => {
         window.scrollTo(0, 0);
-
-        comicService.getById(id)
-            .then(data => {
-                setComic(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
     }, [id]);
 
     if (loading) {

@@ -5,8 +5,9 @@ import { clearReadingHistory } from './readingHistory';
  * This ensures consistency across the application when a session expires.
  */
 export const clearSession = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    clearReadingHistory();
+    // Dynamically import to avoid circular dependencies
+    import('../store/authStore').then(({ useAuthStore }) => {
+        useAuthStore.getState().logout();
+    });
     window.dispatchEvent(new Event('auth:logout'));
 };

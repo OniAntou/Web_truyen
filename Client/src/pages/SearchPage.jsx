@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import ComicGrid from '../components/Home/ComicGrid';
@@ -8,29 +9,14 @@ import { comicService } from '../api/comicService';
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('q');
-    const [comics, setComics] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (query) {
-            fetchSearchResults();
-        } else {
-            setComics([]);
-            setLoading(false);
-        }
-    }, [query]);
+    const { data, isLoading: loading } = useQuery({
+        queryKey: ['search', query],
+        queryFn: () => comicService.getAll(query),
+        enabled: !!query,
+    });
 
-    const fetchSearchResults = async () => {
-        setLoading(true);
-        try {
-            const data = await comicService.getAll(query);
-            setComics(data.comics || []);
-        } catch (error) {
-            console.error('Error fetching search results:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const comics = data?.comics || [];
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
