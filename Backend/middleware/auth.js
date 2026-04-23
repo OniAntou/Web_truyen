@@ -6,7 +6,14 @@ const authenticateToken = (req, res, next) => {
   
   // If token in header is invalid/placeholder, try cookies
   if (!token || token === 'undefined' || token === 'null') {
-    token = req.cookies?.token || req.cookies?.adminToken;
+    // Priority: If the request is for an admin route, prefer adminToken. 
+    // Otherwise, prefer regular token but fall back to adminToken.
+    const isAdminRoute = req.originalUrl && req.originalUrl.includes('/admin');
+    if (isAdminRoute) {
+        token = req.cookies?.adminToken || req.cookies?.token;
+    } else {
+        token = req.cookies?.token || req.cookies?.adminToken;
+    }
   }
 
   if (!token) return res.status(401).json({ message: "Không tìm thấy token" });
