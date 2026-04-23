@@ -16,6 +16,8 @@ import { chapterService } from '../api/chapterService';
 import { API_BASE_URL } from '../constants/api';
 import { clearSession } from '../utils/auth';
 import { saveReadingHistory } from '../utils/readingHistory';
+import ReportModal from '../components/common/ReportModal';
+import { Flag } from 'lucide-react';
 
 import { useThemeStore } from '../store/themeStore';
 import { useAuthStore } from '../store/authStore';
@@ -27,6 +29,7 @@ const ReadPage = () => {
     
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', message: '', price: 0 });
     const [alertModal, setAlertModal] = useState({ isOpen: false, title: '', message: '', isSuccess: false });
+    const [reportModalOpen, setReportModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     
     const theme = useThemeStore(state => state.theme);
@@ -332,6 +335,15 @@ const ReadPage = () => {
                     )}
 
                     {chapter.title && <div className="reader-info-spacer"></div>}
+
+                    <button 
+                        onClick={() => setReportModalOpen(true)}
+                        className="flex items-center gap-2 text-zinc-500 hover:text-rose-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/10 text-xs font-medium"
+                        title="Báo lỗi chương"
+                    >
+                        <Flag size={14} />
+                        <span className="hidden sm:inline">Báo lỗi</span>
+                    </button>
                 </div>
             </div>
 
@@ -392,6 +404,13 @@ const ReadPage = () => {
             </div>
 
             <CommentSection comicId={comicId} chapterId={chapter._id || chapter.id} />
+
+            <ReportModal 
+                isOpen={reportModalOpen}
+                onClose={() => setReportModalOpen(false)}
+                targetType="chapter"
+                targetId={chapter._id || chapterId}
+            />
 
             </main>
             <Footer />

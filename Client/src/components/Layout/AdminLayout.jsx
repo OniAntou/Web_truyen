@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, Menu, UserPlus, Users, MessageSquare, Flag } from 'lucide-react';
 
 const AdminLayout = () => {
     const location = useLocation();
@@ -61,10 +61,18 @@ const AdminLayout = () => {
 
                     <Link
                         to="/admin/comments"
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive('/admin/comments')}`}
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/comments')}`}
                     >
-                        <MessageSquare size={18} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-300'} />
-                        <span className="text-base font-medium">Comments</span>
+                        <MessageSquare size={20} className={location.pathname === '/admin/comments' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
+                        <span className="font-medium">Comments</span>
+                    </Link>
+
+                    <Link
+                        to="/admin/reports"
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/reports')}`}
+                    >
+                        <Flag size={20} className={location.pathname === '/admin/reports' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
+                        <span className="font-medium">Reports</span>
                     </Link>
                 </nav>
                 

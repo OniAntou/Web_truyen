@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { commentService } from '../../api/commentService';
+import ReportModal from '../common/ReportModal';
+import { Flag } from 'lucide-react';
 
 // Decode JWT to get user info (id, role)
 const decodeToken = (token) => {
@@ -27,6 +29,7 @@ const CommentSection = ({ comicId, chapterId }) => {
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [deletingId, setDeletingId] = React.useState(null);
     const [replyingTo, setReplyingTo] = React.useState(null); // id of root comment
+    const [reportModal, setReportModal] = React.useState({ isOpen: false, targetId: null });
     
     const token = localStorage.getItem('token');
     const currentUser = token ? decodeToken(token) : null;
@@ -164,6 +167,14 @@ const CommentSection = ({ comicId, chapterId }) => {
                         </svg>
                         {isBeingReplied ? 'Huỷ trả lời' : 'Trả lời'}
                     </button>
+
+                    <button 
+                        onClick={() => setReportModal({ isOpen: true, targetId: c._id })}
+                        className="comment-action-btn hover-rose"
+                    >
+                        <Flag size={14} />
+                        Báo cáo
+                    </button>
                 </div>
 
                 {/* Reply Form */}
@@ -245,6 +256,13 @@ const CommentSection = ({ comicId, chapterId }) => {
                 </div>
             </div>
 
+            <ReportModal 
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal({ ...reportModal, isOpen: false })}
+                targetType="comment"
+                targetId={reportModal.targetId}
+            />
+
             <style>{`
                 .comment-action-btn {
                     background: none;
@@ -267,6 +285,10 @@ const CommentSection = ({ comicId, chapterId }) => {
                 .comment-action-btn.hover-accent:hover {
                     color: var(--accent) !important;
                     background: rgba(255, 255, 255, 0.05);
+                }
+                .comment-action-btn.hover-rose:hover {
+                    color: #f43f5e !important;
+                    background: rgba(244, 63, 94, 0.1);
                 }
                 .comment-action-btn:disabled {
                     opacity: 0.5;
