@@ -23,8 +23,8 @@ const adminLogin = asyncHandler(async (req, res) => {
   
   res.cookie('adminToken', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
@@ -49,8 +49,8 @@ const register = asyncHandler(async (req, res) => {
   
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
@@ -75,8 +75,8 @@ const login = asyncHandler(async (req, res) => {
   
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
