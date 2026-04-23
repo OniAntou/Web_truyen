@@ -170,6 +170,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 module.exports = {
   adminLogin,
+  adminLogout,
   register,
   login,
   logout,
