@@ -11,7 +11,7 @@ const adminLogin = asyncHandler(async (req, res) => {
   if (!username || !password) {
     throw new AppError("Vui lòng nhập username và password", 400);
   }
-  const admin = await AdminLogin.findOne({ username });
+  const admin = await AdminLogin.findOne({ username: String(username) });
   if (!admin) {
     throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
   }
@@ -19,7 +19,12 @@ const adminLogin = asyncHandler(async (req, res) => {
   if (!isMatch) {
     throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
   }
-  const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret && process.env.NODE_ENV === 'production') {
+    throw new Error("JWT_SECRET is missing in production environment");
+  }
+
+  const token = jwt.sign({ id: admin._id, role: 'admin' }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
   
   res.cookie('adminToken', token, {
     httpOnly: true,
@@ -36,16 +41,26 @@ const register = asyncHandler(async (req, res) => {
   if (!username || !email || !password) {
     throw new AppError("Vui lòng nhập đầy đủ thông tin", 400);
   }
-  const existingUser = await User.findOne({ email });
+  const emailStr = String(email);
+  const existingUser = await User.findOne({ email: emailStr });
   if (existingUser) {
     throw new AppError("Email đã được sử dụng", 400);
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const newUser = new User({ username, email, password: hashedPassword });
+  const newUser = new User({ 
+    username: String(username), 
+    email: emailStr, 
+    password: hashedPassword 
+  });
   await newUser.save();
   
-  const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret && process.env.NODE_ENV === 'production') {
+    throw new Error("JWT_SECRET is missing in production environment");
+  }
+
+  const token = jwt.sign({ id: newUser._id, role: newUser.role }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
   
   res.cookie('token', token, {
     httpOnly: true,
@@ -62,7 +77,7 @@ const login = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new AppError("Vui lòng nhập đầy đủ thông tin", 400);
   }
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: String(email) });
   if (!user) {
     throw new AppError("Sai email hoặc mật khẩu", 401);
   }
@@ -71,7 +86,12 @@ const login = asyncHandler(async (req, res) => {
     throw new AppError("Sai email hoặc mật khẩu", 401);
   }
   
-  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '7d' });
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret && process.env.NODE_ENV === 'production') {
+    throw new Error("JWT_SECRET is missing in production environment");
+  }
+
+  const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
   
   res.cookie('token', token, {
     httpOnly: true,
@@ -107,7 +127,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     throw new AppError("Vui lòng nhập email", 400);
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: String(email) });
   if (!user) {
     // Don't reveal whether email exists — always return success
     return res.json({ message: "Nếu email tồn tại, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu." });
@@ -150,7 +170,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
   const user = await User.findOne({
-    resetPasswordToken: hashedToken,
+    resetPasswordToken: String(hashedToken),
     resetPasswordExpires: { $gt: Date.now() }
   });
 

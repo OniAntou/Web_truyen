@@ -16,10 +16,11 @@ const getGenres = asyncHandler(async (req, res) => {
 
   let comics = [];
   if (genre) {
+    const genreStr = String(genre);
     const genreDoc = await Genre.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${genre}$`, 'i') } },
-        { slug: genre.toLowerCase() }
+        { name: { $regex: new RegExp(`^${genreStr}$`, 'i') } },
+        { slug: genreStr.toLowerCase() }
       ]
     });
 

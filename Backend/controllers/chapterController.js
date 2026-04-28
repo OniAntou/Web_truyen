@@ -115,7 +115,7 @@ const createChapter = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền tạo chương mới.", 403);
   }
   const { comic_id } = req.body;
-  const comic = await Comic.findById(comic_id);
+  const comic = await Comic.findById(String(comic_id));
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   if (req.user.role === 'creator' && comic.uploader_id.toString() !== req.user.id) {

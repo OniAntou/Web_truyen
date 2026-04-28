@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const { resetWeeklyViews } = require('./cron/cronJobs');
 const ensureDbConnection = require('./middleware/ensureDbConnection');
+const { csrfProtection, mongoSanitize } = require('./middleware/security');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -37,6 +38,8 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
+app.use(mongoSanitize);
+app.use(csrfProtection);
 
 if (process.env.TRUST_PROXY) {
   const trustProxyValue = Number(process.env.TRUST_PROXY);

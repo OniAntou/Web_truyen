@@ -56,7 +56,7 @@ const vnpayReturn = asyncHandler(async (req, res) => {
   const responseCode = vnp_Params["vnp_ResponseCode"];
   const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
 
-  const payment = await Payment.findOne({ order_id: orderId });
+  const payment = await Payment.findOne({ order_id: String(orderId) });
   if (!payment) {
     return res.status(200).json({ success: false, message: "Order not found" });
   }
@@ -101,7 +101,7 @@ const vnpayIpn = asyncHandler(async (req, res) => {
   const responseCode = vnp_Params["vnp_ResponseCode"];
   const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
 
-  const payment = await Payment.findOne({ order_id: orderId });
+  const payment = await Payment.findOne({ order_id: String(orderId) });
   if (!payment) {
     return res.status(200).json({ RspCode: "01", Message: "Order not found" });
   }
