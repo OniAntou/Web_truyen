@@ -22,7 +22,8 @@ async function processGenres(genresInput) {
         genreIds.push(g);
         continue;
       }
-      let genreDoc = await Genre.findOne({ name: { $regex: new RegExp(`^${g}$`, 'i') } });
+      const escapedG = g.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      let genreDoc = await Genre.findOne({ name: { $regex: new RegExp(`^${escapedG}$`, 'i') } });
       if (!genreDoc) {
         const slug = g.toLowerCase()
           .normalize("NFD")

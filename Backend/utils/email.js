@@ -46,7 +46,7 @@ const sendEmail = async ({ to, subject, html }) => {
     console.log(`  Subject: ${subject}`);
     console.log(`  Body:`);
     // Strip HTML tags for console readability
-    const textContent = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    const textContent = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
     console.log(`  ${textContent}`);
     console.log('='.repeat(60) + '\n');
     return { messageId: 'console-dev-mode', accepted: [to] };

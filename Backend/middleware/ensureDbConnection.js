@@ -9,7 +9,7 @@ const ensureDbConnection = async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    console.error(`[DB] ${req.method} ${req.originalUrl}`, err);
+    console.error('[DB] %s %s', req.method, req.originalUrl, err);
     res.status(503).json({
       message: "Khong the ket noi co so du lieu luc nay. Vui long thu lai sau.",
     });

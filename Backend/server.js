@@ -68,7 +68,16 @@ app.use(compression()); // Gzip compress all responses
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin image/resource loading (R2, S3)
   crossOriginEmbedderPolicy: false, // Don't block cross-origin embeds
-  contentSecurityPolicy: false, // Disable CSP for API server (frontend handles its own)
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https:", "http:"], // Allow images from R2/S3
+      connectSrc: ["'self'", "https:", "http:"],
+    },
+  },
 })); // Secure HTTP headers
 app.use(express.json());
 

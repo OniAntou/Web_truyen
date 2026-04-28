@@ -10,17 +10,18 @@ const getAllComments = asyncHandler(async (req, res) => {
 
   // Search by comment content
   if (search) {
-    filter.content = { $regex: search, $options: 'i' };
+    const escapedSearch = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.content = { $regex: escapedSearch, $options: 'i' };
   }
 
   // Filter by comic
   if (comicId) {
-    filter.comic_id = comicId;
+    filter.comic_id = String(comicId);
   }
 
   // Filter by user
   if (userId) {
-    filter.user_id = userId;
+    filter.user_id = String(userId);
   }
 
   const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -56,7 +57,7 @@ const getComicsForFilter = asyncHandler(async (req, res) => {
 
 // DELETE /api/admin/comments/:id - Delete single comment + cascade replies
 const deleteComment = asyncHandler(async (req, res) => {
-  const comment = await Comment.findById(req.params.id);
+  const comment = await Comment.findById(String(req.params.id));
   if (!comment) throw new AppError("Bình luận không tồn tại", 404);
 
   // Delete the comment itself

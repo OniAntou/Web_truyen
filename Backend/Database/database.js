@@ -26,7 +26,7 @@ async function connectDB() {
 
   try {
     await globalMongoose.promise;
-    const isAtlas = dbURI.includes("mongodb.net");
+    const isAtlas = /\.mongodb\.net($|[:\/])/.test(dbURI);
     if (globalMongoose.loggedUri !== dbURI) {
       console.log(`Connected to MongoDB: ${isAtlas ? "MongoDB Atlas" : "Localhost"}`);
       if (isAtlas) {
