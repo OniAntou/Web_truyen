@@ -79,9 +79,11 @@ const bulkDeleteComments = asyncHandler(async (req, res) => {
     throw new AppError("Danh sách ID không hợp lệ", 400);
   }
 
+  const safeIds = ids.map(id => String(id));
+
   // Also cascade delete replies for each comment
-  const cascadeResult = await Comment.deleteMany({ parent_id: { $in: ids } });
-  const mainResult = await Comment.deleteMany({ _id: { $in: ids } });
+  const cascadeResult = await Comment.deleteMany({ parent_id: { $in: safeIds } });
+  const mainResult = await Comment.deleteMany({ _id: { $in: safeIds } });
 
   res.json({
     message: `Đã xoá ${mainResult.deletedCount} bình luận`,

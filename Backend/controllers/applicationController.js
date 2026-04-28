@@ -33,7 +33,7 @@ const updateApplicationStatus = asyncHandler(async (req, res) => {
     throw new AppError("Trạng thái không hợp lệ", 400);
   }
   
-  const appDoc = await Application.findById(req.params.id);
+  const appDoc = await Application.findById(String(req.params.id));
   if (!appDoc) {
     throw new AppError("Không tìm thấy đơn", 404);
   }
@@ -49,12 +49,12 @@ const updateApplicationStatus = asyncHandler(async (req, res) => {
 });
 
 const deleteApplication = asyncHandler(async (req, res) => {
-  const appDoc = await Application.findById(req.params.id);
+  const appDoc = await Application.findById(String(req.params.id));
   if (!appDoc) {
     throw new AppError("Không tìm thấy đơn", 404);
   }
   
-  await Application.findByIdAndDelete(req.params.id);
+  await Application.findByIdAndDelete(String(req.params.id));
   res.json({ message: "Đã xóa đơn ứng tuyển thành công" });
 });
 

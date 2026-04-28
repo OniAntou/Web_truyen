@@ -88,13 +88,13 @@ const createGenre = asyncHandler(async (req, res) => {
 });
 
 const updateGenre = asyncHandler(async (req, res) => {
-  const genre = await Genre.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const genre = await Genre.findByIdAndUpdate(String(req.params.id), req.body, { new: true });
   if (!genre) throw new AppError('Genre không tồn tại', 404);
   res.json(genre);
 });
 
 const deleteGenre = asyncHandler(async (req, res) => {
-  const genre = await Genre.findByIdAndDelete(req.params.id);
+  const genre = await Genre.findByIdAndDelete(String(req.params.id));
   if (!genre) throw new AppError('Genre không tồn tại', 404);
   res.json({ message: 'Đã xoá genre thành công' });
 });

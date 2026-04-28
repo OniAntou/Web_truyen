@@ -7,8 +7,9 @@ const apiCache = require('../utils/cache');
 
 // Helper: find comic by ObjectId or legacy numeric id
 const findComic = async (id) => {
-  if (id.match(/^[0-9a-fA-F]{24}$/)) return Comic.findById(id);
-  return Comic.findOne({ id: parseInt(id) });
+  const idStr = String(id);
+  if (idStr.match(/^[0-9a-fA-F]{24}$/)) return Comic.findById(idStr);
+  return Comic.findOne({ id: parseInt(idStr) });
 };
 
 // Ratings

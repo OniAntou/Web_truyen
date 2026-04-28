@@ -51,7 +51,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 // GET /api/admin/users/:id - Get single user details
 const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password').lean();
+  const user = await User.findById(String(req.params.id)).select('-password').lean();
   if (!user) throw new AppError("User không tồn tại", 404);
 
   // Get additional stats
@@ -78,7 +78,7 @@ const getUserById = asyncHandler(async (req, res) => {
 
 // PUT /api/admin/users/:id - Update user (role, VIP, coins)
 const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(String(req.params.id));
   if (!user) throw new AppError("User không tồn tại", 404);
 
   const { role, is_vip, coins, vip_expiry } = req.body;
@@ -120,7 +120,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
 // DELETE /api/admin/users/:id - Delete user with full cleanup
 const adminDeleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(String(req.params.id));
   if (!user) throw new AppError("User không tồn tại", 404);
 
   // Prevent deleting admin accounts

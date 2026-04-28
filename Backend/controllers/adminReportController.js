@@ -73,7 +73,7 @@ const updateReportStatus = asyncHandler(async (req, res) => {
 
 // DELETE /api/admin/reports/:id - Delete a report
 const deleteReport = asyncHandler(async (req, res) => {
-    const report = await Report.findByIdAndDelete(req.params.id);
+    const report = await Report.findByIdAndDelete(String(req.params.id));
 
     if (!report) {
         throw new AppError('Không tìm thấy báo cáo', 404);
