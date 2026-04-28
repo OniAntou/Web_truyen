@@ -33,7 +33,7 @@ const ComicEditor = () => {
             // If data.cover_url is a full R2 url (or resolved one), show it
             if (data.cover_url) {
                 const safeUrl = data.cover_url.trim();
-                if (!safeUrl.toLowerCase().startsWith('javascript:')) {
+                if (!/^\s*javascript:/i.test(safeUrl)) {
                     setPreviewUrl(safeUrl);
                 }
             }

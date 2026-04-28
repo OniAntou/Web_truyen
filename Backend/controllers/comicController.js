@@ -16,10 +16,11 @@ const getLatestComics = asyncHandler(async (req, res) => {
 
   let filter = {};
   if (genre) {
+    const escapedGenre = String(genre).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const genreDoc = await Genre.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${genre}$`, 'i') } },
-        { slug: genre.toLowerCase() }
+        { name: { $regex: new RegExp(`^${escapedGenre}$`, 'i') } },
+        { slug: String(genre).toLowerCase() }
       ]
     });
     if (genreDoc) {
@@ -76,10 +77,11 @@ const getPopularComics = asyncHandler(async (req, res) => {
 
   let filter = {};
   if (genre) {
+    const escapedGenre = String(genre).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const genreDoc = await Genre.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${genre}$`, 'i') } },
-        { slug: genre.toLowerCase() }
+        { name: { $regex: new RegExp(`^${escapedGenre}$`, 'i') } },
+        { slug: String(genre).toLowerCase() }
       ]
     });
     if (genreDoc) {
@@ -139,23 +141,25 @@ const getAllComics = asyncHandler(async (req, res) => {
   let filter = {};
 
   if (q) {
+    const escapedQ = String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // Find matching genres first to include in search
     const matchingGenres = await Genre.find({ 
-      name: { $regex: q, $options: "i" } 
+      name: { $regex: escapedQ, $options: "i" } 
     }).select('_id');
     const genreIds = matchingGenres.map(g => g._id);
 
     filter.$or = [
-      { title: { $regex: q, $options: "i" } },
+      { title: { $regex: escapedQ, $options: "i" } },
       { genres: { $in: genreIds } }
     ];
   }
 
   if (genre) {
+    const escapedGenre = String(genre).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const genreDoc = await Genre.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${genre}$`, 'i') } },
-        { slug: genre.toLowerCase() }
+        { name: { $regex: new RegExp(`^${escapedGenre}$`, 'i') } },
+        { slug: String(genre).toLowerCase() }
       ]
     });
     if (genreDoc) {
