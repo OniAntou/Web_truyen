@@ -7,8 +7,8 @@ const getAllReports = asyncHandler(async (req, res) => {
     const { status, type, page = 1, limit = 20 } = req.query;
 
     const filter = {};
-    if (status) filter.status = status;
-    if (type) filter.target_type = type;
+    if (status) filter.status = String(status);
+    if (type) filter.target_type = String(type);
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
@@ -55,7 +55,7 @@ const updateReportStatus = asyncHandler(async (req, res) => {
     }
 
     const report = await Report.findByIdAndUpdate(
-        req.params.id,
+        String(req.params.id),
         { status },
         { new: true, runValidators: true }
     );

@@ -17,9 +17,10 @@ const getGenres = asyncHandler(async (req, res) => {
   let comics = [];
   if (genre) {
     const genreStr = String(genre);
+    const escapedGenre = genreStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const genreDoc = await Genre.findOne({
       $or: [
-        { name: { $regex: new RegExp(`^${genreStr}$`, 'i') } },
+        { name: { $regex: new RegExp(`^${escapedGenre}$`, 'i') } },
         { slug: genreStr.toLowerCase() }
       ]
     });

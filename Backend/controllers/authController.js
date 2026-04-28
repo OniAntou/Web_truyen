@@ -20,11 +20,11 @@ const adminLogin = asyncHandler(async (req, res) => {
     throw new AppError("Sai tên đăng nhập hoặc mật khẩu", 401);
   }
   const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret && process.env.NODE_ENV === 'production') {
-    throw new Error("JWT_SECRET is missing in production environment");
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is missing. Please set it in your .env file.");
   }
 
-  const token = jwt.sign({ id: admin._id, role: 'admin' }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
+  const token = jwt.sign({ id: admin._id, role: 'admin' }, jwtSecret, { expiresIn: '7d' });
   
   res.cookie('adminToken', token, {
     httpOnly: true,
@@ -56,11 +56,11 @@ const register = asyncHandler(async (req, res) => {
   await newUser.save();
   
   const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret && process.env.NODE_ENV === 'production') {
-    throw new Error("JWT_SECRET is missing in production environment");
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is missing. Please set it in your .env file.");
   }
 
-  const token = jwt.sign({ id: newUser._id, role: newUser.role }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
+  const token = jwt.sign({ id: newUser._id, role: newUser.role }, jwtSecret, { expiresIn: '7d' });
   
   res.cookie('token', token, {
     httpOnly: true,
@@ -87,11 +87,11 @@ const login = asyncHandler(async (req, res) => {
   }
   
   const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret && process.env.NODE_ENV === 'production') {
-    throw new Error("JWT_SECRET is missing in production environment");
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is missing. Please set it in your .env file.");
   }
 
-  const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret || 'dev_secret_key', { expiresIn: '7d' });
+  const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, { expiresIn: '7d' });
   
   res.cookie('token', token, {
     httpOnly: true,

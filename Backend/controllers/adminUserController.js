@@ -10,9 +10,10 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
   // Search by username or email
   if (search) {
+    const escapedSearch = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { username: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } }
+      { username: { $regex: escapedSearch, $options: 'i' } },
+      { email: { $regex: escapedSearch, $options: 'i' } }
     ];
   }
 
@@ -26,7 +27,8 @@ const getAllUsers = asyncHandler(async (req, res) => {
   if (vip === 'false') filter.is_vip = false;
 
   // Sorting
-  const sortField = sort || 'created_at';
+  const allowedSortFields = ['created_at', 'username', 'email', 'role', 'coins', 'is_vip'];
+  const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
   const sortOrder = order === 'asc' ? 1 : -1;
 
   const skip = (parseInt(page) - 1) * parseInt(limit);
