@@ -77,7 +77,7 @@ const GenresPage: React.FC = () => {
         setLoading(true);
         try {
             const data = await comicService.getGenres();
-            const fetchedGenres = data || [];
+            const fetchedGenres = data?.genres || [];
             setGenres(fetchedGenres);
             
             // Set default if not in URL
@@ -103,9 +103,9 @@ const GenresPage: React.FC = () => {
         }
     };
 
-    const filteredGenres = genres.filter(g =>
+    const filteredGenres = Array.isArray(genres) ? genres.filter(g =>
         g.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ) : [];
 
     const handleGenreClick = (genreName: string) => {
         if (selectedGenre === genreName) {

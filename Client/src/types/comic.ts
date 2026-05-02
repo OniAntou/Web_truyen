@@ -2,6 +2,9 @@ export interface Genre {
     _id?: string;
     id?: string;
     name: string;
+    slug?: string;
+    description?: string;
+    count?: number;
 }
 
 export interface Chapter {

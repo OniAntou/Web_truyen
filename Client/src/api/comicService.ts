@@ -45,7 +45,7 @@ export const comicService = {
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;
         return apiClient<ComicsResponse>(endpoint);
     },
-    getGenres: () => apiClient<Genre[]>('/genres'),
+    getGenres: () => apiClient<{ genres: Genre[]; comics: Comic[] }>('/genres'),
     updateView: (id: string) => apiClient<{ success: boolean }>(`/comics/${id}/view`, {
         method: 'POST'
     }),
