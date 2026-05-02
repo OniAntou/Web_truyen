@@ -12,7 +12,7 @@ const getLatestComics = asyncHandler(async (req, res) => {
   
   // Try to get from cache
   const cacheKey = `latest_${genre || 'all'}_${page}_${limit}`;
-  const cachedData = apiCache.get(cacheKey);
+  const cachedData = await apiCache.get(cacheKey);
   if (cachedData) return res.json(cachedData);
 
   let filter: any = {};
@@ -61,7 +61,7 @@ const getLatestComics = asyncHandler(async (req, res) => {
   };
 
   // Cache for 5 minutes in memory
-  apiCache.set(cacheKey, responseData);
+  await apiCache.set(cacheKey, responseData);
 
   // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
@@ -73,7 +73,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
 
   // Try to get from cache
   const cacheKey = `popular_${genre || 'all'}_${sort}_${limit || 'none'}`;
-  const cachedData = apiCache.get(cacheKey);
+  const cachedData = await apiCache.get(cacheKey);
   if (cachedData) return res.json(cachedData);
 
   let filter: any = {};
@@ -121,7 +121,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
   const responseData = { comics: results, genres: allGenres };
   
   // Cache for 5 minutes in memory
-  if (cacheKey) apiCache.set(cacheKey, responseData);
+  if (cacheKey) await apiCache.set(cacheKey, responseData);
 
   // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
@@ -133,7 +133,7 @@ const getAllComics = asyncHandler(async (req, res) => {
   
   // Try to get from cache
   const cacheKey = `search_${q || 'all'}_${genre || 'all'}`;
-  const cachedData = apiCache.get(cacheKey);
+  const cachedData = await apiCache.get(cacheKey);
   if (cachedData) {
     res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=300');
     return res.json(cachedData);
@@ -186,7 +186,7 @@ const getAllComics = asyncHandler(async (req, res) => {
   const responseData = { comics: results };
   
   // Cache for 2 minutes in memory
-  apiCache.set(cacheKey, responseData, 2 * 60 * 1000);
+  await apiCache.set(cacheKey, responseData, 2 * 60 * 1000);
 
   // Vercel Edge Cache: 30s fresh, 5m stale-while-revalidate
   res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=300');
@@ -198,7 +198,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
 
   // Try to get from cache
   const cacheKey = `trending_${limit}`;
-  const cachedData = apiCache.get(cacheKey);
+  const cachedData = await apiCache.get(cacheKey);
   if (cachedData) return res.json(cachedData);
 
   let comics = await Comic.find({})
@@ -219,7 +219,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
   );
 
   const responseData = { comics: results };
-  apiCache.set(cacheKey, responseData);
+  await apiCache.set(cacheKey, responseData);
 
   // Vercel Edge Cache: 10s fresh, 24h stale-while-revalidate
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
@@ -231,7 +231,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
  */
 const getHomeData = asyncHandler(async (req, res) => {
   const cacheKey = 'homepage_all_v2';
-  const cachedData = apiCache.get(cacheKey);
+  const cachedData = await apiCache.get(cacheKey);
   if (cachedData) return res.json(cachedData);
 
   const [popularResult, latestResult, trendingResult, genres] = await Promise.all([
@@ -248,7 +248,7 @@ const getHomeData = asyncHandler(async (req, res) => {
   ]);
 
   const responseData = { popular, latest, trending, genres };
-  apiCache.set(cacheKey, responseData, 300); // 5 minutes cache
+  await apiCache.set(cacheKey, responseData, 300); // 5 minutes cache
 
   // Vercel Edge Cache: 10s fresh. max-age=0 forces browser to always revalidate with the server/CDN.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=86400');
@@ -261,7 +261,7 @@ const getComicById = asyncHandler(async (req, res) => {
   const publicCacheKey = `detail_public_${id}`;
 
   if (isPublicRequest) {
-    const cached = apiCache.get(publicCacheKey);
+    const cached = await apiCache.get(publicCacheKey);
     if (cached) {
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
       return res.json(cached);
@@ -336,7 +336,7 @@ const getComicById = asyncHandler(async (req, res) => {
   };
 
   if (isPublicRequest) {
-    apiCache.set(publicCacheKey, out);
+    await apiCache.set(publicCacheKey, out);
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   }
 
@@ -352,7 +352,7 @@ const getReaderData = asyncHandler(async (req, res) => {
   const publicCacheKey = `reader_public_${id}_${chapterId}`;
 
   if (isPublicRequest) {
-    const cached = apiCache.get(publicCacheKey);
+    const cached = await apiCache.get(publicCacheKey);
     if (cached) {
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
       return res.json(cached);
@@ -425,7 +425,7 @@ const getReaderData = asyncHandler(async (req, res) => {
   };
 
   if (isPublicRequest) {
-    apiCache.set(publicCacheKey, payload);
+    await apiCache.set(publicCacheKey, payload);
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
   }
 
@@ -454,10 +454,10 @@ const createComic = asyncHandler(async (req, res) => {
   await newComic.save();
 
   // Selective cache flush
-  apiCache.flush('latest');
-  apiCache.flush('trending');
-  apiCache.flush('popular');
-  apiCache.flush('homepage');
+  await apiCache.flush('latest');
+  await apiCache.flush('trending');
+  await apiCache.flush('popular');
+  await apiCache.flush('homepage');
 
   res.status(201).json(newComic);
 });
@@ -497,11 +497,11 @@ const updateComic = asyncHandler(async (req, res) => {
   if (!comic) throw new AppError("Comic not found", 404);
   
   // Selective cache flush
-  apiCache.flush('latest');
-  apiCache.flush('popular');
-  apiCache.flush('trending');
-  apiCache.flush('homepage');
-  apiCache.flush(`detail_${id}`);
+  await apiCache.flush('latest');
+  await apiCache.flush('popular');
+  await apiCache.flush('trending');
+  await apiCache.flush('homepage');
+  await apiCache.flush(`detail_${id}`);
   
   res.json(comic);
 });
@@ -552,11 +552,11 @@ const deleteComic = asyncHandler(async (req, res) => {
   await Favorite.deleteMany({ comic_id: comic._id });
   
   // Selective cache flush
-  apiCache.flush('latest');
-  apiCache.flush('popular');
-  apiCache.flush('trending');
-  apiCache.flush('homepage');
-  apiCache.flush(`detail_${id}`);
+  await apiCache.flush('latest');
+  await apiCache.flush('popular');
+  await apiCache.flush('trending');
+  await apiCache.flush('homepage');
+  await apiCache.flush(`detail_${id}`);
   
   res.json({ message: "Comic deleted successfully" });
 });

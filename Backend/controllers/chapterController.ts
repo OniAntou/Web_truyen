@@ -132,7 +132,7 @@ const createChapter = asyncHandler(async (req, res) => {
   }
 
   // Clear cache after adding new chapter
-  apiCache.flush();
+  await apiCache.flush();
   
   res.status(201).json(newChapter);
 });
@@ -166,9 +166,9 @@ const deleteChapter = asyncHandler(async (req, res) => {
   await Upload.deleteMany({ chapter_id: chapterId });
 
   // Surgical cache flush
-  apiCache.flush('detail'); // Flush comic detail pages
-  apiCache.flush('latest');
-  apiCache.flush('homepage');
+  await apiCache.flush('detail'); // Flush comic detail pages
+  await apiCache.flush('latest');
+  await apiCache.flush('homepage');
 
   res.json({ message: "Chapter and its pages deleted" });
 });
@@ -216,7 +216,7 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
   }
 
   // Clear cache after bulk deletion
-  apiCache.flush();
+  await apiCache.flush();
 
   res.json({ message: 'Chapters and their pages deleted', count: result.deletedCount });
 });
@@ -250,7 +250,7 @@ const deletePage = asyncHandler(async (req, res) => {
   );
 
   // Clear cache after deleting page
-  apiCache.flush();
+  await apiCache.flush();
 
   res.json({ message: "Page deleted successfully" });
 });
