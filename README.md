@@ -1,9 +1,10 @@
 <div align="center">
   <h1>📖 ComicVerse</h1>
-  <p><strong>A High-Performance, Scalable Web Comic Platform</strong></p>
+  <p><strong>A Professional, Type-Safe, and Secure Web Comic Platform</strong></p>
 </div>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
   <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
@@ -16,110 +17,104 @@
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Architecture & Tech Stack](#-architecture--tech-stack)
+- [Security & Performance](#-security--performance)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
 - [License](#-license)
 
 ## 🌟 Overview
-ComicVerse is a modern, full-stack web application designed to provide a seamless reading experience for comic enthusiasts while offering a robust monetization and management platform for creators and administrators. Engineered with performance in mind, the platform utilizes cutting-edge caching, intelligent prefetching, and optimized media delivery.
+ComicVerse is a high-performance, full-stack web application designed for a premium comic reading experience. Recently migrated to a **100% TypeScript** architecture, the platform ensures robust type safety and maintainability. It features a state-of-the-art UI with glassmorphic aesthetics, intelligent data fetching, and an enterprise-grade security infrastructure.
 
 ## 🚀 Key Features
 
 ### 📖 For Readers (End-Users)
-- **Zero-Latency Reading:** Implements intelligent prefetching via `React Query` and lazy loading for high-resolution images, ensuring a buffer-free experience.
-- **Dynamic UI/UX:** Features a sleek, responsive design with global Dark/Light mode management powered by `Zustand`. Includes polished skeleton screens for optimal perceived performance.
-- **Personalized Library:** Automated reading history tracking, bookmarks, favorites, and interactive comment sections.
-- **Secure Payments:** Integrated with the **MoMo Payment Gateway** for automated coin top-ups, premium chapter unlocking, and VIP subscriptions.
+- **Fluid Reading Experience:** Intelligent prefetching via `@tanstack/react-query` and optimized image delivery from Cloudflare R2.
+- **Premium Aesthetics:** Sleek, modern design with custom CSS animations, dark mode, and responsive layouts.
+- **Interactive Community:** Robust comment sections with nested replies and real-time interaction.
+- **Monetization & VIP:** Automated MoMo Payment Gateway integration for coin top-ups and chapter unlocking.
 
 ### 🎨 For Creators
-- **Creator Studio:** A dedicated dashboard for authors to publish comics, manage chapters, and monitor real-time engagement analytics.
-- **Monetization Engine:** Flexibility to set custom pricing (Coins) for Early Access or Premium chapters, creating sustainable revenue streams.
+- **Creator Studio:** A professional dashboard for publishing, managing chapters, and analyzing reader engagement.
+- **Monetization Control:** Dynamic pricing models for premium and early-access content.
 
 ### 🛡️ For Administrators
-- **Centralized Dashboard:** Comprehensive management of users, comic content, financial transactions, and creator applications.
-- **Analytics & Insights:** Visualized data representations for platform growth, revenue metrics, and user activity.
+- **Enterprise Dashboard:** Full control over users, content verification, and financial auditing.
+- **Real-time Stats:** Visualized growth metrics and revenue reports.
 
 ## 🏗 Architecture & Tech Stack
 
 ### Frontend (Client)
-- **Core:** React.js bootstrapped with Vite for instant server start and lightning-fast HMR.
+- **Language:** TypeScript 6.x.
+- **Core:** React 19 (Vite-powered).
 - **State Management:** 
-  - `Zustand` for lightweight, scalable global UI and Auth states.
-  - `@tanstack/react-query` for robust server-state synchronization, caching, and background data fetching.
-- **Routing:** React Router v6.
-- **Styling:** Custom CSS architectural patterns combined with modern UI components.
+  - `Zustand` for global UI, auth, and preferences.
+  - `@tanstack/react-query` for server-state management and caching.
+- **Form Handling:** `React Hook Form` with `Zod` validation.
+- **Styling:** Vanilla CSS with modern architectural patterns.
 
 ### Backend (Server)
-- **Core:** Node.js & Express.js RESTful API.
-- **Database:** MongoDB configured with Mongoose ODM and optimized indexing.
-- **Media Storage:** Cloudflare R2 Object Storage for highly available, cost-effective image hosting.
-- **Performance Optimization:** 
-  - On-the-fly image optimization and WebP conversion using `Sharp`.
-  - In-memory data caching for high-traffic endpoints.
-- **Security:** JWT-based authentication, password hashing, and CORS protection.
+- **Language:** TypeScript (TSX for development).
+- **Core:** Node.js & Express 5.x.
+- **Database:** MongoDB with Mongoose (Strict Typing).
+- **Storage:** Cloudflare R2 (S3-compatible).
+
+## 🛡️ Security & Performance
+
+- **Full-Stack Type Safety:** Eliminates entire classes of runtime bugs through strict TypeScript enforcement.
+- **Security Hardening:**
+  - **Helmet.js:** Enterprise-standard security headers.
+  - **Rate Limiting:** Tiered request throttling to prevent abuse and brute-force attacks.
+  - **Injection Prevention:** Global NoSQL injection mitigation and input sanitization.
+  - **CSRF Protection:** Robust header-based validation for state-changing requests.
+- **Performance:** 
+  - **Sharp:** Dynamic image resizing and WebP conversion.
+  - **Compression:** Gzip/Brotli compression for API responses.
+  - **Caching:** Optimized database indexing and memory-efficient data structures.
 
 ## 💻 Getting Started
 
 ### Prerequisites
-- Node.js (v16.x or higher)
-- MongoDB instance (Local or Atlas)
-- Cloudflare R2 Account (for image storage)
-- MoMo Business Account (for payment gateway testing)
+- Node.js (v20+ recommended)
+- MongoDB
+- Cloudflare R2 (or S3-compatible storage)
 
 ### Installation
 
-**1. Clone the repository & Install Backend Dependencies**
+**1. Clone & Setup Backend**
 ```bash
-cd Web_truyen/Backend
+cd Backend
 npm install
-```
-
-**2. Configure Environment Variables**
-Create a `.env` file in the `Backend` directory:
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_jwt_secret
-R2_ACCESS_KEY_ID=your_cloudflare_r2_access_key
-R2_SECRET_ACCESS_KEY=your_cloudflare_r2_secret_key
-R2_ENDPOINT=your_cloudflare_r2_endpoint
-R2_BUCKET_NAME=your_bucket_name
-MOMO_PARTNER_CODE=your_momo_partner_code
-MOMO_ACCESS_KEY=your_momo_access_key
-MOMO_SECRET_KEY=your_momo_secret_key
-```
-
-**3. Start the Backend Server**
-```bash
+cp .env.example .env
+# Configure your .env variables
 npm run dev
 ```
 
-**4. Install & Start Frontend**
-Open a new terminal instance:
+**2. Setup Client**
 ```bash
-cd Web_truyen/Client
+cd Client
 npm install
 npm run dev
 ```
-The application will be available at `http://localhost:5173`.
 
 ## 📂 Project Structure
 
 ```text
 Web_truyen/
-├── Backend/                 # Server-side logic, API definitions, and Database schemas
-│   ├── controllers/         # Business logic handlers (Comic, User, Payment, etc.)
-│   ├── models/              # MongoDB Mongoose schemas
-│   ├── routes/              # Express API route definitions
-│   └── utils/               # Utilities (Cloudflare R2 integration, Sharp, Caching)
-└── Client/                  # Client-side React application
+├── Backend/                 # Full TypeScript Backend
+│   ├── controllers/         # Business logic (TS)
+│   ├── Database/            # Database configuration & Schemas (TS)
+│   ├── middleware/          # Security & Auth middleware (TS)
+│   ├── routes/              # API route definitions (TS)
+│   ├── utils/               # Helpers & Integrations (TS)
+│   └── server.ts            # Entry point
+└── Client/                  # Vite + React + TypeScript Client
     ├── src/
-    │   ├── api/             # Axios/Fetch API clients and service wrappers
-    │   ├── components/      # Reusable UI components (Navbar, Reader, Skeletons)
-    │   ├── pages/           # Application views (Home, ReadPage, Admin Dashboard)
-    │   ├── store/           # Zustand state management
-    │   └── utils/           # Frontend helper functions (Formatting, Auth checks)
-    └── index.html           # Vite entry point
+    │   ├── api/             # Typed API services
+    │   ├── components/      # Reusable UI components (TSX)
+    │   ├── pages/           # Application views (TSX)
+    │   ├── store/           # Zustand stores
+    │   ├── types/           # Global type definitions
+    │   └── main.tsx         # Entry point
 ```
 
 ## 📄 License
