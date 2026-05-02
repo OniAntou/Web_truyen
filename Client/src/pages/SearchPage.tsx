@@ -1,0 +1,45 @@
+import { useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import Navbar from '../components/Layout/Navbar';
+import Footer from '../components/Layout/Footer';
+import ComicGrid from '../components/Home/ComicGrid';
+import { comicService, ComicsResponse } from '../api/comicService';
+
+const SearchPage: React.FC = () => {
+    const [searchParams] = useSearchParams();
+    const query = searchParams.get('q');
+
+    const { data, isLoading: loading } = useQuery<ComicsResponse>({
+        queryKey: ['search', query],
+        queryFn: () => comicService.getAll(query || undefined),
+        enabled: !!query,
+    });
+
+    const comics = data?.comics || [];
+
+    return (
+        <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+            <Navbar />
+            <div style={{ paddingTop: '80px', minHeight: '60vh' }}>
+                <div className="container">
+                    <h2 className="section-title" style={{ marginTop: '2rem' }}>
+                        Kết quả tìm kiếm cho "{query}"
+                    </h2>
+                    
+                    {loading ? (
+                        <div style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>Đang tìm kiếm...</div>
+                    ) : comics.length > 0 ? (
+                        <ComicGrid title="" comics={comics} />
+                    ) : (
+                        <div style={{ color: 'gray', textAlign: 'center', padding: '4rem' }}>
+                            Không tìm thấy truyện nào phù hợp với tìm kiếm của bạn.
+                        </div>
+                    )}
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+};
+
+export default SearchPage;
