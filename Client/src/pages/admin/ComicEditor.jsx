@@ -1,6 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../../constants/api';
+
+/**
+ * Sanitize a URL to only allow safe protocols (http, https, blob).
+ * Returns empty string for any unsafe input, preventing XSS via javascript: URIs.
+ */
+function sanitizeImageUrl(url) {
+    if (typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (trimmed === '') return '';
+    // Only allow http:, https:, and blob: protocols
+    try {
+        const parsed = new URL(trimmed, window.location.origin);
+        if (['http:', 'https:', 'blob:'].includes(parsed.protocol)) {
+            return parsed.href;
+        }
+    } catch {
+        // Relative URLs are safe in img src context
+        if (/^\/[^/]/.test(trimmed)) return trimmed;
+    }
+    return '';
+}
 
 const ComicEditor = () => {
     const { id } = useParams();
@@ -32,8 +53,8 @@ const ComicEditor = () => {
             // Display existing cover if available
             // If data.cover_url is a full R2 url (or resolved one), show it
             if (data.cover_url) {
-                const safeUrl = data.cover_url.trim();
-                if (!/^\s*javascript:/i.test(safeUrl)) {
+                const safeUrl = sanitizeImageUrl(data.cover_url);
+                if (safeUrl) {
                     setPreviewUrl(safeUrl);
                 }
             }
@@ -199,16 +220,12 @@ const ComicEditor = () => {
                 <div>
                     <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
                     <div className="flex flex-col space-y-4">
-                        {/* Preview */}
-                        {(() => {
-                            // Sanitize URL: only allow safe protocols
-                            const isSafeUrl = /^(https?:|blob:)/i.test(previewUrl);
-                            return isSafeUrl ? (
-                                <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
-                                    <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
-                                </div>
-                            ) : null;
-                        })()}
+                        {/* Preview — previewUrl is pre-sanitized via sanitizeImageUrl() */}
+                        {previewUrl && (
+                            <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
+                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
+                            </div>
+                        )}
 
                         <input
                             type="file"
