@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminUserController = require('../controllers/adminUserController');
 const authenticateToken = require('../middleware/auth');
+const { adminLimiter } = require('../middleware/rateLimiter');
 
 // All routes require admin authentication
 // The authenticateToken middleware verifies the JWT; the admin check is
@@ -13,9 +14,12 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
+router.use(adminLimiter);
+
 router.get('/', authenticateToken, requireAdmin, adminUserController.getAllUsers);
 router.get('/:id', authenticateToken, requireAdmin, adminUserController.getUserById);
 router.put('/:id', authenticateToken, requireAdmin, adminUserController.updateUser);
 router.delete('/:id', authenticateToken, requireAdmin, adminUserController.adminDeleteUser);
 
 module.exports = router;
+

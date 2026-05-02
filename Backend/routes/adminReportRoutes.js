@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminReportController = require('../controllers/adminReportController');
 const authenticateToken = require('../middleware/auth');
+const { adminLimiter } = require('../middleware/rateLimiter');
 
 const requireAdmin = (req, res, next) => {
     if (!req.user || req.user.role !== 'admin') {
@@ -12,9 +13,11 @@ const requireAdmin = (req, res, next) => {
 
 router.use(authenticateToken);
 router.use(requireAdmin);
+router.use(adminLimiter);
 
 router.get('/', adminReportController.getAllReports);
 router.patch('/:id/status', adminReportController.updateReportStatus);
 router.delete('/:id', adminReportController.deleteReport);
 
 module.exports = router;
+

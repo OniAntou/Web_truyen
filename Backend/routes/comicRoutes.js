@@ -3,17 +3,19 @@ const router = express.Router();
 const comicController = require('../controllers/comicController');
 const authenticateToken = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
+const { readLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
-router.get('/latest', comicController.getLatestComics);
-router.get('/popular', comicController.getPopularComics);
-router.get('/trending', comicController.getTrendingComics);
-router.get('/home', comicController.getHomeData);
-router.get('/', comicController.getAllComics);
-router.get('/:id', optionalAuth, comicController.getComicById);
-router.get('/:id/reader/:chapterId', optionalAuth, comicController.getReaderData);
+router.get('/latest', readLimiter, comicController.getLatestComics);
+router.get('/popular', readLimiter, comicController.getPopularComics);
+router.get('/trending', readLimiter, comicController.getTrendingComics);
+router.get('/home', readLimiter, comicController.getHomeData);
+router.get('/', readLimiter, comicController.getAllComics);
+router.get('/:id', readLimiter, optionalAuth, comicController.getComicById);
+router.get('/:id/reader/:chapterId', readLimiter, optionalAuth, comicController.getReaderData);
 
-router.post('/', authenticateToken, comicController.createComic);
-router.put('/:id', authenticateToken, comicController.updateComic);
-router.delete('/:id', authenticateToken, comicController.deleteComic);
+router.post('/', writeLimiter, authenticateToken, comicController.createComic);
+router.put('/:id', writeLimiter, authenticateToken, comicController.updateComic);
+router.delete('/:id', writeLimiter, authenticateToken, comicController.deleteComic);
 
 module.exports = router;
+

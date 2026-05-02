@@ -54,9 +54,11 @@ const updateReportStatus = asyncHandler(async (req, res) => {
         throw new AppError('Trạng thái không hợp lệ', 400);
     }
 
+    const validatedStatus = String(status);
+
     const report = await Report.findByIdAndUpdate(
         String(req.params.id),
-        { status },
+        { $set: { status: validatedStatus } },
         { new: true, runValidators: true }
     );
 

@@ -88,7 +88,16 @@ const createGenre = asyncHandler(async (req, res) => {
 });
 
 const updateGenre = asyncHandler(async (req, res) => {
-  const genre = await Genre.findByIdAndUpdate(String(req.params.id), req.body, { new: true });
+  // Whitelist allowed fields to prevent mass-assignment
+  const allowedFields = ['name', 'slug', 'description'];
+  const updateData = {};
+  for (const key of allowedFields) {
+    if (req.body[key] !== undefined) {
+      updateData[key] = String(req.body[key]);
+    }
+  }
+
+  const genre = await Genre.findByIdAndUpdate(String(req.params.id), updateData, { new: true, runValidators: true });
   if (!genre) throw new AppError('Genre không tồn tại', 404);
   res.json(genre);
 });

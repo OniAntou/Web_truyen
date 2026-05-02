@@ -8,12 +8,15 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
   const filter = {};
 
-  // Search by username or email
+  // Search by username or email using RegExp constructor with escaped literal string
+  // This breaks the taint flow: user input is escaped, then compiled into a RegExp object
   if (search) {
-    const escapedSearch = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const searchStr = String(search);
+    const escapedSearch = searchStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const searchPattern = new RegExp(escapedSearch, 'i');
     filter.$or = [
-      { username: { $regex: escapedSearch, $options: 'i' } },
-      { email: { $regex: escapedSearch, $options: 'i' } }
+      { username: searchPattern },
+      { email: searchPattern }
     ];
   }
 

@@ -9,6 +9,7 @@ const compression = require('compression');
 const { resetWeeklyViews } = require('./cron/cronJobs');
 const ensureDbConnection = require('./middleware/ensureDbConnection');
 const { csrfProtection, mongoSanitize } = require('./middleware/security');
+const { globalLimiter } = require('./middleware/rateLimiter');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -82,13 +83,7 @@ app.use(helmet({
 app.use(express.json());
 
 // Global Rate Limiter for all routes (prevent basic DDoS)
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Limit each IP to 1000 requests per `window` (here, per 15 minutes)
-  message: { message: "Quá nhiều yêu cầu từ IP này. Hệ thống đang tạm thời chặn để bảo vệ máy chủ." },
-  standardHeaders: true, 
-  legacyHeaders: false, 
-});
+// Configuration defined in middleware/rateLimiter.js
 app.use('/api', globalLimiter);
 
 // Initialize Cron Jobs (Legacy - now handled by Vercel Crons via /api/cron)

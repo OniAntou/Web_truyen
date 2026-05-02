@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const genreController = require('../controllers/genreController');
+const { readLimiter, writeLimiter } = require('../middleware/rateLimiter');
 
-router.get('/', genreController.getGenres);
-router.get('/list', genreController.getGenreList);
-router.get('/:idOrSlug', genreController.getGenreByIdOrSlug);
-router.post('/', genreController.createGenre);
-router.put('/:id', genreController.updateGenre);
-router.delete('/:id', genreController.deleteGenre);
+router.get('/', readLimiter, genreController.getGenres);
+router.get('/list', readLimiter, genreController.getGenreList);
+router.get('/:idOrSlug', readLimiter, genreController.getGenreByIdOrSlug);
+router.post('/', writeLimiter, genreController.createGenre);
+router.put('/:id', writeLimiter, genreController.updateGenre);
+router.delete('/:id', writeLimiter, genreController.deleteGenre);
 
 module.exports = router;
+

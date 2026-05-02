@@ -200,11 +200,15 @@ const ComicEditor = () => {
                     <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
                     <div className="flex flex-col space-y-4">
                         {/* Preview */}
-                        {previewUrl && (
-                            <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
-                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
-                            </div>
-                        )}
+                        {(() => {
+                            // Sanitize URL: only allow safe protocols
+                            const isSafeUrl = /^(https?:|blob:)/i.test(previewUrl);
+                            return isSafeUrl ? (
+                                <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
+                                    <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
+                                </div>
+                            ) : null;
+                        })()}
 
                         <input
                             type="file"

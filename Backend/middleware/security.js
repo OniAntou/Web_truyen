@@ -32,11 +32,14 @@ const csrfProtection = (req, res, next) => {
 
   // 3. Require a custom header (Standard technique for modern SPAs)
   // Most CSRF attacks (form submissions) cannot set custom headers
-  if (!req.headers['x-requested-with'] && !req.headers['x-csrf-token']) {
-    // For now, we only warn or require it. 
-    // In a real scenario, the frontend should be updated to send this.
-    // To satisfy the security scanner, we implement the check.
-    // return next(new AppError('CSRF Protection: Missing custom security header', 403));
+  // Allow requests without Origin/Referer (server-to-server, mobile apps, etc.)
+  if (!origin && !referer) {
+    return next();
+  }
+
+  // For browser requests, require a custom header that CSRF attacks cannot set
+  if (!req.headers['x-requested-with'] && !req.headers['x-csrf-token'] && !req.headers['content-type']?.includes('application/json')) {
+    return next(new AppError('CSRF Protection: Missing custom security header', 403));
   }
 
   next();
