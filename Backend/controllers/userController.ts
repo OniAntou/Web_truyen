@@ -1,10 +1,16 @@
 import {  User, ComicView, Comic, Rating, Comment, Favorite, Payment, ChapterUnlock  } from "../Database/database";
+import { resolveR2Url } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 
 const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select('-password');
+  const user = await User.findById(req.user.id).select('-password').lean() as any;
   if (!user) throw new AppError("User không tồn tại", 404);
+  
+  if (user.avatar_url) {
+    user.avatar_url = await resolveR2Url(user.avatar_url);
+  }
+  
   res.json(user);
 });
 
@@ -142,7 +148,13 @@ const updateMe = asyncHandler(async (req, res) => {
   }
 
   await user.save();
-  const { password, ...safeUser } = user.toObject();
+  const safeUser = user.toObject() as any;
+  delete safeUser.password;
+  
+  if (safeUser.avatar_url) {
+    safeUser.avatar_url = await resolveR2Url(safeUser.avatar_url);
+  }
+  
   res.json(safeUser);
 });
 

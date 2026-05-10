@@ -15,4 +15,12 @@ export const userService = {
     upgradeVip: <T = { message: string }>() => apiClient<T>('/users/upgrade-vip', {
         method: 'POST'
     }),
+    uploadAvatar: (file: File) => {
+        const formData = new FormData();
+        formData.append('avatar', file);
+        return apiClient<{ user: User; avatar_url: string }>('/upload/avatar', {
+            method: 'POST',
+            body: formData
+        });
+    }
 };

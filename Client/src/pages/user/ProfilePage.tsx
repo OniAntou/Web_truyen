@@ -132,6 +132,36 @@ const ProfilePage: React.FC = () => {
         if (e.key === 'Escape') cancelEdit();
     };
 
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Size check (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('Kích thước ảnh tối đa là 2MB', 'err');
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const data = await userService.uploadAvatar(file);
+            setProfile(data.user as Profile);
+            showToast('Đã cập nhật ảnh đại diện');
+            
+            // Sync with localStorage
+            const localUserString = localStorage.getItem('user');
+            if (localUserString) {
+                const localUser = JSON.parse(localUserString);
+                localStorage.setItem('user', JSON.stringify({ ...localUser, avatar_url: data.avatar_url }));
+            }
+            window.dispatchEvent(new Event('auth:update'));
+        } catch (err: any) {
+            showToast(err.message || 'Lỗi khi tải ảnh lên', 'err');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const isVip = !!(profile?.is_vip && profile?.vip_expiry && new Date(profile.vip_expiry).getTime() > new Date().getTime());
     const daysLeft = isVip && profile?.vip_expiry ? Math.max(0, Math.ceil((new Date(profile.vip_expiry).getTime() - new Date().getTime()) / 86400000)) : 0;
     const roleLabel: Record<string, string> = { admin: 'Admin', creator: 'Creator', user: 'Thành viên' };
@@ -176,7 +206,18 @@ const ProfilePage: React.FC = () => {
                     {/* ── Sidebar ── */}
                     <div className="profile-sidebar">
                         <div className="glass-panel" style={{ borderRadius: '1rem', padding: '2rem', textAlign: 'center' }}>
-                            <div className="profile-letter">{profile.username?.charAt(0).toUpperCase()}</div>
+                            <div className="profile-avatar-wrapper">
+                                {profile.avatar_url ? (
+                                    <img src={profile.avatar_url} className="profile-avatar-img" alt={profile.username} />
+                                ) : (
+                                    <div className="profile-letter">{profile.username?.charAt(0).toUpperCase()}</div>
+                                )}
+                                <label className="profile-avatar-upload" title="Đổi ảnh đại diện">
+                                    <Pencil size={14} />
+                                    <input type="file" accept="image/*" onChange={handleAvatarChange} hidden disabled={saving} />
+                                </label>
+                                {saving && <div className="profile-avatar-loading">...</div>}
+                            </div>
                             <h3 style={{ margin: '0.75rem 0 0.25rem', fontSize: '1.25rem', fontWeight: 700 }}>{profile.username}</h3>
                             <span className="featured-badge" style={{ marginBottom: 0 }}>{roleLabel[profile.role] || profile.role}</span>
                             <p style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
@@ -395,6 +436,49 @@ const ProfilePage: React.FC = () => {
                     display: flex;
                     flex-direction: column;
                     gap: 1.5rem;
+                }
+                .profile-avatar-wrapper {
+                    position: relative;
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 0.5rem;
+                }
+                .profile-avatar-img {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--accent);
+                }
+                .profile-avatar-upload {
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 28px;
+                    height: 28px;
+                    background: var(--accent);
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                    transition: transform 0.2s;
+                }
+                .profile-avatar-upload:hover {
+                    transform: scale(1.1);
+                }
+                .profile-avatar-loading {
+                    position: absolute;
+                    inset: 0;
+                    background: rgba(0,0,0,0.5);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.7rem;
+                    color: white;
                 }
                 .profile-letter {
                     width: 80px; height: 80px;

@@ -300,10 +300,14 @@ const Navbar: React.FC = () => {
                     {user ? (
                         <div className="nav-profile" ref={profileRef} style={{ position: 'relative' }}>
                             <div 
-                                style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none' }}
+                                style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none', overflow: 'hidden' }}
                                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                             >
-                                {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={18} />}
+                                {user.avatar_url ? (
+                                    <img src={user.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.username} />
+                                ) : (
+                                    user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={18} />
+                                )}
                             </div>
                             {showProfileDropdown && (
                                 <div className="profile-dropdown" style={{ position: 'absolute', top: '120%', right: '0', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.5rem', minWidth: '180px', zIndex: 50, boxShadow: 'var(--shadow-card)' }}>
@@ -439,8 +443,12 @@ const Navbar: React.FC = () => {
 
                     {user && (
                         <div className="drawer-user-card">
-                            <div className="drawer-avatar">
-                                {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={20} />}
+                            <div className="drawer-avatar" style={{ overflow: 'hidden' }}>
+                                {user.avatar_url ? (
+                                    <img src={user.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.username} />
+                                ) : (
+                                    user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={20} />
+                                )}
                             </div>
                             <div className="drawer-user-info">
                                 <span className="drawer-username">{user.username}</span>

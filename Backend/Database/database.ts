@@ -157,6 +157,7 @@ const UserSchema = new mongoose.Schema(
     vip_expiry: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
+    avatar_url: { type: String, default: "" },
     created_at: { type: Date, default: Date.now },
   },
   { collection: "users" },

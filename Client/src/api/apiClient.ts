@@ -2,7 +2,7 @@ import { API_BASE_URL } from '../constants/api';
 import { clearAuthToken, getAuthToken } from '../utils/authToken';
 
 interface ApiOptions extends Omit<RequestInit, 'body'> {
-    body?: Record<string, unknown>;
+    body?: Record<string, any> | FormData;
     skipAuthLogout?: boolean;
 }
 
@@ -26,12 +26,12 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
     };
 
     const method = (config.method || 'GET').toUpperCase();
-    if (['POST', 'PUT', 'PATCH'].includes(method)) {
+    if (['POST', 'PUT', 'PATCH'].includes(method) && !(body instanceof FormData)) {
         (config.headers as Record<string, string>)['Content-Type'] = 'application/json';
     }
 
     if (body) {
-        config.body = JSON.stringify(body);
+        config.body = body instanceof FormData ? body : JSON.stringify(body);
     }
 
     try {

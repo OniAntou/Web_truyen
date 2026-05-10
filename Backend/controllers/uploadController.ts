@@ -1,5 +1,5 @@
-import {  Comic, Chapter, Upload, Pages  } from "../Database/database";
-import {  R2_ENABLED, getFileUrl, uploadToR2  } from "../config/r2";
+import {  Comic, Chapter, Upload, Pages, User  } from "../Database/database";
+import {  R2_ENABLED, getFileUrl, uploadToR2, resolveR2Url  } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import {  convertToWebp  } from "../utils/imageHelper";
@@ -94,9 +94,39 @@ const uploadChapterPages = asyncHandler(async (req, res) => {
   res.status(201).json({ chapter: chapterId, pages: created });
 });
 
+const uploadAvatar = asyncHandler(async (req, res) => {
+  if (!R2_ENABLED) throw new AppError("R2 chưa được cấu hình", 503);
+  const user = await User.findById(req.user.id);
+  if (!user) throw new AppError("User không tồn tại", 404);
+  if (!req.file) throw new AppError("Cần gửi file ảnh (field: avatar)", 400);
+
+  // Convert to WebP
+  const webpBuffer = await convertToWebp(req.file.buffer);
+  const key = `avatars/${user._id}/${Date.now()}.webp`;
+
+  const { key: r2Key } = await uploadToR2(
+    key,
+    webpBuffer,
+    "image/webp",
+  );
+  
+  user.avatar_url = r2Key;
+  await user.save();
+  
+  const safeUser = user.toObject() as any;
+  delete safeUser.password;
+  
+  if (safeUser.avatar_url) {
+    safeUser.avatar_url = await resolveR2Url(safeUser.avatar_url);
+  }
+  
+  res.status(201).json({ user: safeUser, avatar_url: safeUser.avatar_url });
+});
+
 export { 
   getR2Status,
   getSignedUrl,
   uploadCover,
-  uploadChapterPages
+  uploadChapterPages,
+  uploadAvatar
  };

@@ -5,6 +5,9 @@ export interface User {
     email: string;
     role?: 'user' | 'creator' | 'admin';
     avatar?: string;
+    avatar_url?: string;
     balance?: number;
+    coins?: number;
+    is_vip?: boolean;
     vip_expiry?: string;
 }
