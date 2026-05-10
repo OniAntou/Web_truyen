@@ -102,7 +102,7 @@ img {
 
 /* Layout Utilities */
 .container {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -247,7 +247,8 @@ img {
   display: none;
   align-items: center;
   gap: 2.25rem;
-  margin-left: 2rem;
+  margin-left: 3rem;
+  margin-right: auto;
 }
 
 .nav-links a {
