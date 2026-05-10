@@ -14,9 +14,9 @@ const ClientLayout: React.FC = () => {
     if (isAdmin) return <Outlet />;
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="app-layout">
             {!isReader && <Navbar />}
-            <main className={`flex-grow ${!isReader ? 'pt-20 md:pt-24' : ''} pb-[var(--nav-bottom-height)] md:pb-0`}>
+            <main className={`app-main ${!isReader ? 'has-navbar' : ''}`}>
                 <Outlet />
             </main>
             {!isReader && <Footer />}

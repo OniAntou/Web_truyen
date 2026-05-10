@@ -36,9 +36,7 @@ const PopularPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
-
-            <main className="flex-1 container mx-auto px-6 pt-24 pb-16 md:pt-32 md:pb-24 max-w-7xl">
+            <div className="flex-1 container mx-auto px-6 pb-16 max-w-7xl">
                 {/* Clean Typography Header */}
                 <div className="mb-12 md:mb-16">
                     <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>

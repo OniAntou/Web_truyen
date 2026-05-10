@@ -9,34 +9,37 @@ const BottomNav: React.FC = () => {
     if (location.pathname.startsWith('/read/')) return null;
 
     const navItems = [
-        { icon: <Home size={22} />, label: 'Home', path: '/' },
-        { icon: <Compass size={22} />, label: 'Khám Phá', path: '/popular' },
-        { icon: <Search size={22} />, label: 'Tìm Kiếm', path: '/search' },
-        { icon: <Bookmark size={22} />, label: 'Tủ Sách', path: '/history' },
-        { icon: <User size={22} />, label: 'Tôi', path: '/profile' },
+        { icon: Home, label: 'Home', path: '/' },
+        { icon: Compass, label: 'Khám Phá', path: '/popular' },
+        { icon: Search, label: 'Tìm Kiếm', path: '/search' },
+        { icon: Bookmark, label: 'Tủ Sách', path: '/history' },
+        { icon: User, label: 'Tôi', path: '/profile' },
     ];
 
     return (
-        <nav className="mobile-only fixed bottom-0 left-0 right-0 z-[1000] h-[var(--nav-bottom-height)] bg-[var(--bg-secondary)] border-t border-[var(--border)] backdrop-blur-xl bg-opacity-80 px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.4)]">
-            <div className="flex items-center justify-around h-full max-w-md mx-auto">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) => 
-                            `flex flex-col items-center justify-center gap-1 w-full h-full transition-all duration-300 ${
-                                isActive ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'
-                            }`
-                        }
-                    >
-                        <div className="relative">
-                            {item.icon}
-                        </div>
-                        <span className="text-[10px] font-bold uppercase tracking-tighter">
-                            {item.label}
-                        </span>
-                    </NavLink>
-                ))}
+        <nav className="mobile-bottom-nav" id="mobile-bottom-nav">
+            <div className="bottom-nav-inner">
+                {navItems.map((item) => {
+                    const isActive = item.path === '/' 
+                        ? location.pathname === '/'
+                        : location.pathname.startsWith(item.path);
+                    const IconComponent = item.icon;
+                    
+                    return (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={`bottom-nav-item ${isActive ? 'active' : ''}`}
+                            id={`bottom-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                            <div className="bottom-nav-icon-wrap">
+                                {isActive && <div className="bottom-nav-indicator" />}
+                                <IconComponent size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                            </div>
+                            <span className="bottom-nav-label">{item.label}</span>
+                        </NavLink>
+                    );
+                })}
             </div>
         </nav>
     );

@@ -232,7 +232,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                 </div>
             </div>
             {/* Sticky Action Bar for Mobile */}
-            <div className="mobile-only md:hidden fixed bottom-[var(--nav-bottom-height)] left-0 right-0 z-50 p-4 bg-[var(--bg-secondary)]/90 backdrop-blur-md border-t border-white/5 animate-in slide-in-from-bottom duration-300">
+            <div className="mobile-only mobile-sticky-action-bar">
                 <div className="flex gap-3">
                     <Link
                         to={comic.chapters && comic.chapters.length > 0 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, User as UserIcon, Star, Sun, Moon } from 'lucide-react';
+import { Search, Menu, X, User as UserIcon, Star, Sun, Moon, Home, TrendingUp, Grid3X3, Clock, Heart, BookOpen, Shield, Palette } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 import { userService } from '../../api/userService';
@@ -13,6 +13,7 @@ import { User } from '../../types/user';
 const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Comic[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -31,6 +32,7 @@ const Navbar: React.FC = () => {
     });
     const searchRef = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
+    const mobileSearchRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<any>(null);
     const navigate = useNavigate();
     // Validate user session and check authentication
@@ -130,6 +132,23 @@ const Navbar: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Focus mobile search input when opened
+    useEffect(() => {
+        if (isMobileSearchOpen && mobileSearchRef.current) {
+            setTimeout(() => mobileSearchRef.current?.focus(), 300);
+        }
+    }, [isMobileSearchOpen]);
+
+    // Lock body scroll when drawer is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isMobileMenuOpen]);
+
     // Debounced live search
     const handleSearchInput = (value: string) => {
         setSearchQuery(value);
@@ -158,6 +177,7 @@ const Navbar: React.FC = () => {
     const handleSearchSubmit = () => {
         if (searchQuery.trim()) {
             setShowDropdown(false);
+            setIsMobileSearchOpen(false);
             navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
         }
     };
@@ -166,8 +186,23 @@ const Navbar: React.FC = () => {
         setTheme(prev => prev === 'dark' ? 'light' : 'dark');
     };
 
+    const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+    const navLinks = [
+        { icon: <Home size={18} />, label: 'Trang Chủ', path: '/' },
+        { icon: <TrendingUp size={18} />, label: 'Thịnh Hành', path: '/popular' },
+        { icon: <Grid3X3 size={18} />, label: 'Thể Loại', path: '/genres' },
+        { icon: <Clock size={18} />, label: 'Mới Nhất', path: '/latest' },
+    ];
+
+    const personalLinks = [
+        { icon: <BookOpen size={18} />, label: 'Lịch Sử Đọc', path: '/history' },
+        { icon: <Heart size={18} />, label: 'Đang Theo Dõi', path: '/following' },
+        { icon: <UserIcon size={18} />, label: 'Trang Cá Nhân', path: '/profile' },
+    ];
+
     return (
-        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} id="main-navbar">
             <div className="container navbar-content">
                 {/* Logo */}
                 <Link to="/" className="nav-logo">
@@ -328,89 +363,200 @@ const Navbar: React.FC = () => {
                     )}
                 </div>
 
-                {/* Mobile Menu Button */}
-                <button
-                    className="mobile-menu-toggle"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                {/* Mobile Actions */}
+                <div className="mobile-nav-actions">
+                    <button
+                        className="mobile-nav-btn"
+                        onClick={() => setIsMobileSearchOpen(true)}
+                        aria-label="Search"
+                    >
+                        <Search size={20} strokeWidth={2} />
+                    </button>
+                    <button
+                        className="mobile-nav-btn"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Menu"
+                    >
+                        {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Mobile Search Overlay */}
+            <div className={`mobile-search-overlay ${isMobileSearchOpen ? 'open' : ''}`}>
+                <div className="mobile-search-bar">
+                    <Search size={18} className="mobile-search-icon" />
+                    <input
+                        ref={mobileSearchRef}
+                        type="text"
+                        placeholder="Tìm kiếm truyện..."
+                        value={searchQuery}
+                        className="mobile-search-input"
+                        onChange={(e) => handleSearchInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSearchSubmit();
+                            if (e.key === 'Escape') setIsMobileSearchOpen(false);
+                        }}
+                    />
+                    <button
+                        className="mobile-search-close"
+                        onClick={() => { setIsMobileSearchOpen(false); setSearchQuery(''); setSearchResults([]); setShowDropdown(false); }}
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+                {/* Mobile search results */}
+                {searchQuery && (
+                    <div className="mobile-search-results">
+                        {searching ? (
+                            <div className="search-dropdown-loading">
+                                <div className="search-spinner"></div>
+                                <span>Đang tìm kiếm...</span>
+                            </div>
+                        ) : searchResults.length > 0 ? (
+                            <>
+                                {searchResults.map(comic => (
+                                    <Link
+                                        key={comic._id || comic.id}
+                                        to={`/p/${comic._id || comic.id}`}
+                                        className="search-dropdown-item"
+                                        onClick={() => { setShowDropdown(false); setSearchQuery(''); setIsMobileSearchOpen(false); }}
+                                    >
+                                        <LazyImage
+                                            src={comic.cover_url || comic.cover || ''}
+                                            alt={comic.title}
+                                            className="search-dropdown-img"
+                                            style={{ width: '40px', height: '56px', flexShrink: 0 }}
+                                        />
+                                        <div className="search-dropdown-info">
+                                            <span className="search-dropdown-title">{comic.title}</span>
+                                            <div className="search-dropdown-meta">
+                                                {(comic.rating && Number(comic.rating) > 0) ? (
+                                                    <span className="search-dropdown-rating">
+                                                        <Star size={10} fill="#eab308" color="#eab308" />
+                                                        {comic.rating}
+                                                    </span>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                                <button className="search-dropdown-viewall" onClick={handleSearchSubmit}>
+                                    Xem tất cả kết quả cho "{searchQuery}"
+                                </button>
+                            </>
+                        ) : (
+                            <div className="search-dropdown-empty">
+                                Không tìm thấy kết quả cho "{searchQuery}"
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Mobile Menu Drawer */}
-            <div 
-                className={`fixed inset-0 z-[2000] transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            >
+            <div className={`mobile-drawer-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
                 {/* Backdrop */}
-                <div 
-                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
+                <div className="mobile-drawer-backdrop" onClick={closeMobileMenu} />
                 
                 {/* Drawer Content */}
-                <div 
-                    className={`absolute top-0 right-0 h-full w-[280px] bg-[var(--bg-secondary)] shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
-                >
-                    <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
-                        <span className="nav-logo text-lg">Comic<span>Verse</span></span>
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-white/10 text-[var(--text-secondary)]">
-                            <X size={24} />
+                <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
+                    {/* Drawer Header */}
+                    <div className="drawer-header">
+                        <span className="nav-logo drawer-logo">Comic<span>Verse</span></span>
+                        <button onClick={closeMobileMenu} className="drawer-close-btn">
+                            <X size={20} />
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-                        {user && (
-                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
-                                <div className="w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold text-xl">
-                                    {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={20} />}
-                                </div>
-                                <div className="flex flex-col min-w-0">
-                                    <span className="font-bold text-[var(--text-primary)] truncate">{user.username}</span>
-                                    <span className="text-xs text-[var(--text-secondary)] truncate">{user.email}</span>
-                                </div>
+                    {/* User Card */}
+                    {user && (
+                        <div className="drawer-user-card">
+                            <div className="drawer-avatar">
+                                {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={20} />}
                             </div>
-                        )}
-
-                        <div className="flex flex-col gap-4">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Điều hướng</h4>
-                            <div className="flex flex-col gap-1">
-                                <Link to="/" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Trang Chủ</Link>
-                                <Link to="/popular" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Thịnh Hành</Link>
-                                <Link to="/genres" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Thể Loại</Link>
-                                <Link to="/latest" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Mới Nhất</Link>
+                            <div className="drawer-user-info">
+                                <span className="drawer-username">{user.username}</span>
+                                <span className="drawer-email">{user.email}</span>
                             </div>
                         </div>
+                    )}
 
-                        {user && (
-                            <div className="flex flex-col gap-4">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Cá nhân</h4>
-                                <div className="flex flex-col gap-1">
-                                    <Link to="/history" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Lịch Sử Đọc</Link>
-                                    <Link to="/following" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Đang Theo Dõi</Link>
-                                    <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Trang Cá Nhân</Link>
-                                </div>
-                            </div>
-                        )}
+                    {/* Navigation */}
+                    <div className="drawer-nav-section">
+                        <div className="drawer-section-label">Điều hướng</div>
+                        <div className="drawer-nav-links">
+                            {navLinks.map(link => (
+                                <Link 
+                                    key={link.path} 
+                                    to={link.path} 
+                                    className="drawer-nav-link" 
+                                    onClick={closeMobileMenu}
+                                >
+                                    <span className="drawer-link-icon">{link.icon}</span>
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
 
-                        <div className="flex flex-col gap-4">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Hệ thống</h4>
-                            <div className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={toggleTheme}>
-                                <span>Giao diện {theme === 'dark' ? 'Tối' : 'Sáng'}</span>
-                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    {/* Personal */}
+                    {user && (
+                        <div className="drawer-nav-section">
+                            <div className="drawer-section-label">Cá nhân</div>
+                            <div className="drawer-nav-links">
+                                {personalLinks.map(link => (
+                                    <Link 
+                                        key={link.path} 
+                                        to={link.path} 
+                                        className="drawer-nav-link" 
+                                        onClick={closeMobileMenu}
+                                    >
+                                        <span className="drawer-link-icon">{link.icon}</span>
+                                        {link.label}
+                                    </Link>
+                                ))}
                             </div>
+                        </div>
+                    )}
+
+                    {/* System */}
+                    <div className="drawer-nav-section">
+                        <div className="drawer-section-label">Hệ thống</div>
+                        <div className="drawer-nav-links">
+                            <button className="drawer-nav-link" onClick={toggleTheme}>
+                                <span className="drawer-link-icon">
+                                    <Palette size={18} />
+                                </span>
+                                Giao diện {theme === 'dark' ? 'Tối' : 'Sáng'}
+                                <span className="drawer-link-badge">
+                                    {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+                                </span>
+                            </button>
                             {user?.role === 'creator' && (
-                                <Link to="/studio" className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] font-bold" onClick={() => setIsMobileMenuOpen(false)}>Creator Studio</Link>
+                                <Link to="/studio" className="drawer-nav-link drawer-nav-accent" onClick={closeMobileMenu}>
+                                    <span className="drawer-link-icon"><BookOpen size={18} /></span>
+                                    Creator Studio
+                                </Link>
+                            )}
+                            {user?.role === 'admin' && (
+                                <Link to="/admin" className="drawer-nav-link drawer-nav-admin" onClick={closeMobileMenu}>
+                                    <span className="drawer-link-icon"><Shield size={18} /></span>
+                                    Admin Panel
+                                </Link>
                             )}
                         </div>
                     </div>
 
-                    <div className="p-6 border-t border-[var(--border)]">
+                    {/* Footer */}
+                    <div className="drawer-footer">
                         {user ? (
-                            <button className="btn w-full bg-[#ef4444]/10 text-[#ef4444] font-bold py-3" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
+                            <button className="drawer-logout-btn" onClick={() => { handleLogout(); closeMobileMenu(); }}>
                                 Đăng Xuất
                             </button>
                         ) : (
-                            <button className="btn btn-primary w-full py-3" onClick={() => { navigate('/auth'); setIsMobileMenuOpen(false); }}>
+                            <button className="drawer-login-btn" onClick={() => { navigate('/auth'); closeMobileMenu(); }}>
+                                <UserIcon size={18} />
                                 Đăng Nhập
                             </button>
                         )}
