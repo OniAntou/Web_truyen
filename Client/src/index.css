@@ -3449,10 +3449,9 @@ body * {
 .mobile-hero {
   position: relative;
   width: 100%;
-  min-height: 420px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  padding-top: 1rem;
   overflow: hidden;
 }
 
