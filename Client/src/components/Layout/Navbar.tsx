@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, User as UserIcon, Star, Sun, Moon, Home, TrendingUp, Grid3X3, Clock, Heart, BookOpen, Shield, Palette } from 'lucide-react';
+import { Search, Menu, X, User as UserIcon, Star, Sun, Moon, Home, TrendingUp, Grid3X3, Clock, Heart, BookOpen, Shield, Palette, Trophy } from 'lucide-react';
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 import { userService } from '../../api/userService';
@@ -179,6 +179,7 @@ const Navbar: React.FC = () => {
 
     const navLinks = [
         { icon: <Home size={18} />, label: 'Trang Chủ', path: '/' },
+        { icon: <Trophy size={18} />, label: 'Xếp Hạng', path: '/ranking' },
         { icon: <TrendingUp size={18} />, label: 'Thịnh Hành', path: '/popular' },
         { icon: <Grid3X3 size={18} />, label: 'Thể Loại', path: '/genres' },
         { icon: <Clock size={18} />, label: 'Mới Nhất', path: '/latest' },
@@ -202,6 +203,7 @@ const Navbar: React.FC = () => {
                 {/* Desktop Menu */}
                 <div className="nav-links hidden md:flex">
                     <Link to="/">Home</Link>
+                    <Link to="/ranking">Ranking</Link>
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
                     <Link to="/latest">Latest</Link>

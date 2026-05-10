@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Compass, Search, Bookmark, User } from 'lucide-react';
+import { Home, Compass, Search, Bookmark, User, Trophy } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
     const location = useLocation();
@@ -10,7 +10,7 @@ const BottomNav: React.FC = () => {
 
     const navItems = [
         { icon: Home, label: 'Home', path: '/' },
-        { icon: Compass, label: 'Khám Phá', path: '/popular' },
+        { icon: Trophy, label: 'Xếp Hạng', path: '/ranking' },
         { icon: Search, label: 'Tìm Kiếm', path: '/search' },
         { icon: Bookmark, label: 'Tủ Sách', path: '/history' },
         { icon: User, label: 'Tôi', path: '/profile' },

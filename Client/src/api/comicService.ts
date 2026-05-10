@@ -41,6 +41,9 @@ export const comicService = {
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;
         return apiClient<ComicsResponse>(endpoint);
     },
+    getRanking: (period: string = 'week', limit: number = 20) => {
+        return apiClient<ComicsResponse>(`/comics/popular?sort=views&period=${period}&limit=${limit}`);
+    },
     getLatest: (page: number = 1, limit: number = 18, genre: string = '') => {
         let endpoint = `/comics/latest?page=${page}&limit=${limit}`;
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;

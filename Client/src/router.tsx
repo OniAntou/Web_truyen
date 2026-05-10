@@ -22,6 +22,7 @@ const TermsOfService = lazy(() => import('./pages/info/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/info/PrivacyPolicy'));
 const ContactPage = lazy(() => import('./pages/info/ContactPage'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const RankingPage = lazy(() => import('./pages/RankingPage'));
 
 const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
 import ClientLayout from './components/Layout/ClientLayout';
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
             {
                 path: '/genres',
                 element: withSuspense(<GenresPage />),
+            },
+            {
+                path: '/ranking',
+                element: withSuspense(<RankingPage />),
             },
             {
                 path: '/latest',
