@@ -4,7 +4,6 @@ import { Search, Menu, X, User as UserIcon, Star, Sun, Moon, Home, TrendingUp, G
 import LazyImage from '../ui/LazyImage';
 import { comicService } from '../../api/comicService';
 import { userService } from '../../api/userService';
-import { clearReadingHistory } from '../../utils/readingHistory';
 import { clearSession } from '../../utils/auth';
 
 import { Comic, Genre } from '../../types/comic';
@@ -35,8 +34,11 @@ const Navbar: React.FC = () => {
             const storedUser = localStorage.getItem('user');
 
             if (storedUser) {
-                // 1. Local sync
-                setUser(JSON.parse(storedUser));
+                // 1. Local sync (update store if needed, though store usually handles this)
+                const parsedUser = JSON.parse(storedUser);
+                if (!user || user.id !== parsedUser.id) {
+                    updateUser(parsedUser);
+                }
                 
                 // 2. Server validation (robust) - Only if explicitly requested or on mount
                 if (shouldVerifyWithServer) {
