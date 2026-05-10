@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthStore } from "../store/authStore";
+import { setAuthToken } from "../utils/authToken";
 
 const registerSchema = z.object({
   username: z.string().min(3, "Tên hiển thị phải có ít nhất 3 ký tự").max(50, "Tên hiển thị quá dài"),
@@ -50,6 +51,7 @@ const AuthPage: React.FC = () => {
         ? await authService.login(data.email, data.password)
         : await authService.register(data.username!, data.email, data.password);
         
+      setAuthToken(response.token);
       storeLogin(response.user);
       navigate("/");
     } catch (err: any) {

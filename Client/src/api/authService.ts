@@ -1,10 +1,17 @@
 import apiClient from './apiClient';
+import { User } from '../types/user';
+
+interface AuthResponse {
+    message: string;
+    token?: string;
+    user: User;
+}
 
 export const authService = {
-    login: (email: string, password: string) => apiClient<any>('/auth/login', {
+    login: (email: string, password: string) => apiClient<AuthResponse>('/auth/login', {
         body: { email, password }
     }),
-    register: (username: string, email: string, password: string) => apiClient<any>('/auth/register', {
+    register: (username: string, email: string, password: string) => apiClient<AuthResponse>('/auth/register', {
         body: { username, email, password }
     }),
     forgotPassword: (email: string) => apiClient<{ message: string }>('/auth/forgot-password', {

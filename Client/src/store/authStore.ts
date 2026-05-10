@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { clearReadingHistory } from '../utils/readingHistory';
+import { clearAuthToken } from '../utils/authToken';
 
 import { User } from '../types/user';
 
@@ -29,6 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   }),
   logout: () => set(() => {
       localStorage.removeItem('user');
+      clearAuthToken();
       clearReadingHistory();
       return { user: null };
   }),

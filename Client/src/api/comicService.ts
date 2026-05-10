@@ -24,9 +24,9 @@ export const comicService = {
     getById: (id: string) => {
         return apiClient<Comic>(`/comics/${id}`);
     },
-    getUserRating: (id: string) => apiClient<{ rating: number }>(`/comics/${id}/user-rating`),
-    getFavoriteStatus: (id: string) => apiClient<{ isFavorited: boolean }>(`/comics/${id}/favorite`),
-    getReadingProgress: (id: string) => apiClient<ReadingProgress>(`/comics/${id}/reading-progress`),
+    getUserRating: (id: string) => apiClient<{ rating: number }>(`/comics/${id}/user-rating`, { skipAuthLogout: true }),
+    getFavoriteStatus: (id: string) => apiClient<{ isFavorited: boolean }>(`/comics/${id}/favorite`, { skipAuthLogout: true }),
+    getReadingProgress: (id: string) => apiClient<ReadingProgress>(`/comics/${id}/reading-progress`, { skipAuthLogout: true }),
     rate: (id: string, rating: number) => apiClient<{ user_rating: number, rating: number }>(`/comics/${id}/rate`, {
         method: 'POST',
         body: { rating }
