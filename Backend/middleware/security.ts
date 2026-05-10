@@ -18,8 +18,12 @@ const csrfProtection = (req, res, next) => {
   const referer = req.headers.referer;
 
   // 1. Check Origin
-  if (origin && !allowedOrigins.includes(origin)) {
-    return next(new AppError('CSRF Protection: Invalid Origin', 403));
+  if (origin) {
+    const cleanOrigin = origin.replace(/\/$/, '');
+    const isAllowed = allowedOrigins.some(o => o.replace(/\/$/, '') === cleanOrigin);
+    if (!isAllowed) {
+      return next(new AppError('CSRF Protection: Invalid Origin', 403));
+    }
   }
 
   // 2. Check Referer (fallback if origin is missing)
