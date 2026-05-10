@@ -213,7 +213,7 @@ const Navbar: React.FC = () => {
                 </div>
 
                 {/* Desktop Menu */}
-                <div className="nav-links absolute left-1/2 -translate-x-1/2 hidden md:flex">
+                <div className="nav-links flex-none flex justify-center hidden md:flex">
                     <Link to="/">Home</Link>
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
