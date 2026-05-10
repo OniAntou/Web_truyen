@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
 
 
-import { API_BASE_URL } from '../constants/api';
-import { clearSession } from '../utils/auth';
+import apiClient from '../api/apiClient';
 
 const CreatorApplication: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -30,29 +29,13 @@ const CreatorApplication: React.FC = () => {
         setError('');
 
         try {
-            const res = await fetch(`${API_BASE_URL}/applications`, {
+            await apiClient('/applications', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify(formData)
+                body: formData
             });
-
-            if (res.status === 401) {
-                clearSession();
-                return;
-            }
-
-            const data = await res.json();
-            
-            if (res.ok) {
-                setSubmitted(true);
-            } else {
-                setError(data.message || 'Có lỗi xảy ra.');
-            }
-        } catch (err) {
-            setError('Lỗi kết nối máy chủ.');
+            setSubmitted(true);
+        } catch (err: any) {
+            setError(err?.message || 'Lỗi kết nối máy chủ.');
         } finally {
             setLoading(false);
         }

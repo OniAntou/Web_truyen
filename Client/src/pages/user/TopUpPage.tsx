@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 
 import { CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 const TopUpPage: React.FC = () => {
     const [amount, setAmount] = useState(50000);
@@ -15,20 +15,14 @@ const TopUpPage: React.FC = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`${API_BASE_URL}/payment/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
+            const data = await apiClient<{ paymentUrl?: string; message?: string }>('/payment/create', {
+                body: {
                     amount: amount,
                     bankCode: '', // Leave empty for VNPay bank selection page
                     locale: 'vn'
-                })
+                }
             });
 
-            const data = await response.json();
             if (data.paymentUrl) {
                 // Redirect user to VNPay
                 window.location.href = data.paymentUrl;

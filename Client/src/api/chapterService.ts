@@ -1,27 +1,10 @@
-import { API_BASE_URL } from '../constants/api';
+import apiClient from './apiClient';
 
 export const chapterService = {
-    getPages: async (chapterId: string) => {
-        const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`, { 
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            throw data; // throw full object to pass is_locked, price, message
-        }
-        return data;
-    },
-    unlockChapter: async (chapterId: string) => {
-        const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}/unlock`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
-        return data;
-    }
+    getPages: (chapterId: string) => apiClient<any>(`/chapters/${chapterId}/pages`, {
+        skipAuthLogout: true
+    }),
+    unlockChapter: (chapterId: string) => apiClient<any>(`/chapters/${chapterId}/unlock`, {
+        method: 'POST'
+    })
 };

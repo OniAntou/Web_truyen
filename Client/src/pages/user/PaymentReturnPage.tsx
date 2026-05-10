@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
 
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 const PaymentReturnPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -15,10 +15,9 @@ const PaymentReturnPage: React.FC = () => {
         const verifyPayment = async () => {
             try {
                 // Send VNPay parameters to our backend to verify
-                const response = await fetch(`${API_BASE_URL}/payment/vnpay_return?${searchParams.toString()}`, {
-                    credentials: 'include'
+                const data = await apiClient<{ success?: boolean; message?: string }>(`/payment/vnpay_return?${searchParams.toString()}`, {
+                    skipAuthLogout: true
                 });
-                const data = await response.json();
 
                 if (data.success) {
                     setStatus('success');

@@ -35,6 +35,7 @@ export const comicService = {
         method: 'POST'
     }),
     getChaptersReadStatus: (id: string) => apiClient<any[]>(`/comics/${id}/chapters/read-status`),
+    getUserFavorites: () => apiClient<Comic[]>('/users/favorites'),
     getPopular: (sortBy: string = 'views', limit: number = 12, genre: string = '') => {
         let endpoint = `/comics/popular?sort=${sortBy}&limit=${limit}`;
         if (genre) endpoint += `&genre=${encodeURIComponent(genre)}`;

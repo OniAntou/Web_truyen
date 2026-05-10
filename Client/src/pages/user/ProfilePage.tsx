@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 
 import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
 import { clearSession } from '../../utils/auth';
+import { userService } from '../../api/userService';
 
 import { User } from '../../types/user';
 
@@ -57,18 +57,8 @@ const ProfilePage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         
-        fetch(`${API_BASE_URL}/users/me`, {
-            credentials: 'include'
-        })
-        .then(res => {
-            if (res.status === 401 || res.status === 403) {
-                clearSession();
-                return null;
-            }
-            if (!res.ok) throw new Error('Lỗi tải dữ liệu');
-            return res.json();
-        })
-        .then(data => { 
+        userService.getMe<Profile>()
+        .then(data => {
             if (data) { 
                 setProfile(data); 
                 setLoading(false); 
@@ -97,14 +87,7 @@ const ProfilePage: React.FC = () => {
         if (trimmed === profile[editing]) { cancelEdit(); return; }
         setSaving(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/users/me`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ [editing]: trimmed })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Lỗi cập nhật');
+            const data = await userService.updateMe<Profile>({ [editing]: trimmed });
             setProfile(data);
             showToast('Đã cập nhật thành công');
             cancelEdit();
@@ -116,14 +99,7 @@ const ProfilePage: React.FC = () => {
     const handleDeleteAccount = async () => {
         setSaving(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/users/me`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Lỗi xóa tài khoản');
-            }
+            await userService.deleteAccount();
             clearSession();
             navigate('/');
         } catch (err: any) {
@@ -137,13 +113,8 @@ const ProfilePage: React.FC = () => {
     const fetchHistory = async () => {
         setLoadingHistory(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/users/transactions`, {
-                credentials: 'include'
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setTransactions(data);
-            }
+            const data = await userService.getTransactions<Transactions>();
+            setTransactions(data);
         } catch (err) {
             console.error('Failed to fetch history', err);
         } finally {

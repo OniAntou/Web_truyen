@@ -1,27 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 
 import ComicGrid from '../../components/Home/ComicGrid';
 import { BookMarked } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import { comicService } from '../../api/comicService';
 import { Comic } from '../../types/comic';
 
 const FollowingPage: React.FC = () => {
     const [comics, setComics] = useState<Comic[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();
+
     useEffect(() => {
         window.scrollTo(0, 0);
         
-        fetch(`${API_BASE_URL}/users/favorites`, {
-            credentials: 'include'
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch favorites');
-                return res.json();
-            })
+        comicService.getUserFavorites()
             .then(data => {
                 setComics(data);
                 setLoading(false);
@@ -31,7 +24,7 @@ const FollowingPage: React.FC = () => {
                 setError(err.message);
                 setLoading(false);
             });
-    }, [navigate]);
+    }, []);
 
     if (loading) return <div style={{ paddingTop: '8rem', textAlign: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Loading...</div>;
     if (error) return <div style={{ paddingTop: '8rem', textAlign: 'center', minHeight: '100vh', background: 'var(--bg-primary)', color: '#ef4444' }}>Error: {error}</div>;

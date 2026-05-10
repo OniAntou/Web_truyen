@@ -13,8 +13,7 @@ import ReadPageSkeleton from '../components/ui/ReadPageSkeleton';
 
 import { comicService } from '../api/comicService';
 import { chapterService } from '../api/chapterService';
-import { API_BASE_URL } from '../constants/api';
-import { clearSession } from '../utils/auth';
+import { userService } from '../api/userService';
 import { saveReadingHistory } from '../utils/readingHistory';
 import ReportModal from '../components/common/ReportModal';
 import { Flag } from 'lucide-react';
@@ -157,7 +156,7 @@ const ReadPage: React.FC = () => {
     };
 
     const handleUnlock = () => {
-        if (!user) return navigate('/login');
+        if (!user) return navigate('/auth');
         setConfirmModal({ 
             isOpen: true, 
             type: 'unlock', 
@@ -167,7 +166,7 @@ const ReadPage: React.FC = () => {
     };
 
     const handleUpgradeVip = () => {
-        if (!user) return navigate('/login');
+        if (!user) return navigate('/auth');
         setConfirmModal({ 
             isOpen: true, 
             type: 'vip', 
@@ -185,19 +184,7 @@ const ReadPage: React.FC = () => {
                 setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true });
                 queryClient.invalidateQueries({ queryKey: ['readerData', comicId, chapterId] });
             } else if (confirmModal.type === 'vip') {
-                const response = await fetch(`${API_BASE_URL}/users/upgrade-vip`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-                
-                if (response.status === 401) {
-                    clearSession();
-                    return;
-                }
-                
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message);
+                await userService.upgradeVip();
                 setConfirmModal({ ...confirmModal, isOpen: false });
                 setAlertModal({ isOpen: true, title: 'Thành công', message: 'Nâng cấp VIP thành công! Hệ thống sẽ tự động tải lại trang.', isSuccess: true });
                 queryClient.invalidateQueries({ queryKey: ['readerData', comicId, chapterId] });

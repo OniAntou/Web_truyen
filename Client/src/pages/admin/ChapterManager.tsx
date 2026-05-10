@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { API_BASE_URL } from '../../constants/api';
+import { withUserAuthHeaders } from '../../utils/authFetch';
 
 const MAX_FILES_PER_UPLOAD_BATCH = 2;
 const MAX_BYTES_PER_UPLOAD_BATCH = 3.5 * 1024 * 1024; // 3.5MB to stay safely under Vercel's 4.5MB limit
@@ -35,6 +36,8 @@ interface FilePreview {
 
 // Helper: determine if we are in admin context
 const isAdminContext = () => window.location.pathname.startsWith('/admin');
+const authHeaders = (headers: Record<string, string> = {}) => isAdminContext() ? headers : withUserAuthHeaders(headers);
+const authRedirectPath = () => isAdminContext() ? '/admin/login' : '/auth';
 
 const splitFilesIntoUploadBatches = (fileList: File[]) => {
     const batches: File[][] = [];
@@ -289,7 +292,7 @@ const ChapterManager: React.FC = () => {
             });
             if (response.status === 401 || response.status === 403) {
                 localStorage.removeItem('admin');
-                window.location.href = isAdminContext() ? '/admin/login' : '/login';
+                window.location.href = authRedirectPath();
                 return;
             }
             const data = await response.json();
@@ -332,7 +335,7 @@ const ChapterManager: React.FC = () => {
             });
             if (comicRes.status === 401 || comicRes.status === 403) {
                 localStorage.removeItem('admin');
-                window.location.href = isAdminContext() ? '/admin/login' : '/login';
+                window.location.href = authRedirectPath();
                 return;
             }
             const comicData = await comicRes.json();
@@ -349,9 +352,9 @@ const ChapterManager: React.FC = () => {
             // 2. Create Chapter
             const response = await fetch(`${API_BASE_URL}/chapters`, {
                 method: 'POST',
-                headers: { 
+                headers: authHeaders({ 
                     'Content-Type': 'application/json'
-                },
+                }),
                 credentials: 'include',
                 body: JSON.stringify(payload)
             });
@@ -451,6 +454,7 @@ const ChapterManager: React.FC = () => {
 
                     const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
                         method: 'POST',
+                        headers: authHeaders(),
                         credentials: 'include',
                         body: formData,
                     });
@@ -538,6 +542,7 @@ const ChapterManager: React.FC = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
                 method: 'DELETE',
+                headers: authHeaders(),
                 credentials: 'include'
             });
             if (response.ok) {
@@ -560,9 +565,9 @@ const ChapterManager: React.FC = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/chapters/bulk-delete`, {
                 method: 'POST',
-                headers: { 
+                headers: authHeaders({ 
                     'Content-Type': 'application/json'
-                },
+                }),
                 credentials: 'include',
                 body: JSON.stringify({ chapterIds: Array.from(selectedChapters) })
             });
@@ -624,7 +629,7 @@ const ChapterManager: React.FC = () => {
             });
             if (res.status === 401 || res.status === 403) {
                 localStorage.removeItem('admin');
-                window.location.href = isAdminContext() ? '/admin/login' : '/login';
+                window.location.href = authRedirectPath();
                 return;
             }
             const data = await res.json();
@@ -660,9 +665,9 @@ const ChapterManager: React.FC = () => {
             }));
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
                 method: 'PUT',
-                headers: { 
+                headers: authHeaders({ 
                     'Content-Type': 'application/json'
-                },
+                }),
                 credentials: 'include',
                 body: JSON.stringify({ order }),
             });
@@ -698,6 +703,7 @@ const ChapterManager: React.FC = () => {
         try {
             const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
                 method: 'DELETE',
+                headers: authHeaders(),
                 credentials: 'include'
             });
             if (res.ok) {

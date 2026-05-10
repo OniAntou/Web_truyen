@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../../constants/api';
+import { withUserAuthHeaders } from '../../utils/authFetch';
 
 /**
  * Sanitize a URL to only allow safe protocols (http, https, blob).
@@ -27,6 +28,7 @@ const ComicEditor: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const isEditing = !!id;
+    const isStudio = window.location.pathname.startsWith('/studio');
 
     const [formData, setFormData] = useState({
         title: '',
@@ -98,7 +100,9 @@ const ComicEditor: React.FC = () => {
 
             const response = await fetch(url, {
                 method,
-                headers: { 
+                headers: isStudio ? withUserAuthHeaders({ 
+                    'Content-Type': 'application/json'
+                }) : { 
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
@@ -124,6 +128,7 @@ const ComicEditor: React.FC = () => {
 
                 const uploadResponse = await fetch(`${API_BASE_URL}/upload/cover/${comicIdToUpload}`, {
                     method: 'POST',
+                    headers: isStudio ? withUserAuthHeaders() : undefined,
                     credentials: 'include',
                     body: uploadFormData
                 });

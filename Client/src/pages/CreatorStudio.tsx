@@ -5,6 +5,7 @@ import LazyImage from '../components/ui/LazyImage';
 import { API_BASE_URL } from '../constants/api';
 import { clearSession } from '../utils/auth';
 import { getAuthToken } from '../utils/authToken';
+import { withUserAuthHeaders } from '../utils/authFetch';
 
 interface StudioComic {
     _id?: string;
@@ -29,9 +30,7 @@ const CreatorStudio: React.FC = () => {
 
         // Add a check in a real app to ensure role === 'creator' from context
         fetch(`${API_BASE_URL}/studio/comics`, {
-            headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            },
+            headers: withUserAuthHeaders(),
             credentials: 'include'
         })
         .then(res => {
@@ -65,12 +64,9 @@ const CreatorStudio: React.FC = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa truyện này? Hành động này không thể hoàn tác.')) return;
         
         try {
-            const token = getAuthToken();
             const res = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                },
+                headers: withUserAuthHeaders(),
                 credentials: 'include'
             });
             if (res.ok) {
