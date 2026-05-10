@@ -5,9 +5,7 @@ const authenticateToken = (req, res, next) => {
   let token = authHeader && authHeader.split(' ')[1];
   
   // If token in header is invalid/placeholder, try cookies
-  if (!token || token === 'undefined' || token === 'null') {
-    // Priority: If the request is for an admin route, prefer adminToken. 
-    // Otherwise, prefer regular token but fall back to adminToken.
+  if (!token || token === 'undefined' || token === 'null' || token === '[object Object]') {
     const isAdminRoute = req.originalUrl && req.originalUrl.includes('/admin');
     if (isAdminRoute) {
         token = req.cookies?.adminToken || req.cookies?.token;
@@ -18,7 +16,12 @@ const authenticateToken = (req, res, next) => {
 
   if (!token) return res.status(401).json({ message: "Không tìm thấy token" });
   
-  jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, user) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV !== 'production') {
+    console.warn('WARNING: JWT_SECRET is missing in environment variables. Using fallback_secret.');
+  }
+
+  jwt.verify(token, secret || 'fallback_secret', (err, user) => {
     if (err) return res.status(403).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
     req.user = user;
     next();

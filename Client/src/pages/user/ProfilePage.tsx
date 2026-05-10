@@ -57,15 +57,21 @@ const ProfilePage: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         
+        setLoading(true);
         userService.getMe<Profile>()
         .then(data => {
             if (data) { 
                 setProfile(data); 
-                setLoading(false); 
             }
         })
-        .catch(() => {
-            setLoading(false);
+        .catch((err: any) => {
+            console.error('Failed to fetch profile:', err);
+            // If it's a 401/403, apiClient will handle the logout.
+            // For other errors, we might want to show them.
+            setToast({ msg: err.message || 'Lỗi khi tải thông tin cá nhân', type: 'err' });
+        })
+        .finally(() => {
+            setLoading(false); 
         });
     }, [navigate]);
 
@@ -176,15 +182,18 @@ const ProfilePage: React.FC = () => {
         );
     }
 
-    if (!profile) {
+    if (!profile && !loading) {
         return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-                
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-secondary)' }}>
-                    <p>Phiên đăng nhập hết hạn.</p>
-                    <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>Đăng nhập lại</button>
+                    <AlertTriangle size={48} style={{ color: 'var(--accent)', marginBottom: '1rem' }} />
+                    <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>Không thể tải thông tin cá nhân</p>
+                    <p style={{ maxWidth: '300px', textAlign: 'center', fontSize: '0.9rem' }}>Vui lòng kiểm tra lại kết nối hoặc đăng nhập lại nếu phiên làm việc đã hết hạn.</p>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <button className="btn btn-glass" onClick={() => window.location.reload()}>Thử lại</button>
+                        <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>Đăng nhập</button>
+                    </div>
                 </div>
-                
             </div>
         );
     }

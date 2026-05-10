@@ -43,7 +43,10 @@ const Navbar: React.FC = () => {
                 if (shouldVerifyWithServer) {
                     try {
                         const latestUser = await userService.getMe();
-                        updateUser(latestUser as User);
+                        // Only update if the data is actually different to avoid infinite loops
+                        if (JSON.stringify(latestUser) !== JSON.stringify(user)) {
+                            updateUser(latestUser as User);
+                        }
                     } catch (err) {}
                 }
             }
