@@ -61,7 +61,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ chapters, comicId }) => {
             <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Danh Sách Chapter</h3>
             <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
                 <div className="chapter-list-grid">
-                    {chapters.map(chapter => {
+                    {[...chapters].reverse().map(chapter => {
                         const chapterId = chapter._id || chapter.id;
                         if (!chapterId) return null;
                         const isRead = readChapters.has(chapterId);

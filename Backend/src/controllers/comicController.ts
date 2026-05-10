@@ -134,6 +134,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
 
 const getAllComics = asyncHandler(async (req, res) => {
   const { q, genre } = req.query;
+  console.log(`[API] getAllComics - q: ${q}, genre: ${genre}`);
   
   // Try to get from cache
   const cacheKey = `search_${q || 'all'}_${genre || 'all'}`;
@@ -176,6 +177,8 @@ const getAllComics = asyncHandler(async (req, res) => {
     .select('title id author status cover_url rating views genres chapter_count created_at')
     .populate('genres', 'name slug')
     .lean();
+
+  console.log(`[API] Found ${comics.length} comics`);
 
   const results = await Promise.all(
     comics.map(async (c) => {

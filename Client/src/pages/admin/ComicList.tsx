@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, List, Search, LayoutGrid, LayoutList, Eye, Star } 
 import { API_BASE_URL } from '../../constants/api';
 import { translateStatus } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
+import { comicService } from '../../api/comicService';
 
 interface Comic {
     _id?: string;
@@ -31,13 +32,13 @@ const ComicList: React.FC = () => {
     };
 
     const fetchComics = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`${API_BASE_URL}/comics`);
-            const data = await response.json();
+            const data = await comicService.getAll();
             setComics(data.comics || []);
-            setLoading(false);
         } catch (error: any) {
             console.error('Error fetching comics:', error);
+        } finally {
             setLoading(false);
         }
     };
@@ -72,7 +73,7 @@ const ComicList: React.FC = () => {
     };
 
     const filteredComics = Array.isArray(comics) ? comics.filter(comic =>
-        comic.title.toLowerCase().includes(searchTerm.toLowerCase())
+        comic.title && comic.title.toLowerCase().includes(searchTerm.toLowerCase())
     ) : [];
 
     if (loading) return (
