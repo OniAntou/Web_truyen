@@ -202,13 +202,13 @@ const Navbar: React.FC = () => {
 
                 {/* Desktop Menu */}
                 <div className="nav-links hidden md:flex">
-                    <Link to="/">Home</Link>
-                    <Link to="/ranking">Ranking</Link>
-                    <Link to="/popular">Popular</Link>
-                    <Link to="/genres">Genres</Link>
-                    <Link to="/latest">Latest</Link>
-                    {user && <Link to="/history">History</Link>}
-                    {user && <Link to="/following" style={{ color: '#eab308' }}>Following</Link>}
+                    <Link to="/">Trang Chủ</Link>
+                    <Link to="/ranking">Xếp Hạng</Link>
+                    <Link to="/popular">Thịnh Hành</Link>
+                    <Link to="/genres">Thể Loại</Link>
+                    <Link to="/latest">Mới Nhất</Link>
+                    {user && <Link to="/history">Lịch Sử</Link>}
+                    {user && <Link to="/following" style={{ color: '#eab308' }}>Theo Dõi</Link>}
                 </div>
 
                 {/* Actions */}
