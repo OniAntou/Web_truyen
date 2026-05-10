@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Compass, Search, Bookmark, User, Trophy } from 'lucide-react';
+import { Home, Search, Bookmark, User, Trophy } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
     const location = useLocation();

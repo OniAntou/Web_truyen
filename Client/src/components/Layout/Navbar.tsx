@@ -1,3 +1,4 @@
+/* VERSION 2.0 - RANKING UPDATED */
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, User as UserIcon, Star, Sun, Moon, Home, TrendingUp, Grid3X3, Clock, Heart, BookOpen, Shield, Palette, Trophy } from 'lucide-react';
@@ -28,35 +29,28 @@ const Navbar: React.FC = () => {
     const mobileSearchRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<any>(null);
     const navigate = useNavigate();
-    // Validate user session and check authentication
+    
     useEffect(() => {
         const checkAuth = async (shouldVerifyWithServer = false) => {
             const storedUser = localStorage.getItem('user');
 
             if (storedUser) {
-                // 1. Local sync (update store if needed, though store usually handles this)
                 const parsedUser = JSON.parse(storedUser);
                 if (!user || user.id !== parsedUser.id) {
                     updateUser(parsedUser);
                 }
                 
-                // 2. Server validation (robust) - Only if explicitly requested or on mount
                 if (shouldVerifyWithServer) {
                     try {
                         const latestUser = await userService.getMe();
                         updateUser(latestUser as User);
-                    } catch (err) {
-                        // If error (401/403), apiClient.js will call clearSession
-                        // which triggers the 'auth:logout' event handled below
-                    }
+                    } catch (err) {}
                 }
             }
         };
 
-        // Initial check on mount
         checkAuth(true);
 
-        // Check auth periodically and when user returns to tab
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
                 checkAuth(true);
@@ -68,7 +62,6 @@ const Navbar: React.FC = () => {
         window.addEventListener('focus', handleFocus);
         const authInterval = setInterval(() => checkAuth(false), 60000);
 
-        // Listen for auth:logout events
         const handleLogoutEvent = () => {
             storeLogout();
             setShowProfileDropdown(false);
@@ -82,7 +75,7 @@ const Navbar: React.FC = () => {
             window.removeEventListener('focus', handleFocus);
             clearInterval(authInterval);
         };
-    }, [navigate]);
+    }, [navigate, storeLogout, updateUser, user]);
 
     const handleLogout = () => {
         clearSession();
@@ -91,9 +84,6 @@ const Navbar: React.FC = () => {
         navigate('/');
     };
 
-
-
-    // Apply theme on mount and change
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
@@ -107,7 +97,6 @@ const Navbar: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -121,14 +110,12 @@ const Navbar: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Focus mobile search input when opened
     useEffect(() => {
         if (isMobileSearchOpen && mobileSearchRef.current) {
             setTimeout(() => mobileSearchRef.current?.focus(), 300);
         }
     }, [isMobileSearchOpen]);
 
-    // Lock body scroll when drawer is open
     useEffect(() => {
         if (isMobileMenuOpen) {
             document.body.style.overflow = 'hidden';
@@ -138,7 +125,6 @@ const Navbar: React.FC = () => {
         return () => { document.body.style.overflow = ''; };
     }, [isMobileMenuOpen]);
 
-    // Debounced live search
     const handleSearchInput = (value: string) => {
         setSearchQuery(value);
         if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -249,7 +235,6 @@ const Navbar: React.FC = () => {
                             )}
                         </div>
 
-                        {/* Search Dropdown */}
                         {showDropdown && (
                             <div className="search-dropdown">
                                 {searching ? (
@@ -308,7 +293,6 @@ const Navbar: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Theme Toggle */}
                     <button className="theme-toggle-btn" onClick={toggleTheme} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
                         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
@@ -343,7 +327,6 @@ const Navbar: React.FC = () => {
                                     <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
                                         Đăng xuất
                                     </button>
-
                                 </div>
                             )}
                         </div>
@@ -355,7 +338,6 @@ const Navbar: React.FC = () => {
                     )}
                 </div>
 
-                {/* Mobile Actions */}
                 <div className="mobile-nav-actions">
                     <button
                         className="mobile-nav-btn"
@@ -375,7 +357,6 @@ const Navbar: React.FC = () => {
             </div>
             </nav>
 
-            {/* Mobile Search Overlay */}
             <div className={`mobile-search-overlay ${isMobileSearchOpen ? 'open' : ''}`}>
                 <div className="mobile-search-bar">
                     <Search size={18} className="mobile-search-icon" />
@@ -398,7 +379,6 @@ const Navbar: React.FC = () => {
                         <X size={18} />
                     </button>
                 </div>
-                {/* Mobile search results */}
                 {searchQuery && (
                     <div className="mobile-search-results">
                         {searching ? (
@@ -447,14 +427,9 @@ const Navbar: React.FC = () => {
                 )}
             </div>
 
-            {/* Mobile Menu Drawer */}
             <div className={`mobile-drawer-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
-                {/* Backdrop */}
                 <div className="mobile-drawer-backdrop" onClick={closeMobileMenu} />
-                
-                {/* Drawer Content */}
                 <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
-                    {/* Drawer Header */}
                     <div className="drawer-header">
                         <span className="nav-logo drawer-logo">Comic<span>Verse</span></span>
                         <button onClick={closeMobileMenu} className="drawer-close-btn">
@@ -462,7 +437,6 @@ const Navbar: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* User Card */}
                     {user && (
                         <div className="drawer-user-card">
                             <div className="drawer-avatar">
@@ -475,7 +449,6 @@ const Navbar: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Navigation */}
                     <div className="drawer-nav-section">
                         <div className="drawer-section-label">Điều hướng</div>
                         <div className="drawer-nav-links">
@@ -493,7 +466,6 @@ const Navbar: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Personal */}
                     {user && (
                         <div className="drawer-nav-section">
                             <div className="drawer-section-label">Cá nhân</div>
@@ -513,7 +485,6 @@ const Navbar: React.FC = () => {
                         </div>
                     )}
 
-                    {/* System */}
                     <div className="drawer-nav-section">
                         <div className="drawer-section-label">Hệ thống</div>
                         <div className="drawer-nav-links">
@@ -541,7 +512,6 @@ const Navbar: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Footer */}
                     <div className="drawer-footer">
                         {user ? (
                             <button className="drawer-logout-btn" onClick={() => { handleLogout(); closeMobileMenu(); }}>

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trophy, Calendar, Clock, Star, Eye } from 'lucide-react';
+import { Trophy, Calendar, Clock } from 'lucide-react';
 import { comicService, ComicsResponse } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
-import { Comic } from '../types/comic';
 
 const RankingPage: React.FC = () => {
     const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
