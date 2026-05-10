@@ -168,21 +168,15 @@ const ProfilePage: React.FC = () => {
         }
     };
 
-    const isVip = !!(profile?.is_vip && profile?.vip_expiry && new Date(profile.vip_expiry).getTime() > new Date().getTime());
-    const daysLeft = isVip && profile?.vip_expiry ? Math.max(0, Math.ceil((new Date(profile.vip_expiry).getTime() - new Date().getTime()) / 86400000)) : 0;
     const roleLabel: Record<string, string> = { admin: 'Admin', creator: 'Creator', user: 'Thành viên' };
 
-    if (loading) {
-        return (
+    if (!profile) {
+        if (loading) return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-                
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Đang tải...</div>
-                
             </div>
         );
-    }
 
-    if (!profile && !loading) {
         return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-secondary)' }}>
@@ -197,6 +191,8 @@ const ProfilePage: React.FC = () => {
             </div>
         );
     }
+    const isVip = !!(profile.is_vip && profile.vip_expiry && new Date(profile.vip_expiry).getTime() > new Date().getTime());
+    const daysLeft = isVip && profile.vip_expiry ? Math.max(0, Math.ceil((new Date(profile.vip_expiry).getTime() - new Date().getTime()) / 86400000)) : 0;
 
     const allTransactions = [
         ...transactions.payments.map(p => ({ ...p, type: 'payment' as const })),
