@@ -6,7 +6,7 @@ interface ApiOptions extends Omit<RequestInit, 'body'> {
 
 const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}): Promise<T> => {
     const { body, ...customConfig } = options;
-    const headers: HeadersInit = { 'Content-Type': 'application/json', ...customConfig.headers };
+    const headers: HeadersInit = { ...customConfig.headers };
 
     const config: RequestInit = {
         method: body ? 'POST' : 'GET',
@@ -14,6 +14,11 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
         headers,
         credentials: 'include',
     };
+
+    const method = (config.method || 'GET').toUpperCase();
+    if (['POST', 'PUT', 'PATCH'].includes(method)) {
+        (config.headers as Record<string, string>)['Content-Type'] = 'application/json';
+    }
 
     if (body) {
         config.body = JSON.stringify(body);
