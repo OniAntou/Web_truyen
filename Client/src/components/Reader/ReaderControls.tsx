@@ -75,7 +75,7 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, chapters, curr
 
           <button
             onClick={() => setShowChapters(true)}
-            className="px-6 py-2 rounded-full text-[var(--accent)] font-bold text-sm tracking-wide bg-white/5 hover:bg-white/10 transition-all border border-white/5 whitespace-nowrap"
+            className="px-6 py-2 rounded-full text-white font-bold text-sm tracking-wide bg-white/5 hover:bg-white/10 transition-all border border-white/5 whitespace-nowrap"
             title="Chapter List"
           >
             {currentChapter ? `Chapter ${currentChapter.chapter_number}` : 'Danh sách chapter'}

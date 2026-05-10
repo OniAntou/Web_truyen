@@ -4,6 +4,8 @@ import { BookOpen, Search, X, Layers } from 'lucide-react';
 import { comicService } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre } from '../types/comic';
+import Navbar from '../components/Layout/Navbar';
+import Footer from '../components/Layout/Footer';
 
 interface GenreCardProps {
     genre: Genre;
