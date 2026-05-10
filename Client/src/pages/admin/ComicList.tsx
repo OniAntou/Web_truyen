@@ -5,18 +5,8 @@ import { API_BASE_URL } from '../../constants/api';
 import { translateStatus } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
 import { comicService } from '../../api/comicService';
+import { Comic } from '../../types/comic';
 
-interface Comic {
-    _id?: string;
-    id?: string;
-    title: string;
-    cover_url: string;
-    author: string;
-    chapter_count: number;
-    status: 'Ongoing' | 'Completed' | string;
-    views?: number;
-    rating?: number;
-}
 
 const ComicList: React.FC = () => {
     const [comics, setComics] = useState<Comic[]>([]);
@@ -148,7 +138,7 @@ const ComicList: React.FC = () => {
                                         <td className="px-6 py-4 w-24">
                                             <div className="relative h-16 w-11 rounded border border-white/10 group-hover:border-white/20 transition-colors">
                                                 <img
-                                                    src={comic.cover_url}
+                                                    src={comic.cover_url || ''}
                                                     alt={comic.title}
                                                     className="h-full w-full object-cover transition-all duration-300"
                                                 />
@@ -157,7 +147,7 @@ const ComicList: React.FC = () => {
                                         <td className="px-6 py-4">
                                             <div className="font-bold text-white text-base mb-1">{comic.title}</div>
                                             <div className="text-xs text-zinc-300 font-medium flex items-center gap-2">
-                                                <span>{comic.author}</span>
+                                                <span>{comic.author || 'Unknown Author'}</span>
                                                 <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
                                                 <span className="text-zinc-400">{comic.chapter_count || 0} Ch.</span>
                                             </div>
@@ -212,7 +202,7 @@ const ComicList: React.FC = () => {
                     {filteredComics.length > 0 ? filteredComics.map((comic) => (
                         <div key={comic._id || comic.id} className="group relative flex flex-col gap-3.5 bg-[#121212] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all">
                             <Link to={`/admin/comics/${comic._id || comic.id}/chapters`} className="aspect-[2/3] w-full rounded-lg overflow-hidden relative border border-white/5 block">
-                                <LazyImage src={comic.cover_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={comic.title} />
+                                <LazyImage src={comic.cover_url || ''} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={comic.title} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                                 
                                 <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-white">
@@ -243,7 +233,7 @@ const ComicList: React.FC = () => {
                                         }`}>
                                         {translateStatus(comic.status || 'Ongoing')}
                                     </span>
-                                    <span className="text-[0.65rem] text-zinc-300 font-medium truncate">{comic.author}</span>
+                                    <span className="text-[0.65rem] text-zinc-300 font-medium truncate">{comic.author || 'Unknown'}</span>
                                 </div>
                                 
                                 <div className="flex gap-2 pt-1">
