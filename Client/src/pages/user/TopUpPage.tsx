@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Navbar from '../../components/Layout/Navbar';
-import Footer from '../../components/Layout/Footer';
+
+
 import { CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 
@@ -45,7 +45,7 @@ const TopUpPage: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col font-sans" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-            <Navbar />
+            
             <div className="flex-1 w-full max-w-5xl mx-auto px-4 pt-24 pb-16">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2 pb-4" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}>Nạp Xu</h1>
@@ -144,7 +144,7 @@ const TopUpPage: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            
         </div>
     );
 };

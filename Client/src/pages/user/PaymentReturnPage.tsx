@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Layout/Navbar';
-import Footer from '../../components/Layout/Footer';
+
+
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 
@@ -38,7 +38,7 @@ const PaymentReturnPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
+            
             <div className="container" style={{ flex: 1, padding: '100px 20px 40px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
                 <div className="glass-panel" style={{ padding: '3rem', borderRadius: '1.5rem', background: 'var(--bg-secondary)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)', textAlign: 'center' }}>
                     
@@ -113,7 +113,7 @@ const PaymentReturnPage: React.FC = () => {
 
                 </div>
             </div>
-            <Footer />
+            
         </div>
     );
 };

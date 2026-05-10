@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { BookOpen, ChevronRight, Trash2, History } from 'lucide-react';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+
+
 import LazyImage from '../components/ui/LazyImage';
 import { clearReadingHistory } from '../utils/readingHistory';
 import { comicService } from '../api/comicService';
@@ -61,7 +61,7 @@ const HistoryPage: React.FC = () => {
                 <title>Lịch Sử Đọc Truyện | ComicVerse</title>
                 <meta name="description" content="Xem lại lịch sử đọc truyện của bạn trên ComicVerse." />
             </Helmet>
-            <Navbar />
+            
 
             <main className="flex-1 container mx-auto px-6 pt-24 pb-16 md:pt-32 md:pb-24 max-w-7xl">
                 {/* Header */}
@@ -184,7 +184,7 @@ const HistoryPage: React.FC = () => {
                 )}
             </main>
 
-            <Footer />
+            
         </div>
     );
 };

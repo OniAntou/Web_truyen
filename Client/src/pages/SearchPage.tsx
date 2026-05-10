@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+
+
 import ComicGrid from '../components/Home/ComicGrid';
 import { comicService, ComicsResponse } from '../api/comicService';
 
@@ -19,7 +19,7 @@ const SearchPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <Navbar />
+            
             <div style={{ paddingTop: '80px', minHeight: '60vh' }}>
                 <div className="container">
                     <h2 className="section-title" style={{ marginTop: '2rem' }}>
@@ -37,7 +37,7 @@ const SearchPage: React.FC = () => {
                     )}
                 </div>
             </div>
-            <Footer />
+            
         </div>
     );
 };

@@ -1,10 +1,10 @@
-import Navbar from "../../components/Layout/Navbar";
-import Footer from "../../components/Layout/Footer";
+
+
 
 const AboutPage: React.FC = () => {
   return (
     <div className="info-page-container">
-      <Navbar />
+      
       <main className="info-content">
         <section className="info-hero">
           <h1>Chào mừng đến với ComicVerse</h1>
@@ -52,7 +52,7 @@ const AboutPage: React.FC = () => {
           </p>
         </section>
       </main>
-      <Footer />
+      
 
       <style>{`
         .info-page-container {

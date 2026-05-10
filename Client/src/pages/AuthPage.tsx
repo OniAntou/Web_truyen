@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Layout/Navbar";
-import Footer from "../components/Layout/Footer";
+
+
 import { authService } from "../api/authService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -162,11 +162,11 @@ const AuthPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", flexDirection: "column" }}>
-      <Navbar />
+      
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "100px 20px" }}>
         <div style={cardStyle}>{renderForm()}</div>
       </div>
-      <Footer />
+      
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+
+
 import { API_BASE_URL } from '../constants/api';
 import { clearSession } from '../utils/auth';
 
@@ -61,7 +61,7 @@ const CreatorApplication: React.FC = () => {
     if (submitted) {
         return (
             <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
-                <Navbar />
+                
                 <div className="flex-1 flex justify-center items-center p-6 md:p-12">
                     <div className="max-w-md w-full text-center space-y-6">
                         <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8" style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
@@ -76,14 +76,14 @@ const CreatorApplication: React.FC = () => {
                         </Link>
                     </div>
                 </div>
-                <Footer />
+                
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
-            <Navbar />
+            
             <div className="flex-1 flex justify-center p-6 py-20 md:py-32">
                 <div className="max-w-6xl w-full grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
                     
@@ -159,7 +159,7 @@ const CreatorApplication: React.FC = () => {
                     )}
                 </div>
             </div>
-            <Footer />
+            
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Layout/Navbar';
-import Footer from '../../components/Layout/Footer';
+
+
 import ComicGrid from '../../components/Home/ComicGrid';
 import { BookMarked } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
@@ -38,7 +38,7 @@ const FollowingPage: React.FC = () => {
 
     return (
         <div className="page-wrapper" style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <Navbar />
+            
             <main className="main-content" style={{ paddingTop: '7rem', paddingBottom: '4rem' }}>
                 <section className="container section">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
@@ -56,7 +56,7 @@ const FollowingPage: React.FC = () => {
                     )}
                 </section>
             </main>
-            <Footer />
+            
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Clock, Filter, ChevronDown, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+
+
 import { comicService, ComicsResponse } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre, Pagination } from '../types/comic';
@@ -51,7 +51,7 @@ const LatestPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
+            
 
             <main className="flex-1 container mx-auto px-6 pt-24 pb-16 md:pt-32 md:pb-24 max-w-7xl">
                 {/* Clean Typography Header */}
@@ -197,7 +197,7 @@ const LatestPage: React.FC = () => {
                 )}
             </main>
 
-            <Footer />
+            
         </div>
     );
 };

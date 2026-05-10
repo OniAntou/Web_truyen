@@ -4,8 +4,8 @@ import { BookOpen, Search, X, Layers } from 'lucide-react';
 import { comicService } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre } from '../types/comic';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
+
+
 
 interface GenreCardProps {
     genre: Genre;
@@ -117,7 +117,7 @@ const GenresPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
+            
 
             <main className="flex-1 container mx-auto px-6 pt-24 pb-16 md:pt-32 md:pb-24 max-w-7xl">
                 {/* Clean Typography Header */}
@@ -244,7 +244,7 @@ const GenresPage: React.FC = () => {
                 </div>
             </main>
 
-            <Footer />
+            
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Navbar from "../components/Layout/Navbar";
-import Footer from "../components/Layout/Footer";
+
+
 import { authService } from "../api/authService";
 
 const ResetPassword: React.FC = () => {
@@ -39,7 +39,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", flexDirection: "column" }}>
-      <Navbar />
+      
       <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", padding: "100px 20px" }}>
         <div style={cardStyle}>
           <h2 style={titleStyle}>Đặt lại mật khẩu</h2>
@@ -79,7 +79,7 @@ const ResetPassword: React.FC = () => {
           )}
         </div>
       </div>
-      <Footer />
+      
     </div>
   );
 };

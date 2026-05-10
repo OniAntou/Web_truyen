@@ -1,6 +1,6 @@
 import { Mail, Share2, Github } from 'lucide-react';
-import Navbar from '../../components/Layout/Navbar';
-import Footer from '../../components/Layout/Footer';
+
+
 
 const ContactPage: React.FC = () => {
     const contactMethods = [
@@ -24,7 +24,7 @@ const ContactPage: React.FC = () => {
 
     return (
         <div className="contact-page-container">
-            <Navbar />
+            
             <main className="contact-content">
                 <header className="contact-header">
                     <h1>Liên Hệ Với Chúng Tôi</h1>
@@ -59,7 +59,7 @@ const ContactPage: React.FC = () => {
                     ))}
                 </div>
             </main>
-            <Footer />
+            
 
             <style>{`
                 .contact-page-container {

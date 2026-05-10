@@ -1,10 +1,10 @@
-import Navbar from "../../components/Layout/Navbar";
-import Footer from "../../components/Layout/Footer";
+
+
 
 const TermsOfService: React.FC = () => {
   return (
     <div className="info-page-container">
-      <Navbar />
+      
       <main className="info-content">
         <h1>Điều khoản Sử dụng</h1>
         <p className="last-updated">Cập nhật lần cuối: 12 tháng 4, 2026</p>
@@ -55,7 +55,7 @@ const TermsOfService: React.FC = () => {
           </p>
         </section>
       </main>
-      <Footer />
+      
 
       <style>{`
         .info-page-container {

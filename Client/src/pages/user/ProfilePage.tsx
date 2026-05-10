@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Layout/Navbar';
-import Footer from '../../components/Layout/Footer';
+
+
 import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
 import { clearSession } from '../../utils/auth';
@@ -168,9 +168,9 @@ const ProfilePage: React.FC = () => {
     if (loading) {
         return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-                <Navbar />
+                
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Đang tải...</div>
-                <Footer />
+                
             </div>
         );
     }
@@ -178,12 +178,12 @@ const ProfilePage: React.FC = () => {
     if (!profile) {
         return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-                <Navbar />
+                
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-secondary)' }}>
                     <p>Phiên đăng nhập hết hạn.</p>
                     <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>Đăng nhập lại</button>
                 </div>
-                <Footer />
+                
             </div>
         );
     }
@@ -195,7 +195,7 @@ const ProfilePage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
+            
 
             <div className="container" style={{ flex: 1, paddingTop: '7rem', paddingBottom: '3rem' }}>
                 {/* Page title */}
@@ -407,7 +407,7 @@ const ProfilePage: React.FC = () => {
                 </div>
             )}
 
-            <Footer />
+            
 
             <style>{`
                 .profile-layout {
