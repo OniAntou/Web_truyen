@@ -4,6 +4,7 @@ import { Plus, BookOpen, Edit, Eye, Star, Home, LayoutDashboard, Trash2 } from '
 import LazyImage from '../components/ui/LazyImage';
 import { API_BASE_URL } from '../constants/api';
 import { clearSession } from '../utils/auth';
+import { getAuthToken } from '../utils/authToken';
 
 interface StudioComic {
     _id?: string;
@@ -24,14 +25,22 @@ const CreatorStudio: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const token = getAuthToken();
+
         // Add a check in a real app to ensure role === 'creator' from context
         fetch(`${API_BASE_URL}/studio/comics`, {
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
+            },
             credentials: 'include'
         })
         .then(res => {
             if (res.status === 401) {
-                clearSession();
-                return null;
+                if (token) {
+                    clearSession();
+                    return null;
+                }
+                throw new Error('Phien dang nhap can duoc lam moi. Vui long dang nhap lai.');
             }
             if (res.status === 403) {
                 throw new Error('Bạn không có quyền truy cập trang này. Vui lòng nộp đơn xin cấp quyền tác giả.');
@@ -56,8 +65,12 @@ const CreatorStudio: React.FC = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa truyện này? Hành động này không thể hoàn tác.')) return;
         
         try {
+            const token = getAuthToken();
             const res = await fetch(`${API_BASE_URL}/comics/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
                 credentials: 'include'
             });
             if (res.ok) {
