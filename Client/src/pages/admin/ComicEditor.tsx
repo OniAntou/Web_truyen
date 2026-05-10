@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_BASE_URL } from '../../constants/api';
-import { withUserAuthHeaders } from '../../utils/authFetch';
+import apiClient from '../../api/apiClient';
 
 /**
  * Sanitize a URL to only allow safe protocols (http, https, blob).

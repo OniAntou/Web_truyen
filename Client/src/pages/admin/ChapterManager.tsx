@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { API_BASE_URL } from '../../constants/api';
-import { withUserAuthHeaders } from '../../utils/authFetch';
+import apiClient from '../../api/apiClient';
 
 const MAX_FILES_PER_UPLOAD_BATCH = 2;
 const MAX_BYTES_PER_UPLOAD_BATCH = 3.5 * 1024 * 1024; // 3.5MB to stay safely under Vercel's 4.5MB limit
@@ -34,10 +33,6 @@ interface FilePreview {
     preview: string;
 }
 
-// Helper: determine if we are in admin context
-const isAdminContext = () => window.location.pathname.startsWith('/admin');
-const authHeaders = (headers: Record<string, string> = {}) => isAdminContext() ? headers : withUserAuthHeaders(headers);
-const authRedirectPath = () => isAdminContext() ? '/admin/login' : '/auth';
 
 const splitFilesIntoUploadBatches = (fileList: File[]) => {
     const batches: File[][] = [];

@@ -12,9 +12,11 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
         'X-Requested-With': 'XMLHttpRequest',
         ...((customConfig.headers as Record<string, string>) || {}) 
     };
-
-    const isAdmin = endpoint.startsWith('/admin') || endpoint.startsWith('admin');
-    const token = isAdmin ? getAdminToken() : getAuthToken();
+    const isAdminContext = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/studio');
+    const isExplicitAdminEndpoint = endpoint.startsWith('/admin') || endpoint.startsWith('admin') || endpoint.startsWith('/studio') || endpoint.startsWith('studio');
+    
+    const isAdmin = isAdminContext || isExplicitAdminEndpoint;
+    const token = isAdmin ? (getAdminToken() || getAuthToken()) : getAuthToken();
     
     if (token && !headers.Authorization) {
         headers.Authorization = `Bearer ${token}`;

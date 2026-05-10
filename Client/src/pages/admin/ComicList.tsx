@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, List, Search, LayoutGrid, LayoutList, Eye, Star } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 import { translateStatus } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
 import { comicService } from '../../api/comicService';
@@ -41,24 +41,13 @@ const ComicList: React.FC = () => {
         if (!window.confirm('Are you sure you want to delete this comic?')) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
+            await apiClient(`/comics/${id}`, {
+                method: 'DELETE'
             });
-
-            if (response.ok) {
-                setComics(comics.filter(comic => comic._id !== id && comic.id !== id));
-            } else if (response.status === 401 || response.status === 403) {
-                alert('Không có quyền xóa truyện. Vui lòng đăng nhập lại.');
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || 'Failed to delete comic');
-            }
+            setComics(comics.filter(comic => comic._id !== id && comic.id !== id));
         } catch (error: any) {
             console.error('Error deleting comic:', error);
-            alert('Lỗi kết nối khi xóa truyện. Vui lòng thử lại.');
+            alert(error.message || 'Lỗi khi xóa truyện');
         }
     };
 

@@ -22,7 +22,10 @@ const authenticateToken = (req, res, next) => {
   }
 
   jwt.verify(token, secret || 'fallback_secret', (err, user) => {
-    if (err) return res.status(403).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    if (err) {
+      console.log(`[AUTH] Token verification failed: ${err.message}. Token: ${token?.substring(0, 10)}...`);
+      return res.status(403).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    }
     req.user = user;
     next();
   });

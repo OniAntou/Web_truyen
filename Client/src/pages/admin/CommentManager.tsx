@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Search, Trash2, MessageSquare, ChevronLeft, ChevronRight, X, RefreshCw, Filter, CheckSquare, Square, AlertTriangle, BookOpen, Clock, Reply } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 interface AdminComment {
     _id: string;
@@ -109,17 +109,7 @@ const CommentManager: React.FC = () => {
     }, [searchTerm]);
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/admin/comments/comics`, {
-            credentials: 'include'
-        })
-            .then(res => {
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem('admin');
-                    window.location.href = '/admin/login';
-                    return;
-                }
-                return res.json();
-            })
+        apiClient<ComicListItem[]>('/admin/comments/comics')
             .then(data => {
                 if (data) setComicsList(data);
             })
@@ -135,15 +125,7 @@ const CommentManager: React.FC = () => {
         params.set('limit', '15');
 
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/comments?${params.toString()}`, {
-                credentials: 'include'
-            });
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-                return;
-            }
-            const data = await res.json();
+            const data = await apiClient<any>(`/admin/comments?${params.toString()}`);
             setComments(data.comments || []);
             setTotalPages(data.totalPages || 1);
             setTotal(data.total || 0);
@@ -184,49 +166,32 @@ const CommentManager: React.FC = () => {
     // Delete handlers
     const handleDeleteSingle = async (id: string) => {
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/comments/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
+            await apiClient(`/admin/comments/${id}`, {
+                method: 'DELETE'
             });
-            if (res.ok) {
-                setComments(prev => prev.filter(c => c._id !== id));
-                setTotal(prev => prev - 1);
-                setSelectedIds(prev => {
-                    const next = new Set(prev);
-                    next.delete(id);
-                    return next;
-                });
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Lỗi khi xoá bình luận');
-            }
+            setComments(prev => prev.filter(c => c._id !== id));
+            setTotal(prev => prev - 1);
+            setSelectedIds(prev => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
         } catch (e: any) {
-            alert('Lỗi kết nối');
+            alert(e.message || 'Lỗi khi xoá bình luận');
         }
-        setDeleteModal(null);
-    };
 
     const handleBulkDelete = async () => {
         const ids = Array.from(selectedIds);
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/comments/bulk`, {
+            await apiClient('/admin/comments/bulk', {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ ids })
+                body: { ids }
             });
-            if (res.ok) {
-                setComments(prev => prev.filter(c => !selectedIds.has(c._id)));
-                setTotal(prev => prev - ids.length);
-                setSelectedIds(new Set());
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Lỗi khi xoá bình luận');
-            }
+            setComments(prev => prev.filter(c => !selectedIds.has(c._id)));
+            setTotal(prev => prev - ids.length);
+            setSelectedIds(new Set());
         } catch (e: any) {
-            alert('Lỗi kết nối');
+            alert(e.message || 'Lỗi khi xoá bình luận');
         }
         setDeleteModal(null);
     };

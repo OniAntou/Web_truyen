@@ -360,7 +360,7 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        apiClient<DashboardStats>('/stats')
+        apiClient<DashboardStats>('/admin/stats')
             .then(data => {
                 if (!data) return;
                 setStats(data);
@@ -391,9 +391,11 @@ const Dashboard: React.FC = () => {
                     <p className="text-zinc-300 mt-1 text-base font-medium">Core platform metrics and performance trends.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl">
-                        <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                        <span className="text-zinc-200 text-xs font-bold uppercase tracking-widest">{systemStatus}</span>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl shadow-inner">
+                        <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
+                        <span className={`text-xs font-bold uppercase tracking-widest ${systemStatus === 'Active' ? 'text-zinc-200' : 'text-amber-500'}`}>
+                            {systemStatus === 'Active' ? 'System Online' : 'Session Expired'}
+                        </span>
                     </div>
                 </div>
             </div>

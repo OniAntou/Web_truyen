@@ -122,7 +122,7 @@ app.use('/api/chapters', chapterRoutes);
 app.use('/api/genres', genreRoutes);
 app.use('/api/studio', studioRoutes);
 app.use('/api/upload', uploadRoutes); 
-app.use('/api/stats', statsRoutes);
+app.use('/api/admin/stats', statsRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/comments', adminCommentRoutes);
