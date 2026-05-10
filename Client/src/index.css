@@ -214,8 +214,8 @@ img {
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 1.5rem 0;
-  transition: all 0.3s ease;
+  padding: 1.25rem 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
 }
 
@@ -246,16 +246,37 @@ img {
 .nav-links {
   display: none;
   align-items: center;
-  gap: 2rem;
+  gap: 2.25rem;
+  margin-left: 2rem;
 }
 
 .nav-links a {
   color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+  letter-spacing: 0.01em;
 }
 
 .nav-links a:hover {
   color: white;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
 }
 
 .nav-actions {
@@ -1897,8 +1918,13 @@ img {
   color: var(--text-primary);
   outline: none;
   margin-left: 10px;
-  width: 150px;
+  width: 200px;
   font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-search-input:focus {
+  width: 320px;
 }
 
 .nav-search-input::placeholder {
