@@ -10,6 +10,8 @@ import { clearSession } from '../../utils/auth';
 import { Comic, Genre } from '../../types/comic';
 import { User } from '../../types/user';
 import { useAuthStore } from '../../store/authStore';
+import { useTranslation } from '../../hooks/useTranslation';
+import { Languages } from 'lucide-react';
 
 const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -21,6 +23,7 @@ const Navbar: React.FC = () => {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [searching, setSearching] = useState(false);
     const { user, logout: storeLogout, updateUser } = useAuthStore();
+    const { t, language, toggleLanguage } = useTranslation();
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('theme') || 'dark';
     });
@@ -167,17 +170,17 @@ const Navbar: React.FC = () => {
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
     const navLinks = [
-        { icon: <Home size={18} />, label: 'Trang Chủ', path: '/' },
-        { icon: <Trophy size={18} />, label: 'Xếp Hạng', path: '/ranking' },
-        { icon: <TrendingUp size={18} />, label: 'Thịnh Hành', path: '/popular' },
-        { icon: <Grid3X3 size={18} />, label: 'Thể Loại', path: '/genres' },
-        { icon: <Clock size={18} />, label: 'Mới Nhất', path: '/latest' },
+        { icon: <Home size={18} />, label: t('home'), path: '/' },
+        { icon: <Trophy size={18} />, label: t('ranking'), path: '/ranking' },
+        { icon: <TrendingUp size={18} />, label: t('popular'), path: '/popular' },
+        { icon: <Grid3X3 size={18} />, label: t('genres'), path: '/genres' },
+        { icon: <Clock size={18} />, label: t('latest'), path: '/latest' },
     ];
 
     const personalLinks = [
-        { icon: <BookOpen size={18} />, label: 'Lịch Sử Đọc', path: '/history' },
-        { icon: <Heart size={18} />, label: 'Đang Theo Dõi', path: '/following' },
-        { icon: <UserIcon size={18} />, label: 'Trang Cá Nhân', path: '/profile' },
+        { icon: <BookOpen size={18} />, label: t('history'), path: '/history' },
+        { icon: <Heart size={18} />, label: t('following'), path: '/following' },
+        { icon: <UserIcon size={18} />, label: t('profile'), path: '/profile' },
     ];
 
     return (
@@ -191,13 +194,13 @@ const Navbar: React.FC = () => {
 
                 {/* Desktop Menu */}
                 <div className="nav-links hidden md:flex" id="desktop-nav-links">
-                    <Link to="/" id="nav-home">Trang Chủ</Link>
-                    <Link to="/ranking" id="nav-ranking">Xếp Hạng</Link>
-                    <Link to="/popular" id="nav-popular">Thịnh Hành</Link>
-                    <Link to="/genres" id="nav-genres">Thể Loại</Link>
-                    <Link to="/latest" id="nav-latest">Mới Nhất</Link>
-                    {user && <Link to="/history" id="nav-history">Lịch Sử</Link>}
-                    {user && <Link to="/following" id="nav-following" style={{ color: '#eab308' }}>Theo Dõi</Link>}
+                    <Link to="/" id="nav-home">{t('home')}</Link>
+                    <Link to="/ranking" id="nav-ranking">{t('ranking')}</Link>
+                    <Link to="/popular" id="nav-popular">{t('popular')}</Link>
+                    <Link to="/genres" id="nav-genres">{t('genres')}</Link>
+                    <Link to="/latest" id="nav-latest">{t('latest')}</Link>
+                    {user && <Link to="/history" id="nav-history">{t('history')}</Link>}
+                    {user && <Link to="/following" id="nav-following" style={{ color: '#eab308' }}>{t('following')}</Link>}
                 </div>
 
                 {/* Actions */}
@@ -216,7 +219,7 @@ const Navbar: React.FC = () => {
                             <Search size={18} className="nav-search-icon" />
                             <input 
                                 type="text" 
-                                placeholder="Search..." 
+                                placeholder={t('search_placeholder')} 
                                 value={searchQuery}
                                 className="nav-search-input"
                                 onChange={(e) => handleSearchInput(e.target.value)}
@@ -243,7 +246,7 @@ const Navbar: React.FC = () => {
                                 {searching ? (
                                     <div className="search-dropdown-loading">
                                         <div className="search-spinner"></div>
-                                        <span>Searching...</span>
+                                        <span>{t('searching')}</span>
                                     </div>
                                 ) : searchResults.length > 0 ? (
                                     <>
@@ -284,20 +287,30 @@ const Navbar: React.FC = () => {
                                             className="search-dropdown-viewall"
                                             onClick={handleSearchSubmit}
                                         >
-                                            View all results for "{searchQuery}"
+                                            {t('view_all')} "{searchQuery}"
                                         </button>
                                     </>
                                 ) : (
                                     <div className="search-dropdown-empty">
-                                        No results found for "{searchQuery}"
+                                        {t('no_results')} "{searchQuery}"
                                     </div>
                                 )}
                             </div>
                         )}
                     </div>
 
-                    <button className="theme-toggle-btn" onClick={toggleTheme} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                    <button className="theme-toggle-btn" onClick={toggleTheme} title={theme === 'dark' ? t('theme_light') : t('theme_dark')}>
                         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
+
+                    <button 
+                        className="theme-toggle-btn ml-2" 
+                        onClick={toggleLanguage} 
+                        title={t('switch_lang')}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '0 8px' }}
+                    >
+                        <Languages size={18} />
+                        <span style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>{language.toUpperCase()}</span>
                     </button>
 
                     {user ? (
@@ -319,7 +332,7 @@ const Navbar: React.FC = () => {
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
                                     </div>
                                     <Link to="/profile" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--text-primary)', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
-                                        Trang cá nhân
+                                        {t('profile')}
                                     </Link>
                                     {user?.role === 'admin' && (
                                         <Link to="/admin" style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#3b82f6', textDecoration: 'none', cursor: 'pointer', borderRadius: '4px', fontWeight: '600', marginBottom: '0.25rem' }} onClick={() => setShowProfileDropdown(false)}>
@@ -332,7 +345,7 @@ const Navbar: React.FC = () => {
                                         </Link>
                                     )}
                                     <button onClick={handleLogout} style={{ width: '100%', textAlign: 'left', padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', borderRadius: '4px', fontWeight: '600' }}>
-                                        Đăng xuất
+                                        {t('logout')}
                                     </button>
                                 </div>
                             )}
@@ -340,7 +353,7 @@ const Navbar: React.FC = () => {
                     ) : (
                         <button className="btn btn-primary" onClick={() => navigate('/auth')}>
                             <UserIcon size={18} />
-                            <span>Login</span>
+                            <span>{t('login')}</span>
                         </button>
                     )}
                 </div>
@@ -370,7 +383,7 @@ const Navbar: React.FC = () => {
                     <input
                         ref={mobileSearchRef}
                         type="text"
-                        placeholder="Tìm kiếm truyện..."
+                        placeholder={t('search_placeholder')}
                         value={searchQuery}
                         className="mobile-search-input"
                         onChange={(e) => handleSearchInput(e.target.value)}
@@ -391,7 +404,7 @@ const Navbar: React.FC = () => {
                         {searching ? (
                             <div className="search-dropdown-loading">
                                 <div className="search-spinner"></div>
-                                <span>Đang tìm kiếm...</span>
+                                <span>{t('searching')}</span>
                             </div>
                         ) : searchResults.length > 0 ? (
                             <>
@@ -422,12 +435,12 @@ const Navbar: React.FC = () => {
                                     </Link>
                                 ))}
                                 <button className="search-dropdown-viewall" onClick={handleSearchSubmit}>
-                                    Xem tất cả kết quả cho "{searchQuery}"
+                                    {t('view_all')} "{searchQuery}"
                                 </button>
                             </>
                         ) : (
                             <div className="search-dropdown-empty">
-                                Không tìm thấy kết quả cho "{searchQuery}"
+                                {t('no_results')} "{searchQuery}"
                             </div>
                         )}
                     </div>
@@ -461,7 +474,7 @@ const Navbar: React.FC = () => {
                     )}
 
                     <div className="drawer-nav-section">
-                        <div className="drawer-section-label">Điều hướng</div>
+                        <div className="drawer-section-label">{t('navigation')}</div>
                         <div className="drawer-nav-links">
                             {navLinks.map(link => (
                                 <Link 
@@ -479,7 +492,7 @@ const Navbar: React.FC = () => {
 
                     {user && (
                         <div className="drawer-nav-section">
-                            <div className="drawer-section-label">Cá nhân</div>
+                            <div className="drawer-section-label">{t('personal')}</div>
                             <div className="drawer-nav-links">
                                 {personalLinks.map(link => (
                                     <Link 
@@ -497,15 +510,25 @@ const Navbar: React.FC = () => {
                     )}
 
                     <div className="drawer-nav-section">
-                        <div className="drawer-section-label">Hệ thống</div>
+                        <div className="drawer-section-label">{t('system')}</div>
                         <div className="drawer-nav-links">
                             <button className="drawer-nav-link" onClick={toggleTheme}>
                                 <span className="drawer-link-icon">
                                     <Palette size={18} />
                                 </span>
-                                Giao diện {theme === 'dark' ? 'Tối' : 'Sáng'}
+                                {t('theme')} {theme === 'dark' ? t('theme_dark') : t('theme_light')}
                                 <span className="drawer-link-badge">
                                     {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+                                </span>
+                            </button>
+
+                            <button className="drawer-nav-link" onClick={toggleLanguage}>
+                                <span className="drawer-link-icon">
+                                    <Languages size={18} />
+                                </span>
+                                {t('language')}: {language === 'vi' ? 'Tiếng Việt' : 'English'}
+                                <span className="drawer-link-badge">
+                                    {language.toUpperCase()}
                                 </span>
                             </button>
 
@@ -521,12 +544,12 @@ const Navbar: React.FC = () => {
                     <div className="drawer-footer">
                         {user ? (
                             <button className="drawer-logout-btn" onClick={() => { handleLogout(); closeMobileMenu(); }}>
-                                Đăng Xuất
+                                {t('logout')}
                             </button>
                         ) : (
                             <button className="drawer-login-btn" onClick={() => { navigate('/auth'); closeMobileMenu(); }}>
                                 <UserIcon size={18} />
-                                Đăng Nhập
+                                {t('login')}
                             </button>
                         )}
                     </div>

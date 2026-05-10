@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../hooks/useTranslation';
 
 
 import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
@@ -53,6 +54,7 @@ const ProfilePage: React.FC = () => {
     const [transactions, setTransactions] = useState<Transactions>({ payments: [], unlocks: [] });
     const [loadingHistory, setLoadingHistory] = useState(false);
     const navigate = useNavigate();
+    const { t, language } = useTranslation();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -68,7 +70,7 @@ const ProfilePage: React.FC = () => {
             console.error('Failed to fetch profile:', err);
             // If it's a 401/403, apiClient will handle the logout.
             // For other errors, we might want to show them.
-            setToast({ msg: err.message || 'Lỗi khi tải thông tin cá nhân', type: 'err' });
+            setToast({ msg: err.message || t('profile_load_err'), type: 'err' });
         })
         .finally(() => {
             setLoading(false); 
@@ -95,7 +97,7 @@ const ProfilePage: React.FC = () => {
         try {
             const data = await userService.updateMe<Profile>({ [editing]: trimmed });
             setProfile(data);
-            showToast('Đã cập nhật thành công');
+            showToast(t('update_success'));
             cancelEdit();
         } catch (err: any) {
             showToast(err.message, 'err');
@@ -144,7 +146,7 @@ const ProfilePage: React.FC = () => {
 
         // Size check (2MB)
         if (file.size > 2 * 1024 * 1024) {
-            showToast('Kích thước ảnh tối đa là 2MB', 'err');
+            showToast(t('avatar_size_err'), 'err');
             return;
         }
 
@@ -152,7 +154,7 @@ const ProfilePage: React.FC = () => {
         try {
             const data = await userService.uploadAvatar(file);
             setProfile(data.user as Profile);
-            showToast('Đã cập nhật ảnh đại diện');
+            showToast(t('avatar_update_success'));
             
             // Sync with localStorage
             const localUserString = localStorage.getItem('user');
@@ -168,12 +170,12 @@ const ProfilePage: React.FC = () => {
         }
     };
 
-    const roleLabel: Record<string, string> = { admin: 'Admin', creator: 'Creator', user: 'Thành viên' };
+    const roleLabel: Record<string, string> = { admin: 'Admin', creator: 'Creator', user: language === 'vi' ? 'Thành viên' : 'Member' };
 
     if (!profile) {
         if (loading) return (
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Đang tải...</div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>{t('loading')}</div>
             </div>
         );
 
@@ -181,11 +183,11 @@ const ProfilePage: React.FC = () => {
             <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', color: 'var(--text-secondary)' }}>
                     <AlertTriangle size={48} style={{ color: 'var(--accent)', marginBottom: '1rem' }} />
-                    <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>Không thể tải thông tin cá nhân</p>
-                    <p style={{ maxWidth: '300px', textAlign: 'center', fontSize: '0.9rem' }}>Vui lòng kiểm tra lại kết nối hoặc đăng nhập lại nếu phiên làm việc đã hết hạn.</p>
+                    <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>{t('profile_load_err')}</p>
+                    <p style={{ maxWidth: '300px', textAlign: 'center', fontSize: '0.9rem' }}>{language === 'vi' ? 'Vui lòng kiểm tra lại kết nối hoặc đăng nhập lại nếu phiên làm việc đã hết hạn.' : 'Please check your connection or log in again if your session has expired.'}</p>
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <button className="btn btn-glass" onClick={() => window.location.reload()}>Thử lại</button>
-                        <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>Đăng nhập</button>
+                        <button className="btn btn-glass" onClick={() => window.location.reload()}>{t('retry')}</button>
+                        <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>{t('login')}</button>
                     </div>
                 </div>
             </div>
@@ -205,7 +207,7 @@ const ProfilePage: React.FC = () => {
 
             <div className="container" style={{ flex: 1, paddingTop: '7rem', paddingBottom: '3rem' }}>
                 {/* Page title */}
-                <h2 className="section-title" style={{ marginBottom: '2rem' }}>Hồ Sơ Cá Nhân</h2>
+                <h2 className="section-title" style={{ marginBottom: '2rem' }}>{t('profile_title')}</h2>
 
                 <div className="profile-layout">
                     {/* ── Sidebar ── */}
@@ -235,7 +237,7 @@ const ProfilePage: React.FC = () => {
                             onClick={() => setShowDeleteModal(true)}
                             style={{ width: '100%', marginTop: '1rem' }}
                         >
-                            <Trash2 size={16} /> Xóa tài khoản
+                            <Trash2 size={16} /> {t('delete_account')}
                         </button>
                     </div>
 
@@ -243,11 +245,11 @@ const ProfilePage: React.FC = () => {
                     <div className="profile-main">
                         {/* Info card */}
                         <div className="glass-panel" style={{ borderRadius: '1rem', padding: '1.5rem' }}>
-                            <h4 className="profile-card-heading">Thông tin cá nhân</h4>
+                            <h4 className="profile-card-heading">{language === 'vi' ? 'Thông tin cá nhân' : 'Personal Information'}</h4>
 
                             {/* Username */}
                             <div className="profile-field">
-                                <span className="profile-field-label">Tên hiển thị</span>
+                                <span className="profile-field-label">{t('display_name')}</span>
                                 {editing === 'username' ? (
                                     <div className="profile-field-edit">
                                         <input className="profile-input" value={editValue} onChange={e => setEditValue(e.target.value)} onKeyDown={handleKeyDown} autoFocus disabled={saving} />
@@ -284,16 +286,16 @@ const ProfilePage: React.FC = () => {
                         <div className="profile-stats-row">
                             {/* Xu */}
                             <div className="glass-panel" style={{ borderRadius: '1rem', padding: '1.5rem', flex: 1 }}>
-                                <h4 className="profile-card-heading">Số dư</h4>
+                                <h4 className="profile-card-heading">{t('balance')}</h4>
                                 <div style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0.5rem 0' }}>
-                                    {(profile.coins || 0).toLocaleString('vi-VN')} <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>xu</span>
+                                    {(profile.coins || 0).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')} <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{t('currency')}</span>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <button className="btn btn-glass" style={{ flex: 1, fontSize: '0.85rem' }} onClick={() => navigate('/payment/topup')}>
-                                        <Plus size={15} /> Nạp Xu
+                                        <Plus size={15} /> {t('topup')}
                                     </button>
                                     <button className="btn btn-glass" style={{ flex: 1, fontSize: '0.85rem' }} onClick={handleOpenHistory}>
-                                        <History size={15} /> Lịch sử
+                                        <History size={15} /> {t('history_btn')}
                                     </button>
                                 </div>
                             </div>
@@ -304,10 +306,10 @@ const ProfilePage: React.FC = () => {
                                 {isVip && profile.vip_expiry ? (
                                     <>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#f59e0b', fontWeight: 600, fontSize: '0.9rem', margin: '0.5rem 0' }}>
-                                            <Crown size={16} /> Đang hoạt động
+                                            <Crown size={16} /> {t('vip_active')}
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
-                                            <Clock size={13} /> Hết hạn {new Date(profile.vip_expiry).toLocaleDateString('vi-VN')} · còn {daysLeft} ngày
+                                            <Clock size={13} /> {t('vip_expiry')} {new Date(profile.vip_expiry).toLocaleDateString(language === 'vi' ? 'vi-VN' : 'en-US')} · {t('vip_days_left').replace('%d', daysLeft.toString())}
                                         </div>
                                         <div style={{ height: 4, background: 'rgba(245,158,11,0.1)', borderRadius: 4, overflow: 'hidden' }}>
                                             <div style={{ height: '100%', width: `${Math.min(100, (daysLeft / 30) * 100)}%`, background: '#f59e0b', borderRadius: 4, transition: 'width 0.4s' }} />
@@ -315,9 +317,9 @@ const ProfilePage: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.5rem 0 0.75rem' }}>Chưa kích hoạt</p>
+                                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.5rem 0 0.75rem' }}>{t('vip_expired')}</p>
                                         <button className="btn" style={{ width: '100%', fontSize: '0.85rem', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }} onClick={() => navigate('/payment/topup')}>
-                                            <Crown size={15} /> Nâng cấp VIP
+                                            <Crown size={15} /> {t('vip_upgrade')}
                                         </button>
                                     </>
                                 )}
@@ -334,9 +336,9 @@ const ProfilePage: React.FC = () => {
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: 'var(--accent)' }}>
                             <AlertTriangle size={48} />
                         </div>
-                        <h3 style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.25rem' }}>Xác nhận xóa tài khoản?</h3>
+                        <h3 style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.25rem' }}>{t('confirm_delete_title')}</h3>
                         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5' }}>
-                            Hành động này không thể hoàn tác. Mọi thông tin, lịch sử đọc truyện và số dư xu của bạn sẽ bị xóa vĩnh viễn.
+                            {t('confirm_delete_msg')}
                         </p>
                         <div style={{ display: 'flex', gap: '1rem' }}>
                             <button 
@@ -345,7 +347,7 @@ const ProfilePage: React.FC = () => {
                                 onClick={() => setShowDeleteModal(false)}
                                 disabled={saving}
                             >
-                                Hủy
+                                {t('cancel')}
                             </button>
                             <button 
                                 className="btn btn-primary" 
@@ -353,7 +355,7 @@ const ProfilePage: React.FC = () => {
                                 onClick={handleDeleteAccount}
                                 disabled={saving}
                             >
-                                {saving ? 'Đang xóa...' : 'Xác nhận xóa'}
+                                {saving ? t('deleting') : t('confirm')}
                             </button>
                         </div>
                     </div>
@@ -365,13 +367,13 @@ const ProfilePage: React.FC = () => {
                 <div className="modal-overlay" onClick={(e) => { if ((e.target as HTMLElement).className === 'modal-overlay') setShowHistoryModal(false); }}>
                     <div className="glass-panel modal-content" style={{ borderRadius: '1rem', padding: '2rem', maxWidth: '750px', width: '95%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><History size={20} className="text-accent" /> Lịch sử giao dịch</h3>
+                            <h3 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><History size={20} className="text-accent" /> {t('transaction_history')}</h3>
                             <button className="profile-icon-btn cancel" onClick={() => setShowHistoryModal(false)}><X size={20} /></button>
                         </div>
                         
                         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }} className="custom-scrollbar">
                             {loadingHistory ? (
-                                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Đang tải...</div>
+                                <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>{t('loading')}</div>
                             ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {allTransactions.map((item: any, idx: number) => (
@@ -391,24 +393,24 @@ const ProfilePage: React.FC = () => {
                                                 <div style={{ flex: 1 }}>
                                                     <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.2rem' }}>
                                                         {item.type === 'payment' 
-                                                            ? `Nạp qua VNPay (${item.status === 'success' ? 'Thành công' : item.status === 'failed' ? 'Thất bại' : 'Đang chờ'})` 
-                                                            : `Mở khóa Chapter ${item.chapter_id?.chapter_number || '?'}`}
+                                                            ? `${t('topup_vnpay')} (${item.status === 'success' ? t('success') : item.status === 'failed' ? t('failed') : t('pending')})` 
+                                                            : `${t('unlock_chapter')} ${item.chapter_id?.chapter_number || '?'}`}
                                                     </div>
                                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                                                         {item.type === 'unlock' && item.chapter_id?.comic_id?.title && <span style={{display: 'block', marginBottom: '0.1rem'}}>{item.chapter_id.comic_id.title}</span>}
-                                                        {new Date(item.created_at).toLocaleString('vi-VN')}
+                                                        {new Date(item.created_at).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')}
                                                     </div>
                                                 </div>
                                                 <div style={{ 
                                                     fontWeight: 700, whiteSpace: 'nowrap',
                                                     color: item.type === 'payment' && item.status === 'success' ? '#10b981' : item.type === 'unlock' ? '#f43f5e' : 'var(--text-secondary)' 
                                                 }}>
-                                                    {item.type === 'payment' ? (item.status === 'success' ? '+' : '') + Math.floor(item.amount / 1000 * 100).toLocaleString('vi-VN') : '-' + item.price.toLocaleString('vi-VN')} xu
+                                                    {item.type === 'payment' ? (item.status === 'success' ? '+' : '') + Math.floor(item.amount / 1000 * 100).toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US') : '-' + item.price.toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')} {t('currency')}
                                                 </div>
                                             </div>
                                         ))}
                                     {transactions.payments.length === 0 && transactions.unlocks.length === 0 && (
-                                        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Chưa có giao dịch nào.</div>
+                                        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>{t('no_transactions')}</div>
                                     )}
                                 </div>
                             )}
