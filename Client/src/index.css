@@ -774,8 +774,9 @@ img {
   overflow: hidden;
   display: flex;
   align-items: center;
-  padding-top: 6rem;
+  padding-top: calc(6rem + 4.5rem);
   padding-bottom: 3rem;
+  margin-top: -4.5rem;
   background: linear-gradient(
     160deg,
     #12091a 0%,
@@ -783,6 +784,13 @@ img {
     #0c0c12 60%,
     #0a0a0a 100%
   );
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-top: calc(6rem + 5.5rem);
+    margin-top: -5.5rem;
+  }
 }
 
 .hero::before {
@@ -1103,6 +1111,12 @@ img {
   height: 400px;
   position: relative;
   overflow: hidden;
+  margin-top: -4.5rem;
+}
+@media (min-width: 768px) {
+  .info-banner-bg {
+    margin-top: -5.5rem;
+  }
 }
 
 .info-banner-blur {

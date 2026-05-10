@@ -202,15 +202,18 @@ const Navbar: React.FC = () => {
     ];
 
     return (
-        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} id="main-navbar">
-            <div className="container navbar-content">
+        <>
+            <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} id="main-navbar">
+                <div className="container navbar-content">
                 {/* Logo */}
-                <Link to="/" className="nav-logo">
-                    Comic<span>Verse</span>
-                </Link>
+                <div className="flex-1 flex justify-start">
+                    <Link to="/" className="nav-logo">
+                        Comic<span>Verse</span>
+                    </Link>
+                </div>
 
                 {/* Desktop Menu */}
-                <div className="nav-links">
+                <div className="nav-links flex-none flex justify-center hidden md:flex">
                     <Link to="/">Home</Link>
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
@@ -220,7 +223,7 @@ const Navbar: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="nav-actions flex items-center">
+                <div className="nav-actions flex-1 flex items-center justify-end hidden md:flex">
                     {user?.role === 'creator' ? (
                         <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-[var(--accent)] hover:bg-orange-600 text-white rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                             Studio
@@ -380,7 +383,7 @@ const Navbar: React.FC = () => {
                         {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
                     </button>
                 </div>
-            </div>
+            </nav>
 
             {/* Mobile Search Overlay */}
             <div className={`mobile-search-overlay ${isMobileSearchOpen ? 'open' : ''}`}>
@@ -563,7 +566,7 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </div>
-        </nav>
+        </>
     );
 };
 
