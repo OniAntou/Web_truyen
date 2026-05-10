@@ -206,14 +206,12 @@ const Navbar: React.FC = () => {
             <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} id="main-navbar">
                 <div className="container navbar-content">
                 {/* Logo */}
-                <div className="flex-1 flex justify-start">
-                    <Link to="/" className="nav-logo">
-                        Comic<span>Verse</span>
-                    </Link>
-                </div>
+                <Link to="/" className="nav-logo">
+                    Comic<span>Verse</span>
+                </Link>
 
                 {/* Desktop Menu */}
-                <div className="nav-links flex-none flex justify-center hidden md:flex">
+                <div className="nav-links hidden md:flex">
                     <Link to="/">Home</Link>
                     <Link to="/popular">Popular</Link>
                     <Link to="/genres">Genres</Link>
@@ -223,7 +221,7 @@ const Navbar: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="nav-actions flex-1 flex items-center justify-end hidden md:flex">
+                <div className="nav-actions hidden md:flex">
                     {user?.role === 'creator' ? (
                         <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-[var(--accent)] hover:bg-orange-600 text-white rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                             Studio
