@@ -1,6 +1,6 @@
 require('dotenv').config();
-import {  Comic, Pages, Upload, connectDB, mongoose  } from "../Database/database";
-import {  deleteFromR2, R2_ENABLED  } from "../config/r2";
+import {  Comic, Pages, Upload, connectDB, mongoose  } from "../src/database";
+import {  deleteFromR2, R2_ENABLED  } from "../src/config/r2";
 
 async function cleanup() {
   if (!R2_ENABLED) {

@@ -1,6 +1,6 @@
 require('dotenv').config();
 import mongoose from "mongoose";
-import {  Comic, Chapter, connectDB  } from "../Database/database";
+import {  Comic, Chapter, connectDB  } from "../src/database";
 
 async function sync() {
   try {

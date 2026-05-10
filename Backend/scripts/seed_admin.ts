@@ -1,7 +1,7 @@
 require('dotenv').config();
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import {  AdminLogin  } from "../Database/database";
+import {  AdminLogin  } from "../src/database";
 
 const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/skycomic';
 

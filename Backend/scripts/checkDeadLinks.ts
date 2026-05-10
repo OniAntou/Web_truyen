@@ -1,5 +1,5 @@
 require('dotenv').config();
-import {  Pages, connectDB, mongoose  } from "../Database/database";
+import {  Pages, connectDB, mongoose  } from "../src/database";
 
 async function checkDeadLinks() {
   await connectDB();
