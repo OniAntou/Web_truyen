@@ -179,6 +179,7 @@ const CommentManager: React.FC = () => {
         } catch (e: any) {
             alert(e.message || 'Lỗi khi xoá bình luận');
         }
+    };
 
     const handleBulkDelete = async () => {
         const ids = Array.from(selectedIds);
