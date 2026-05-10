@@ -27,7 +27,6 @@ const ComicEditor: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const isEditing = !!id;
-    const isStudio = window.location.pathname.startsWith('/studio');
 
     const [formData, setFormData] = useState({
         title: '',
@@ -43,8 +42,7 @@ const ComicEditor: React.FC = () => {
 
     const fetchComic = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/comics/${id}`);
-            const data = await response.json();
+            const data = await apiClient<any>(`/comics/${id}`);
             setFormData({
                 ...data,
                 genres: Array.isArray(data.genres) 
@@ -52,7 +50,6 @@ const ComicEditor: React.FC = () => {
                     : data.genres
             });
             // Display existing cover if available
-            // If data.cover_url is a full R2 url (or resolved one), show it
             if (data.cover_url) {
                 const safeUrl = sanitizeImageUrl(data.cover_url);
                 if (safeUrl) {
@@ -92,51 +89,32 @@ const ComicEditor: React.FC = () => {
 
         try {
             // 1. Create or Update Comic first
-            const url = isEditing
-                ? `${API_BASE_URL}/comics/${id}`
-                : `${API_BASE_URL}/comics`;
+            const path = isEditing ? `/comics/${id}` : '/comics';
             const method = isEditing ? 'PUT' : 'POST';
 
-            const response = await fetch(url, {
+            const comicData = await apiClient<any>(path, {
                 method,
-                headers: isStudio ? withUserAuthHeaders({ 
-                    'Content-Type': 'application/json'
-                }) : { 
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify(payload)
+                body: payload
             });
 
-            if (!response.ok) {
+            if (!comicData) {
                 alert('Failed to save comic data');
                 return;
             }
 
-            const comicData = await response.json();
-
             // 2. Upload cover image if selected
             if (coverFile) {
-                // Determine comic ID to use for upload
-                // If we edited, we have 'id' from params or comicData._id
-                // If we created, comicData should contain the new comic's _id (or id)
                 const comicIdToUpload = comicData._id || comicData.id;
-
                 const uploadFormData = new FormData();
                 uploadFormData.append('cover', coverFile);
 
-                const uploadResponse = await fetch(`${API_BASE_URL}/upload/cover/${comicIdToUpload}`, {
-                    method: 'POST',
-                    headers: isStudio ? withUserAuthHeaders() : undefined,
-                    credentials: 'include',
-                    body: uploadFormData
-                });
-
-                if (!uploadResponse.ok) {
-                    const err = await uploadResponse.json();
-                    alert('Comic saved, but image upload failed: ' + err.message);
-                    // Still navigate back probably, or let user retry?
-                    // For now, let's navigate back since the comic is saved
+                try {
+                    await apiClient(`/upload/cover/${comicIdToUpload}`, {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
+                } catch (uploadError: any) {
+                    alert('Comic saved, but image upload failed: ' + (uploadError.message || 'Unknown error'));
                 }
             }
 
@@ -145,7 +123,7 @@ const ComicEditor: React.FC = () => {
 
         } catch (error: any) {
             console.error('Error saving comic:', error);
-            alert('An error occurred');
+            alert('An error occurred: ' + (error.message || 'Unknown error'));
         }
     };
 
@@ -224,11 +202,10 @@ const ComicEditor: React.FC = () => {
                 <div>
                     <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
                     <div className="flex flex-col space-y-4">
-                        {/* Preview — previewUrl is pre-sanitized via sanitizeImageUrl() */}
+                        {/* Preview */}
                         {previewUrl && (
                             <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
-                                {/* codeql[js/xss-through-dom-property] */}
-                                <img src={previewUrl || ''} alt="Cover Preview" className="h-full object-contain rounded-xl" />
+                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
                             </div>
                         )}
 

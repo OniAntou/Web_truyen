@@ -282,15 +282,7 @@ const ChapterManager: React.FC = () => {
 
     const fetchData = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/comics/${id}`, {
-                credentials: 'include'
-            });
-            if (response.status === 401 || response.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = authRedirectPath();
-                return;
-            }
-            const data = await response.json();
+            const data = await apiClient<any>(`/comics/${id}`);
             setChapters(data.chapters || []);
             setComicTitle(data.title);
         } catch (error: any) {
@@ -325,15 +317,7 @@ const ChapterManager: React.FC = () => {
         e.preventDefault();
         try {
             // 1. Get Comic ID (ensure MongoDB _id)
-            const comicRes = await fetch(`${API_BASE_URL}/comics/${id}`, {
-                credentials: 'include'
-            });
-            if (comicRes.status === 401 || comicRes.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = authRedirectPath();
-                return;
-            }
-            const comicData = await comicRes.json();
+            const comicData = await apiClient<any>(`/comics/${id}`);
 
             const payload = {
                 comic_id: comicData._id,
@@ -345,18 +329,12 @@ const ChapterManager: React.FC = () => {
             };
 
             // 2. Create Chapter
-            const response = await fetch(`${API_BASE_URL}/chapters`, {
+            const createdChapter = await apiClient<any>('/chapters', {
                 method: 'POST',
-                headers: authHeaders({ 
-                    'Content-Type': 'application/json'
-                }),
-                credentials: 'include',
-                body: JSON.stringify(payload)
+                body: payload
             });
 
-            if (response.ok) {
-                const createdChapter = await response.json();
-
+            if (createdChapter) {
                 // 3. Upload Images if selected (in user-arranged order)
                 let uploadResult = { completed: true, uploadedCount: 0, total: files.length, message: '' };
                 if (files.length > 0) {
@@ -447,36 +425,16 @@ const ChapterManager: React.FC = () => {
                         `Đang upload ${uploadedCount + 1}-${uploadedCount + batch.length}/${fileList.length} ảnh${attempt > 1 ? ` (retry ${attempt}/${MAX_RETRIES})` : ''}...`
                     );
 
-                    const res = await fetch(`${API_BASE_URL}/upload/chapter/${chapterId}`, {
+                    const res = await apiClient<any>(`/upload/chapter/${chapterId}`, {
                         method: 'POST',
-                        headers: authHeaders(),
-                        credentials: 'include',
                         body: formData,
                     });
 
-                    if (res.ok) {
+                    if (res) {
                         return { success: true, batch };
                     }
 
-                    // Only retry on server error (5xx) or network-like errors
-                    const isTransientError = res.status >= 500 || !res.status;
-                    if (attempt < MAX_RETRIES && isTransientError) {
-                        // Exponential backoff: 1s, 2s, 4s
-                        const delay = 1000 * Math.pow(2, attempt - 1);
-                        await new Promise(r => setTimeout(r, delay));
-                        continue;
-                    }
-
-                    // Permanent error or last attempt
-                    let errorMessage = 'Upload failed';
-                    try {
-                        const err = await res.json();
-                        errorMessage = err?.message || errorMessage;
-                    } catch {
-                        // Ignore JSON parse error
-                    }
-
-                    return { success: false, error: errorMessage, status: res.status };
+                    return { success: false, error: 'Upload failed', status: 500 };
                 } catch (error: any) {
                     // Network error - retry if not last attempt
                     if (attempt < MAX_RETRIES) {
@@ -535,19 +493,15 @@ const ChapterManager: React.FC = () => {
     const handleDelete = async (chapterId: string) => {
         if (!confirm('Delete this chapter?')) return;
         try {
-            const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
-                method: 'DELETE',
-                headers: authHeaders(),
-                credentials: 'include'
+            await apiClient(`/chapters/${chapterId}`, {
+                method: 'DELETE'
             });
-            if (response.ok) {
-                setChapters(chapters.filter(c => c._id !== chapterId));
-                setSelectedChapters(prev => {
-                    const next = new Set(prev);
-                    next.delete(chapterId);
-                    return next;
-                });
-            }
+            setChapters(chapters.filter(c => c._id !== chapterId));
+            setSelectedChapters(prev => {
+                const next = new Set(prev);
+                next.delete(chapterId);
+                return next;
+            });
         } catch (error: any) {
             console.error('Error deleting chapter:', error);
         }
@@ -558,23 +512,16 @@ const ChapterManager: React.FC = () => {
         if (!confirm(`Delete ${selectedChapters.size} chapters?`)) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/chapters/bulk-delete`, {
+            await apiClient('/chapters/bulk-delete', {
                 method: 'POST',
-                headers: authHeaders({ 
-                    'Content-Type': 'application/json'
-                }),
-                credentials: 'include',
-                body: JSON.stringify({ chapterIds: Array.from(selectedChapters) })
+                body: { chapterIds: Array.from(selectedChapters) }
             });
 
-            if (response.ok) {
-                setChapters(chapters.filter(c => !selectedChapters.has(c._id)));
-                setSelectedChapters(new Set());
-            } else {
-                alert('Failed to delete chapters');
-            }
+            setChapters(chapters.filter(c => !selectedChapters.has(c._id)));
+            setSelectedChapters(new Set());
         } catch (error: any) {
             console.error('Error deleting chapters:', error);
+            alert('Failed to delete chapters');
         }
     };
 
@@ -619,19 +566,8 @@ const ChapterManager: React.FC = () => {
         reorderChapterIdRef.current = chapterId;
         setReorderModalOpen(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/chapters/${chapterId}/pages`, {
-                credentials: 'include'
-            });
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = authRedirectPath();
-                return;
-            }
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data?.message || 'Không thể tải danh sách ảnh');
-            }
-
+            const data = await apiClient<any>(`/chapters/${chapterId}/pages`);
+            
             const pages = Array.isArray(data) ? data : data?.pages;
             if (!Array.isArray(pages)) {
                 throw new Error('Dữ liệu danh sách ảnh không hợp lệ');
@@ -646,7 +582,6 @@ const ChapterManager: React.FC = () => {
             console.error('Error fetching pages:', err);
             alert(err.message || 'Không thể tải danh sách ảnh');
             setReorderModalOpen(false);
-        } finally {
         }
     };
 
@@ -658,26 +593,17 @@ const ChapterManager: React.FC = () => {
                 pageId: p._id,
                 page_number: idx + 1,
             }));
-            const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
+            await apiClient(`/chapters/${reorderChapterIdRef.current}/reorder-pages`, {
                 method: 'PUT',
-                headers: authHeaders({ 
-                    'Content-Type': 'application/json'
-                }),
-                credentials: 'include',
-                body: JSON.stringify({ order }),
+                body: { order },
             });
-            if (res.ok) {
-                alert('Đã lưu thứ tự ảnh thành công!');
-                setReorderModalOpen(false);
-                reorderChapterIdRef.current = null;
-                fetchData();
-            } else {
-                const err = await res.json();
-                alert(`Lỗi: ${err.message}`);
-            }
+            alert('Đã lưu thứ tự ảnh thành công!');
+            setReorderModalOpen(false);
+            reorderChapterIdRef.current = null;
+            fetchData();
         } catch (err: any) {
             console.error('Save reorder error:', err);
-            alert('Có lỗi xảy ra khi lưu thứ tự');
+            alert(err.message || 'Có lỗi xảy ra khi lưu thứ tự');
         } finally {
             setSavingOrder(false);
         }
@@ -696,30 +622,22 @@ const ChapterManager: React.FC = () => {
         if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn trang ${idx + 1} này không?\nHành động này sẽ xóa file gốc trên Cloudflare R2 và không thể hoàn tác.`)) return;
 
         try {
-            const res = await fetch(`${API_BASE_URL}/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
-                method: 'DELETE',
-                headers: authHeaders(),
-                credentials: 'include'
+            await apiClient(`/chapters/${reorderChapterIdRef.current}/pages/${pageToDelete._id}`, {
+                method: 'DELETE'
             });
-            if (res.ok) {
-                const updated = [...reorderPages];
-                updated.splice(idx, 1);
-                // Adjust local page numbers
-                for (let i = idx; i < updated.length; i++) {
-                    updated[i].page_number -= 1;
-                }
-                setReorderPages(updated);
-                fetchData(); // Refresh chapters count if needed
-            } else {
-                const err = await res.json();
-                alert(`Lỗi: ${err.message}`);
+            const updated = [...reorderPages];
+            updated.splice(idx, 1);
+            // Adjust local page numbers
+            for (let i = idx; i < updated.length; i++) {
+                updated[i].page_number -= 1;
             }
+            setReorderPages(updated);
+            fetchData(); // Refresh chapters count if needed
         } catch (err: any) {
             console.error('Delete page error:', err);
-            alert('Có lỗi xảy ra khi xóa ảnh');
+            alert(err.message || 'Có lỗi xảy ra khi xóa ảnh');
         }
     };
-    // -----------------------------------
 
     const toggleSelectAll = () => {
         if (selectedChapters.size === chapters.length) {
