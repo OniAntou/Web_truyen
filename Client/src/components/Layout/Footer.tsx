@@ -44,12 +44,12 @@ const Footer: React.FC = () => {
     ];
 
     return (
-        <footer className="w-full py-10 md:py-20 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+        <footer className="w-full py-6 md:py-16 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <div className="container mx-auto px-6 max-w-7xl">
-                <div className="flex flex-col lg:flex-row justify-between gap-10 lg:gap-8">
+                <div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-8">
                     
                     {/* Branding */}
-                    <div className="flex flex-col gap-6 max-w-sm">
+                    <div className="flex flex-col gap-4 max-w-sm">
                         <Link to="/" className="inline-block">
                             <h3 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                                 Comic<span style={{ color: 'var(--accent)' }}>Verse</span>
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
                     </div>
 
                     {/* Links Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 lg:gap-24">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-12 lg:gap-24">
                         {sections.map((section, idx) => (
                             <div key={idx} className="flex flex-col gap-5">
                                 <h4 className="text-[0.7rem] uppercase tracking-[0.2em] font-bold opacity-60" style={{ color: 'var(--text-primary)' }}>
@@ -97,7 +97,7 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: 'var(--border)' }}>
+                <div className="mt-6 pt-4 border-t flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderColor: 'var(--border)' }}>
                     <p className="text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
                         © {currentYear} ComicVerse. All rights reserved.
                     </p>
