@@ -383,6 +383,7 @@ const Navbar: React.FC = () => {
                         {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
                     </button>
                 </div>
+            </div>
             </nav>
 
             {/* Mobile Search Overlay */}
