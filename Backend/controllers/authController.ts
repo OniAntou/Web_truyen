@@ -69,7 +69,7 @@ const register = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
-  res.status(201).json({ message: "Đăng ký thành công", user: { username: newUser.username, email: newUser.email, role: newUser.role } });
+  res.status(201).json({ message: "Đăng ký thành công", user: { id: newUser._id, username: newUser.username, email: newUser.email, role: newUser.role } });
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -100,7 +100,7 @@ const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
-  res.json({ message: "Đăng nhập thành công", user: { username: user.username, email: user.email, role: user.role } });
+  res.json({ message: "Đăng nhập thành công", user: { id: user._id, username: user.username, email: user.email, role: user.role } });
 });
 
 const logout = asyncHandler(async (req, res) => {

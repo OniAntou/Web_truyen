@@ -9,6 +9,7 @@ import { clearSession } from '../../utils/auth';
 
 import { Comic, Genre } from '../../types/comic';
 import { User } from '../../types/user';
+import { useAuthStore } from '../../store/authStore';
 
 const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -19,14 +20,7 @@ const Navbar: React.FC = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [searching, setSearching] = useState(false);
-    const [user, setUser] = useState<User | null>(() => {
-        const storedUser = localStorage.getItem('user');
-        try {
-            return storedUser ? JSON.parse(storedUser) : null;
-        } catch (e) {
-            return null;
-        }
-    });
+    const { user, logout: storeLogout, updateUser } = useAuthStore();
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('theme') || 'dark';
     });
@@ -48,15 +42,12 @@ const Navbar: React.FC = () => {
                 if (shouldVerifyWithServer) {
                     try {
                         const latestUser = await userService.getMe();
-                        setUser(latestUser as User);
-                        localStorage.setItem('user', JSON.stringify(latestUser));
+                        updateUser(latestUser as User);
                     } catch (err) {
                         // If error (401/403), apiClient.js will call clearSession
                         // which triggers the 'auth:logout' event handled below
                     }
                 }
-            } else {
-                setUser(null);
             }
         };
 
@@ -70,7 +61,6 @@ const Navbar: React.FC = () => {
             }
         };
         const handleFocus = () => checkAuth(true);
-        const handleStorage = () => checkAuth(false);
         
         window.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleFocus);
@@ -78,18 +68,14 @@ const Navbar: React.FC = () => {
 
         // Listen for auth:logout events
         const handleLogoutEvent = () => {
-            localStorage.removeItem('user');
-            clearReadingHistory();
-            setUser(null);
+            storeLogout();
             setShowProfileDropdown(false);
             navigate('/auth');
         };
         window.addEventListener('auth:logout', handleLogoutEvent);
-        window.addEventListener('storage', handleStorage);
 
         return () => {
             window.removeEventListener('auth:logout', handleLogoutEvent);
-            window.removeEventListener('storage', handleStorage);
             window.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
             clearInterval(authInterval);
@@ -98,6 +84,7 @@ const Navbar: React.FC = () => {
 
     const handleLogout = () => {
         clearSession();
+        storeLogout();
         setShowProfileDropdown(false);
         navigate('/');
     };

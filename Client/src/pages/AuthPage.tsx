@@ -6,6 +6,7 @@ import { authService } from "../api/authService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useAuthStore } from "../store/authStore";
 
 const registerSchema = z.object({
   username: z.string().min(3, "Tên hiển thị phải có ít nhất 3 ký tự").max(50, "Tên hiển thị quá dài"),
@@ -30,6 +31,7 @@ const AuthPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
+  const { login: storeLogin } = useAuthStore();
 
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotMessage, setForgotMessage] = useState('');
@@ -48,7 +50,7 @@ const AuthPage: React.FC = () => {
         ? await authService.login(data.email, data.password)
         : await authService.register(data.username!, data.email, data.password);
         
-      localStorage.setItem("user", JSON.stringify(response.user));
+      storeLogin(response.user);
       navigate("/");
     } catch (err: any) {
       setApiError(err.message || err);
