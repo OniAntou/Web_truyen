@@ -13,6 +13,8 @@ const AdminLayout: React.FC = () => {
             console.error('Logout failed:', err);
         }
         localStorage.removeItem('admin');
+        const { clearAdminToken } = await import('../../utils/authToken');
+        clearAdminToken();
         window.location.href = '/admin/login';
     };
 

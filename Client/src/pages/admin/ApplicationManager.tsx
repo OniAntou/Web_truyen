@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserCheck, UserX, Clock, ExternalLink, HelpCircle, Trash2 } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 interface Application {
     id: string;
@@ -18,20 +18,10 @@ const ApplicationManager: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     React.useEffect(() => {
-        fetch(`${API_BASE_URL}/applications/admin`, {
-            credentials: 'include'
-        })
-            .then(res => {
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem('admin');
-                    window.location.href = '/admin/login';
-                    return;
-                }
-                return res.json();
-            })
+        apiClient<any[]>('/applications/admin')
             .then(data => {
                 if (!data) return;
-                const formatted: Application[] = data.map((app: Record<string, unknown> & { _id: string, penName: string, user_id?: { email: string }, portfolio?: string, reason: string, status: 'pending' | 'approved' | 'rejected', created_at: string }) => ({
+                const formatted: Application[] = data.map((app: any) => ({
                     id: app._id,
                     penName: app.penName,
                     email: app.user_id?.email || 'Không rõ',
@@ -51,42 +41,24 @@ const ApplicationManager: React.FC = () => {
 
     const handleApprove = async (id: string) => {
         try {
-            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
+            await apiClient(`/applications/admin/${id}/status`, {
                 method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ status: 'approved' })
+                body: { status: 'approved' }
             });
-            if (res.ok) {
-                setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'approved' } : app));
-            } else if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-            }
-        } catch (err: unknown) {
+            setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'approved' } : app));
+        } catch (err: any) {
             console.error(err);
         }
     };
 
     const handleReject = async (id: string) => {
         try {
-            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}/status`, {
+            await apiClient(`/applications/admin/${id}/status`, {
                 method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ status: 'rejected' })
+                body: { status: 'rejected' }
             });
-            if (res.ok) {
-                setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'rejected' } : app));
-            } else if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-            }
-        } catch (err: unknown) {
+            setApplications(apps => apps.map(app => app.id === id ? { ...app, status: 'rejected' } : app));
+        } catch (err: any) {
             console.error(err);
         }
     };
@@ -95,17 +67,11 @@ const ApplicationManager: React.FC = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa đơn ứng tuyển này? Thao tác này không thể hoàn tác.')) return;
         
         try {
-            const res = await fetch(`${API_BASE_URL}/applications/admin/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
+            await apiClient(`/applications/admin/${id}`, {
+                method: 'DELETE'
             });
-            if (res.ok) {
-                setApplications(apps => apps.filter(app => app.id !== id));
-            } else if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-            }
-        } catch (err: unknown) {
+            setApplications(apps => apps.filter(app => app.id !== id));
+        } catch (err: any) {
             console.error(err);
         }
     };

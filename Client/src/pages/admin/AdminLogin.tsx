@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, BookOpen } from 'lucide-react';
 import { API_BASE_URL } from '../../constants/api';
+import { setAdminToken } from '../../utils/authToken';
 
 const AdminLogin = () => {
 
@@ -42,6 +43,7 @@ const AdminLogin = () => {
             const data = await response.json();
 
             if (response.ok) {
+                setAdminToken(data.token);
                 localStorage.setItem('admin', JSON.stringify(data.admin));
                 navigate('/admin', { replace: true });
             } else {

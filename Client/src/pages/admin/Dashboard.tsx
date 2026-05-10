@@ -11,7 +11,7 @@ import {
     ArrowUpRight,
     Calendar
 } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 interface ComicStats {
     _id: string;
@@ -360,17 +360,7 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/stats`, {
-            credentials: 'include'
-        })
-            .then(res => {
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem('admin');
-                    window.location.href = '/admin/login';
-                    return;
-                }
-                return res.json();
-            })
+        apiClient<DashboardStats>('/stats')
             .then(data => {
                 if (!data) return;
                 setStats(data);

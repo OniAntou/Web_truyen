@@ -30,7 +30,8 @@ const adminLogin = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/'
   });
 
   res.json({ message: "Đăng nhập thành công", token, admin: { username: admin.username } });
@@ -66,7 +67,8 @@ const register = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/'
   });
 
   res.status(201).json({ message: "Đăng ký thành công", token, user: { id: newUser._id, username: newUser.username, email: newUser.email, role: newUser.role } });
@@ -97,7 +99,8 @@ const login = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/'
   });
 
   res.json({ message: "Đăng nhập thành công", token, user: { id: user._id, username: user.username, email: user.email, role: user.role } });
@@ -107,7 +110,8 @@ const logout = asyncHandler(async (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
   });
   res.json({ message: "Đăng xuất người dùng thành công" });
 });
@@ -116,7 +120,8 @@ const adminLogout = asyncHandler(async (req, res) => {
   res.clearCookie('adminToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' ? true : (req.secure || req.headers['x-forwarded-proto'] === 'https'),
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
   });
   res.json({ message: "Đăng xuất Admin thành công" });
 });

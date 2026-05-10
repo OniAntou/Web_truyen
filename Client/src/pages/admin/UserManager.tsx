@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Search, Trash2, Shield, Crown, ChevronLeft, ChevronRight, X, Users, Eye, MessageSquare, Heart, DollarSign, Coins, Star, RefreshCw, Filter } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../api/apiClient';
 
 interface User {
     _id: string;
@@ -55,17 +55,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
 
     useEffect(() => {
         if (!user) return;
-        fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
-            credentials: 'include'
-        })
-            .then(res => {
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem('admin');
-                    window.location.href = '/admin/login';
-                    return;
-                }
-                return res.json();
-            })
+        apiClient<UserDetails>(`/admin/users/${user._id}`)
             .then(data => {
                 if (data) {
                     setDetails(data);
@@ -81,28 +71,18 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
     const handleSave = async () => {
         setSaving(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
+            const updated = await apiClient<User>(`/admin/users/${user._id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
+                body: {
                     role: editRole,
                     is_vip: editVip,
                     coins: typeof editCoins === 'string' ? parseInt(editCoins) || 0 : editCoins
-                })
+                }
             });
-            if (res.ok) {
-                const updated = await res.json();
-                onUpdate(updated);
-                onClose();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Lỗi khi cập nhật');
-            }
-        } catch (e) {
-            alert('Lỗi kết nối');
+            onUpdate(updated);
+            onClose();
+        } catch (e: any) {
+            alert(e.message || 'Lỗi khi cập nhật');
         }
         setSaving(false);
     };
@@ -110,19 +90,13 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose, onUpda
     const handleDelete = async () => {
         if (!window.confirm(`Bạn có chắc muốn xoá user "${user.username}"? Hành động này không thể hoàn tác.`)) return;
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/users/${user._id}`, {
-                method: 'DELETE',
-                credentials: 'include'
+            await apiClient(`/admin/users/${user._id}`, {
+                method: 'DELETE'
             });
-            if (res.ok) {
-                onDelete(user._id);
-                onClose();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Lỗi khi xoá user');
-            }
-        } catch (e) {
-            alert('Lỗi kết nối');
+            onDelete(user._id);
+            onClose();
+        } catch (e: any) {
+            alert(e.message || 'Lỗi khi xoá user');
         }
     };
 
@@ -316,15 +290,7 @@ const UserManager: React.FC = () => {
         params.set('order', 'desc');
 
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/users?${params.toString()}`, {
-                credentials: 'include'
-            });
-            if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('admin');
-                window.location.href = '/admin/login';
-                return;
-            }
-            const data = await res.json();
+            const data = await apiClient<any>(`/admin/users?${params.toString()}`);
             setUsers(data.users || []);
             setTotalPages(data.totalPages || 1);
             setTotal(data.total || 0);

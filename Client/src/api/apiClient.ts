@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../constants/api';
-import { clearAuthToken, getAuthToken } from '../utils/authToken';
+import { clearAuthToken, getAuthToken, getAdminToken, clearAdminToken } from '../utils/authToken';
 
 interface ApiOptions extends Omit<RequestInit, 'body'> {
     body?: Record<string, any> | FormData;
@@ -13,7 +13,9 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
         ...((customConfig.headers as Record<string, string>) || {}) 
     };
 
-    const token = endpoint.startsWith('/admin') ? null : getAuthToken();
+    const isAdmin = endpoint.startsWith('/admin') || endpoint.startsWith('admin');
+    const token = isAdmin ? getAdminToken() : getAuthToken();
+    
     if (token && !headers.Authorization) {
         headers.Authorization = `Bearer ${token}`;
     }
@@ -46,12 +48,18 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
 
         // Global handling of expired/invalid tokens.
         if (!skipAuthLogout && (response.status === 401 || (response.status === 403 && data.message?.toLowerCase().includes('token')))) {
-            const user = localStorage.getItem('user');
-            // Only auto-logout user if there IS a user session and the response is not a specific "chapter locked" payload.
-            if (user && !data.is_locked) {
-                localStorage.removeItem('user');
-                clearAuthToken();
-                window.dispatchEvent(new Event('auth:logout'));
+            if (isAdmin) {
+                localStorage.removeItem('admin');
+                clearAdminToken();
+                window.location.href = '/admin/login';
+            } else {
+                const user = localStorage.getItem('user');
+                // Only auto-logout user if there IS a user session and the response is not a specific "chapter locked" payload.
+                if (user && !data.is_locked) {
+                    localStorage.removeItem('user');
+                    clearAuthToken();
+                    window.dispatchEvent(new Event('auth:logout'));
+                }
             }
         }
         
