@@ -21,6 +21,7 @@
   --search-bg: #1e1e1e;
   --search-border: #333;
   --search-text: #888;
+  --nav-bottom-height: 64px;
 }
 
 [data-theme="light"] {
@@ -100,7 +101,13 @@ img {
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 1.5rem;
+  }
 }
 
 .flex {
@@ -134,6 +141,16 @@ img {
 
   .md-block {
     display: block;
+  }
+}
+
+.mobile-only {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
   }
 }
 

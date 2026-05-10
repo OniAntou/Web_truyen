@@ -2,8 +2,6 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
 import ComicInfo from '../components/Comic/ComicInfo';
 import ChapterList from '../components/Comic/ChapterList';
 import CommentSection from '../components/Comic/CommentSection';
@@ -54,13 +52,9 @@ const ComicInfoPage = () => {
                     })}
                 </script>
             </Helmet>
-            <Navbar />
-            <main>
-                <ComicInfo comic={comic} />
-                <ChapterList chapters={comic.chapters || []} comicId={comic.id || comic._id || ''} />
-                <CommentSection comicId={comic.id || comic._id || ''} />
-            </main>
-            <Footer />
+            <ComicInfo comic={comic} />
+            <ChapterList chapters={comic.chapters || []} comicId={comic.id || comic._id || ''} />
+            <CommentSection comicId={comic.id || comic._id || ''} />
         </div>
     );
 };

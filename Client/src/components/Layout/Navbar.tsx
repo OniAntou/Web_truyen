@@ -337,47 +337,86 @@ const Navbar: React.FC = () => {
                 </button>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            {isMobileMenuOpen && (
-                <div className="mobile-menu-overlay">
-                    <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-                    <Link to="/popular" onClick={() => setIsMobileMenuOpen(false)}>Popular</Link>
-                    <Link to="/genres" onClick={() => setIsMobileMenuOpen(false)}>Genres</Link>
-                    <Link to="/latest" onClick={() => setIsMobileMenuOpen(false)}>Latest</Link>
-                    {user && <Link to="/history" onClick={() => setIsMobileMenuOpen(false)}>History</Link>}
-                    {user && <Link to="/following" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#eab308' }}>Following</Link>}
-                    {user?.role === 'creator' ? (
-                        <Link to="/studio" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', fontWeight: 'bold' }}>Creator Studio</Link>
-                    ) : user?.role !== 'admin' ? (
-                        <Link to="/become-creator" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#a855f7', fontWeight: 'bold' }}>Become Creator</Link>
-                    ) : null}
-                    <div style={{ height: '1px', background: 'var(--border)' }}></div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Theme</span>
-                        <button className="theme-toggle-btn" onClick={toggleTheme}>
-                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {/* Mobile Menu Drawer */}
+            <div 
+                className={`fixed inset-0 z-[2000] transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+                {/* Backdrop */}
+                <div 
+                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                
+                {/* Drawer Content */}
+                <div 
+                    className={`absolute top-0 right-0 h-full w-[280px] bg-[var(--bg-secondary)] shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                >
+                    <div className="flex items-center justify-between p-6 border-b border-[var(--border)]">
+                        <span className="nav-logo text-lg">Comic<span>Verse</span></span>
+                        <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-white/10 text-[var(--text-secondary)]">
+                            <X size={24} />
                         </button>
                     </div>
-                    {user ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--bg-primary)', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-                                    {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={18} />}
+
+                    <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+                        {user && (
+                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
+                                <div className="w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center text-white font-bold text-xl">
+                                    {user.username ? user.username.charAt(0).toUpperCase() : <UserIcon size={20} />}
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: '0.9rem' }}>{user.username}</span>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{user.email}</span>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="font-bold text-[var(--text-primary)] truncate">{user.username}</span>
+                                    <span className="text-xs text-[var(--text-secondary)] truncate">{user.email}</span>
                                 </div>
                             </div>
-                            <button className="btn w-full" style={{ justifyContent: 'center', background: 'var(--bg-secondary)', color: 'var(--text-primary)', marginBottom: '0.5rem', border: '1px solid var(--border)' }} onClick={() => { navigate('/profile'); setIsMobileMenuOpen(false); }}>Trang cá nhân</button>
-                            <button className="btn w-full" style={{ justifyContent: 'center', background: '#3f3f46', color: '#ef4444' }} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Đăng xuất</button>
+                        )}
 
+                        <div className="flex flex-col gap-4">
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Điều hướng</h4>
+                            <div className="flex flex-col gap-1">
+                                <Link to="/" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Trang Chủ</Link>
+                                <Link to="/popular" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Thịnh Hành</Link>
+                                <Link to="/genres" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Thể Loại</Link>
+                                <Link to="/latest" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Mới Nhất</Link>
+                            </div>
                         </div>
-                    ) : (
-                        <button className="btn btn-primary w-full" style={{ justifyContent: 'center', marginTop: '1rem' }} onClick={() => { navigate('/auth'); setIsMobileMenuOpen(false); }}>Login</button>
-                    )}
+
+                        {user && (
+                            <div className="flex flex-col gap-4">
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Cá nhân</h4>
+                                <div className="flex flex-col gap-1">
+                                    <Link to="/history" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Lịch Sử Đọc</Link>
+                                    <Link to="/following" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Đang Theo Dõi</Link>
+                                    <Link to="/profile" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>Trang Cá Nhân</Link>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col gap-4">
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)] px-2">Hệ thống</h4>
+                            <div className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-white/5 transition-colors" onClick={toggleTheme}>
+                                <span>Giao diện {theme === 'dark' ? 'Tối' : 'Sáng'}</span>
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                            </div>
+                            {user?.role === 'creator' && (
+                                <Link to="/studio" className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] font-bold" onClick={() => setIsMobileMenuOpen(false)}>Creator Studio</Link>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="p-6 border-t border-[var(--border)]">
+                        {user ? (
+                            <button className="btn w-full bg-[#ef4444]/10 text-[#ef4444] font-bold py-3" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
+                                Đăng Xuất
+                            </button>
+                        ) : (
+                            <button className="btn btn-primary w-full py-3" onClick={() => { navigate('/auth'); setIsMobileMenuOpen(false); }}>
+                                Đăng Nhập
+                            </button>
+                        )}
+                    </div>
                 </div>
-            )}
+            </div>
         </nav>
     );
 };

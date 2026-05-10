@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BookOpen, Search, X, Layers } from 'lucide-react';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
 import { comicService } from '../api/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre } from '../types/comic';

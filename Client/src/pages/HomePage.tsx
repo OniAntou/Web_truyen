@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Navbar from '../components/Layout/Navbar';
-import Footer from '../components/Layout/Footer';
 import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
 import LazyImage from '../components/ui/LazyImage';
@@ -69,9 +67,7 @@ const HomePage: React.FC = () => {
                 <meta property="og:description" content="Đọc truyện tranh bản quyền, chất lượng cao cực nhanh, cập nhật liên tục mỗi ngày." />
                 <meta property="og:type" content="website" />
             </Helmet>
-            <Navbar />
-            <main>
-                <h1 className="sr-only" style={{ display: 'none' }}>Web Truyện - Đọc truyện tranh online, truyện tranh bản quyền, cập nhật nhanh nhất</h1>
+            <h1 className="sr-only" style={{ display: 'none' }}>Web Truyện - Đọc truyện tranh online, truyện tranh bản quyền, cập nhật nhanh nhất</h1>
             {featuredComics.length > 0 && <HeroSection featuredComics={featuredComics} />}
 
             {/* Trending Section wrapper */}
@@ -128,8 +124,6 @@ const HomePage: React.FC = () => {
 
             <ComicGrid title="Truyện Thịnh Hành" comics={popularComics} linkTo="/popular" />
             <ComicGrid title="Truyện Mới" comics={newComics} linkTo="/latest" />
-            </main>
-            <Footer />
         </div>
     );
 };

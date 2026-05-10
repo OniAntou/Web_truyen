@@ -24,6 +24,7 @@ const ContactPage = lazy(() => import('./pages/info/ContactPage'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
+import ClientLayout from './components/Layout/ClientLayout';
 const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
 const ComicList = lazy(() => import('./pages/admin/ComicList'));
 const ComicEditor = lazy(() => import('./pages/admin/ComicEditor'));
@@ -53,80 +54,85 @@ const withSuspense = (Component: React.ReactNode) => (
 
 export const router = createBrowserRouter([
     {
-        path: '/',
-        element: withSuspense(<HomePage />),
-    },
-    {
-        path: '/p/:id',
-        element: withSuspense(<ComicInfoPage />),
-    },
-    {
-        path: '/read/:comicId/:chapterId',
-        element: withSuspense(<ReadPage />),
-    },
-    {
-        path: '/search',
-        element: withSuspense(<SearchPage />),
-    },
-    {
-        path: '/popular',
-        element: withSuspense(<PopularPage />),
-    },
-    {
-        path: '/genres',
-        element: withSuspense(<GenresPage />),
-    },
-    {
-        path: '/latest',
-        element: withSuspense(<LatestPage />),
-    },
-    {
-        path: '/auth',
-        element: withSuspense(<AuthPage />),
-    },
-    {
-        path: '/reset-password/:token',
-        element: withSuspense(<ResetPassword />),
-    },
-    {
-        path: '/about',
-        element: withSuspense(<AboutPage />),
-    },
-    {
-        path: '/terms',
-        element: withSuspense(<TermsOfService />),
-    },
-    {
-        path: '/privacy',
-        element: withSuspense(<PrivacyPolicy />),
-    },
-    {
-        path: '/contact',
-        element: withSuspense(<ContactPage />),
-    },
-    {
-        path: '/history',
-        element: withSuspense(<HistoryPage />),
-    },
-    {
-        path: '/following',
-        element: withSuspense(<FollowingPage />),
-    },
-    {
-        path: '/profile',
-        element: withSuspense(<ProfilePage />),
-    },
-    {
-        path: '/payment/topup',
-        element: withSuspense(<TopUpPage />),
-    },
-    {
-        path: '/payment/vnpay_return',
-        element: withSuspense(<PaymentReturnPage />),
-    },
-    {
-        path: '/become-creator',
-        element: withSuspense(<CreatorApplication />),
+        element: <ClientLayout />,
+        children: [
+            {
+                path: '/',
+                element: withSuspense(<HomePage />),
+            },
+            {
+                path: '/p/:id',
+                element: withSuspense(<ComicInfoPage />),
+            },
+            {
+                path: '/read/:comicId/:chapterId',
+                element: withSuspense(<ReadPage />),
+            },
+            {
+                path: '/search',
+                element: withSuspense(<SearchPage />),
+            },
+            {
+                path: '/popular',
+                element: withSuspense(<PopularPage />),
+            },
+            {
+                path: '/genres',
+                element: withSuspense(<GenresPage />),
+            },
+            {
+                path: '/latest',
+                element: withSuspense(<LatestPage />),
+            },
+            {
+                path: '/auth',
+                element: withSuspense(<AuthPage />),
+            },
+            {
+                path: '/reset-password/:token',
+                element: withSuspense(<ResetPassword />),
+            },
+            {
+                path: '/about',
+                element: withSuspense(<AboutPage />),
+            },
+            {
+                path: '/terms',
+                element: withSuspense(<TermsOfService />),
+            },
+            {
+                path: '/privacy',
+                element: withSuspense(<PrivacyPolicy />),
+            },
+            {
+                path: '/contact',
+                element: withSuspense(<ContactPage />),
+            },
+            {
+                path: '/history',
+                element: withSuspense(<HistoryPage />),
+            },
+            {
+                path: '/following',
+                element: withSuspense(<FollowingPage />),
+            },
+            {
+                path: '/profile',
+                element: withSuspense(<ProfilePage />),
+            },
+            {
+                path: '/payment/topup',
+                element: withSuspense(<TopUpPage />),
+            },
+            {
+                path: '/payment/vnpay_return',
+                element: withSuspense(<PaymentReturnPage />),
+            },
+            {
+                path: '/become-creator',
+                element: withSuspense(<CreatorApplication />),
+            },
+        ]
     },
     {
         element: <ProtectedCreatorRoute />,
