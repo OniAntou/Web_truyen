@@ -1277,32 +1277,20 @@ img {
 
 /* Chapter List */
 .chapter-list-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .chapter-list-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .chapter-list-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .chapter-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 0.85rem 1.25rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chapter-item:hover {
@@ -3836,7 +3824,7 @@ body * {
 /* ------ MOBILE: Chapter List ------ */
 @media (max-width: 767px) {
   .chapter-list-grid {
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .chapter-item {
