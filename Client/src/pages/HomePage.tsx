@@ -1,10 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import HeroSection from '../components/Home/HeroSection';
 import ComicGrid from '../components/Home/ComicGrid';
-import LazyImage from '../components/ui/LazyImage';
 import { comicService } from '../api/comicService';
 import HomePageSkeleton from '../components/Home/HomePageSkeleton';
 
