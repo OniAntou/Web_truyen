@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
     ];
 
     return (
-        <footer className="w-full py-8 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+        <footer className="w-full py-10 md:py-20 border-t" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <div className="container mx-auto px-6 max-w-7xl">
                 <div className="flex flex-col lg:flex-row justify-between gap-10 lg:gap-8">
                     
@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
                                 Comic<span style={{ color: 'var(--accent)' }}>Verse</span>
                             </h3>
                         </Link>
-                        <p className="text-[0.9rem] leading-relaxed opacity-80" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-[0.9rem] leading-relaxed opacity-80 hidden md:block" style={{ color: 'var(--text-secondary)' }}>
                             Nền tảng đọc truyện tranh trực tuyến hiện đại. Cung cấp trải nghiệm đọc mượt mà và nội dung chọn lọc hàng đầu.
                         </p>
                         <div className="flex gap-5 mt-2">
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
                     </div>
 
                     {/* Links Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-24">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 lg:gap-24">
                         {sections.map((section, idx) => (
                             <div key={idx} className="flex flex-col gap-5">
                                 <h4 className="text-[0.7rem] uppercase tracking-[0.2em] font-bold opacity-60" style={{ color: 'var(--text-primary)' }}>

@@ -497,12 +497,7 @@ const Navbar: React.FC = () => {
                                     {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
                                 </span>
                             </button>
-                            {user?.role === 'creator' && (
-                                <Link to="/studio" className="drawer-nav-link drawer-nav-accent" onClick={closeMobileMenu}>
-                                    <span className="drawer-link-icon"><BookOpen size={18} /></span>
-                                    Creator Studio
-                                </Link>
-                            )}
+
                             {user?.role === 'admin' && (
                                 <Link to="/admin" className="drawer-nav-link drawer-nav-admin" onClick={closeMobileMenu}>
                                     <span className="drawer-link-icon"><Shield size={18} /></span>

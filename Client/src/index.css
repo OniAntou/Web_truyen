@@ -3486,7 +3486,7 @@ body * {
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: none;
+  display: block;
 }
 
 .mobile-hero-bg-img {
@@ -3530,7 +3530,7 @@ body * {
 .mobile-hero-cover {
   position: relative;
   flex-shrink: 0;
-  width: 140px;
+  width: 160px;
   aspect-ratio: 2/3;
   border-radius: 1rem;
   overflow: hidden;
@@ -3568,7 +3568,7 @@ body * {
 }
 
 .mobile-hero-title {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: white;
   line-height: 1.2;
