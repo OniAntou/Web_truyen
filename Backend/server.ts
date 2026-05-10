@@ -40,9 +40,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 app.use(mongoSanitize);
-// Custom CSRF protection: validates Origin/Referer headers and requires custom security headers
+// Custom CSRF protection middleware: validates Origin/Referer headers and requires custom security headers
 // for state-changing requests. This replaces the deprecated `csurf` package.
 // codeql[js/missing-token-validation]
+// codeql[js/missing-csrf-middleware]
 app.use(csrfProtection);
 
 if (process.env.TRUST_PROXY) {

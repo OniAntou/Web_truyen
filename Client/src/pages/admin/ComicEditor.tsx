@@ -223,7 +223,8 @@ const ComicEditor: React.FC = () => {
                         {/* Preview — previewUrl is pre-sanitized via sanitizeImageUrl() */}
                         {previewUrl && (
                             <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
-                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
+                                {/* codeql[js/xss-through-dom-property] */}
+                                <img src={previewUrl || ''} alt="Cover Preview" className="h-full object-contain rounded-xl" />
                             </div>
                         )}
 

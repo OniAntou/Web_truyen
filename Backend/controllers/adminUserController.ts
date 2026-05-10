@@ -4,16 +4,19 @@ import AppError from "../utils/AppError";
 
 // GET /api/admin/users - List all users with search, filter, pagination
 const getAllUsers = asyncHandler(async (req, res) => {
-  const { search, role, vip, sort, order, page = 1, limit = 20 } = req.query;
+  const search = req.query.search ? String(req.query.search) : undefined;
+  const role = req.query.role ? String(req.query.role) : undefined;
+  const vip = req.query.vip ? String(req.query.vip) : undefined;
+  const sort = req.query.sort ? String(req.query.sort) : undefined;
+  const order = req.query.order ? String(req.query.order) : undefined;
+  const page = parseInt(String(req.query.page || '1'));
+  const limit = parseInt(String(req.query.limit || '20'));
 
-  const filter: any = {};
+  const filter: Record<string, any> = {};
 
   // Search by username or email using MongoDB native $regex with escaped literal string.
-  // The user input is cast to String, then all regex metacharacters are escaped,
-  // producing a safe literal pattern string passed directly to $regex.
   if (search) {
-    const searchStr = String(search);
-    const escapedSearch = searchStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
       { username: { $regex: escapedSearch, $options: 'i' } },
       { email: { $regex: escapedSearch, $options: 'i' } }
@@ -31,17 +34,17 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
   // Sorting
   const allowedSortFields = ['created_at', 'username', 'email', 'role', 'coins', 'is_vip'];
-  const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
+  const sortField = allowedSortFields.includes(sort || '') ? (sort as string) : 'created_at';
   const sortOrder = order === 'asc' ? 1 : -1;
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const skip = (page - 1) * limit;
   const total = await User.countDocuments(filter);
 
   const users = await User.find(filter)
     .select('-password')
     .sort({ [sortField]: sortOrder })
     .skip(skip)
-    .limit(parseInt(limit))
+    .limit(limit)
     .lean();
 
   res.json({
