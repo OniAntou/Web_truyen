@@ -1152,6 +1152,7 @@ img {
 }
 
 .info-cover-box {
+  position: relative;
   width: 260px;
   height: 380px;
   border-radius: 1rem;
@@ -3459,6 +3460,7 @@ body * {
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: none;
 }
 
 .mobile-hero-bg-img {

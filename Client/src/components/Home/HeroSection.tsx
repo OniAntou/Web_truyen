@@ -63,7 +63,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                 <div className="mobile-hero-bg">
                     <LazyImage 
                         src={currentComic.cover_url || currentComic.cover || ''} 
-                        className="mobile-hero-bg-img" 
+                        className="mobile-hero-bg-img w-full h-full" 
                         alt="" 
                     />
                     <div className="mobile-hero-gradient" />
@@ -74,7 +74,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                     <Link to={`/p/${currentComic.id || currentComic._id}`} className="mobile-hero-cover">
                         <LazyImage 
                             src={currentComic.cover_url || currentComic.cover || ''} 
-                            className="mobile-hero-cover-img" 
+                            className="mobile-hero-cover-img w-full h-full" 
                             alt={currentComic.title} 
                         />
                     </Link>

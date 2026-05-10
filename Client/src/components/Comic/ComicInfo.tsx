@@ -142,7 +142,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                     <LazyImage
                         src={comic.cover_url || comic.cover || ''}
                         alt={comic.title}
-                        className="info-cover-img"
+                        className="info-cover-img w-full h-full object-cover"
                     />
                 </div>
 
