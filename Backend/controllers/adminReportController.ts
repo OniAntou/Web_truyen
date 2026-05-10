@@ -4,19 +4,22 @@ import AppError from "../utils/AppError";
 
 // GET /api/admin/reports - Get all reports with filters
 const getAllReports = asyncHandler(async (req, res) => {
-    const { status, type, page = 1, limit = 20 } = req.query;
+    const status = req.query.status ? String(req.query.status) : undefined;
+    const type = req.query.type ? String(req.query.type) : undefined;
+    const page = parseInt(String(req.query.page || '1'));
+    const limit = parseInt(String(req.query.limit || '20'));
 
     const filter: any = {};
     if (status) filter.status = String(status);
     if (type) filter.target_type = String(type);
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const skip = (page - 1) * limit;
     
     const reports = await Report.find(filter)
         .populate('user_id', 'username email avatar')
         .sort({ created_at: -1 })
         .skip(skip)
-        .limit(parseInt(limit))
+        .limit(limit)
         .lean();
 
     // Populate target data manually because target_id is dynamic
@@ -41,8 +44,8 @@ const getAllReports = asyncHandler(async (req, res) => {
         status: 'success',
         reports: populatedReports,
         total,
-        page: parseInt(page),
-        totalPages: Math.ceil(total / parseInt(limit))
+        page: page,
+        totalPages: Math.ceil(total / limit)
     });
 });
 

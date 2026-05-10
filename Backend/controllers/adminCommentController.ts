@@ -4,7 +4,11 @@ import AppError from "../utils/AppError";
 
 // GET /api/admin/comments - List all comments with search, filter, pagination
 const getAllComments = asyncHandler(async (req, res) => {
-  const { search, comicId, userId, page = 1, limit = 20 } = req.query;
+  const search = req.query.search ? String(req.query.search) : undefined;
+  const comicId = req.query.comicId ? String(req.query.comicId) : undefined;
+  const userId = req.query.userId ? String(req.query.userId) : undefined;
+  const page = parseInt(String(req.query.page || '1'));
+  const limit = parseInt(String(req.query.limit || '20'));
 
   const filter: any = {};
 
@@ -24,7 +28,7 @@ const getAllComments = asyncHandler(async (req, res) => {
     filter.user_id = String(userId);
   }
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const skip = (page - 1) * limit;
   const total = await Comment.countDocuments(filter);
 
   const comments = await Comment.find(filter)
@@ -34,14 +38,14 @@ const getAllComments = asyncHandler(async (req, res) => {
     .populate('parent_id', 'content')
     .sort({ created_at: -1 })
     .skip(skip)
-    .limit(parseInt(limit))
+    .limit(limit)
     .lean();
 
   res.json({
     comments,
     total,
-    page: parseInt(page),
-    totalPages: Math.ceil(total / parseInt(limit))
+    page: page,
+    totalPages: Math.ceil(total / limit)
   });
 });
 

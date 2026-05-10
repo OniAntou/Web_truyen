@@ -50,8 +50,8 @@ const getAllUsers = asyncHandler(async (req, res) => {
   res.json({
     users,
     total,
-    page: parseInt(page),
-    totalPages: Math.ceil(total / parseInt(limit))
+    page: page,
+    totalPages: Math.ceil(total / limit)
   });
 });
 

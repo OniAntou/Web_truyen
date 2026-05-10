@@ -8,7 +8,9 @@ import AppError from "../utils/AppError";
 import apiCache from "../utils/cache";
 
 const getLatestComics = asyncHandler(async (req, res) => {
-  const { genre, page = 1, limit = 20 } = req.query;
+  const genre = req.query.genre ? String(req.query.genre) : undefined;
+  const page = parseInt(String(req.query.page || '1'));
+  const limit = parseInt(String(req.query.limit || '20'));
   
   // Try to get from cache
   const cacheKey = `latest_${genre || 'all'}_${page}_${limit}`;
@@ -29,14 +31,14 @@ const getLatestComics = asyncHandler(async (req, res) => {
     }
   }
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const skip = (page - 1) * limit;
   const total = await Comic.countDocuments(filter);
   const comics = await Comic.find(filter)
     .select('title id author status cover_url rating views weekly_views genres chapter_count created_at')
     .populate('genres', 'name slug')
     .sort({ created_at: -1 })
     .skip(skip)
-    .limit(parseInt(limit))
+    .limit(limit)
     .lean();
 
   const results = await Promise.all(comics.map(async (c) => {
@@ -53,10 +55,10 @@ const getLatestComics = asyncHandler(async (req, res) => {
     comics: results,
     genres: allGenres,
     pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
+      page: page,
+      limit: limit,
       total,
-      totalPages: Math.ceil(total / parseInt(limit)),
+      totalPages: Math.ceil(total / limit),
     }
   };
 
@@ -69,7 +71,9 @@ const getLatestComics = asyncHandler(async (req, res) => {
 });
 
 const getPopularComics = asyncHandler(async (req, res) => {
-  const { genre, sort = "views", limit } = req.query;
+  const genre = req.query.genre ? String(req.query.genre) : undefined;
+  const sort = req.query.sort ? String(req.query.sort) : "views";
+  const limit = req.query.limit ? parseInt(String(req.query.limit)) : undefined;
 
   // Try to get from cache
   const cacheKey = `popular_${genre || 'all'}_${sort}_${limit || 'none'}`;
@@ -102,7 +106,7 @@ const getPopularComics = asyncHandler(async (req, res) => {
   let query = Comic.find(filter).populate('genres', 'name slug').sort(sortOption);
   
   if (limit) {
-    query = query.limit(parseInt(limit));
+    query = query.limit(limit);
   }
 
   const comics = await query.select('title id author status cover_url rating views weekly_views genres chapter_count created_at').lean();
@@ -194,7 +198,7 @@ const getAllComics = asyncHandler(async (req, res) => {
 });
 
 const getTrendingComics = asyncHandler(async (req, res) => {
-  const { limit = 10 } = req.query;
+  const limit = parseInt(String(req.query.limit || '10'));
 
   // Try to get from cache
   const cacheKey = `trending_${limit}`;
@@ -203,7 +207,7 @@ const getTrendingComics = asyncHandler(async (req, res) => {
 
   let comics = await Comic.find({})
     .sort({ weekly_views: -1 })
-    .limit(parseInt(limit))
+    .limit(limit)
     .populate('genres', 'name slug')
     .select('title id author status cover_url rating weekly_views genres chapter_count')
     .lean();
