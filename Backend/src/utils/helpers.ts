@@ -108,6 +108,24 @@ const isChapterLocked = (chapter: any, user: any, userDoc: any, unlockedChapters
   return true;
 };
 
+// Helper: Find comic by ID (supports both ObjectId and numeric id)
+async function findComicById(id: string, selectFields: string = '', lean: boolean = true) {
+  let query;
+  if (isValidObjectId(id)) {
+    query = Comic.findById(id);
+  } else {
+    const numericId = parseInt(id);
+    if (isNaN(numericId)) return null;
+    query = Comic.findOne({ id: numericId });
+  }
+  
+  if (selectFields) {
+    query = query.select(selectFields);
+  }
+  
+  return lean ? query.lean() : query;
+}
+
 export { 
   getChapterCounts,
   processGenres,
@@ -115,5 +133,6 @@ export {
   syncLatestChapter,
   isValidObjectId,
   isChapterRequiresLock,
-  isChapterLocked
+  isChapterLocked,
+  findComicById
  };

@@ -1,4 +1,4 @@
-import {  getChapterCounts, processGenres, isValidObjectId, isChapterRequiresLock, isChapterLocked, formatExactDate  } from "../utils/helpers";
+import {  getChapterCounts, processGenres, isValidObjectId, isChapterRequiresLock, isChapterLocked, formatExactDate, findComicById  } from "../utils/helpers";
 import {  Comic, Genre, User, ChapterUnlock  } from "../database";
 import {  resolveR2Url, resolveR2Urls, deleteFromR2  } from "../config/r2";
 import {  Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite  } from "../database";
@@ -252,12 +252,7 @@ const getComicById = asyncHandler(async (req, res) => {
     }
   }
 
-  let comic;
-  if (isValidObjectId(id)) {
-    comic = await Comic.findById(id).select('-__v').lean();
-  } else {
-    comic = await Comic.findOne({ id: parseInt(id) }).select('-__v').lean();
-  }
+  const comic = await findComicById(id, '-__v');
 
   if (!comic) throw new AppError("Comic not found", 404);
 
@@ -316,12 +311,7 @@ const getReaderData = asyncHandler(async (req, res) => {
     }
   }
 
-  let comic;
-  if (isValidObjectId(id)) {
-    comic = await Comic.findById(id).select('title id cover_url genres').lean();
-  } else {
-    comic = await Comic.findOne({ id: parseInt(id) }).select('title id cover_url genres').lean();
-  }
+  const comic = await findComicById(id, 'title id cover_url genres');
 
   if (!comic) throw new AppError("Comic not found", 404);
 
@@ -413,12 +403,7 @@ const updateComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền chỉnh sửa truyện.", 403);
   }
   const { id } = req.params;
-  let comic: any;
-  if (isValidObjectId(id)) {
-    comic = await Comic.findById(id);
-  } else {
-    comic = await Comic.findOne({ id: parseInt(id) });
-  }
+  const comic: any = await findComicById(id, '', false);
 
   if (!comic) throw new AppError("Comic not found", 404);
 
@@ -457,13 +442,7 @@ const deleteComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền xóa truyện.", 403);
   }
   const { id } = req.params;
-  let comic;
-
-  if (isValidObjectId(id)) {
-    comic = await Comic.findById(id);
-  } else {
-    comic = await Comic.findOne({ id: parseInt(id) });
-  }
+  const comic = await findComicById(id, '', false);
 
   if (!comic) throw new AppError("Comic not found", 404);
 
@@ -472,12 +451,7 @@ const deleteComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền xóa truyện này.", 403);
   }
 
-  // Delete the comic
-  if (isValidObjectId(id)) {
-    await Comic.findByIdAndDelete(id);
-  } else {
-    await Comic.findOneAndDelete({ id: parseInt(id) });
-  }
+  await Comic.deleteOne({ _id: comic._id });
 
   if (comic.cover_url && comic.cover_url.startsWith('r2:')) {
     await deleteFromR2(comic.cover_url);
