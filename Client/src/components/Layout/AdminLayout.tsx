@@ -6,6 +6,14 @@ import { authService } from '../../api/authService';
 const AdminLayout: React.FC = () => {
     const location = useLocation();
 
+    React.useEffect(() => {
+        const handleAdminLogout = () => {
+            window.location.href = '/admin/login';
+        };
+        window.addEventListener('auth:admin-logout', handleAdminLogout);
+        return () => window.removeEventListener('auth:admin-logout', handleAdminLogout);
+    }, []);
+
     const handleLogout = async () => {
         try {
             await authService.adminLogout();

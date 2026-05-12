@@ -1,5 +1,6 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
+import { Comic } from '../../types/comic';
 
 interface LockedError {
     is_locked: boolean;
@@ -7,7 +8,7 @@ interface LockedError {
     message: string;
     price: number;
     early_access_end_date?: string;
-    comic?: any;
+    comic?: Partial<Comic>;
 }
 
 interface LockedChapterViewProps {
@@ -24,7 +25,7 @@ const LockedChapterView: React.FC<LockedChapterViewProps> = ({
     onUpgradeVip 
 }) => {
     const earlyAccessDate = error.early_access_end_date;
-    const isEarlyAccess = earlyAccessDate && new Date(earlyAccessDate).getTime() > new Date().getTime();
+    const isEarlyAccess = !!(earlyAccessDate && new Date(earlyAccessDate).getTime() > Date.now());
 
     return (
         <div style={{ 

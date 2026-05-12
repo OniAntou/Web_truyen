@@ -53,11 +53,11 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
             if (isAdmin) {
                 localStorage.removeItem('admin');
                 clearAdminToken();
-                window.location.href = '/admin/login';
+                window.dispatchEvent(new Event('auth:admin-logout'));
             } else {
-                const user = localStorage.getItem('user');
+                const userSession = localStorage.getItem('user');
                 // Only auto-logout user if there IS a user session and the response is not a specific "chapter locked" payload.
-                if (user && !data.is_locked) {
+                if (userSession && !data.is_locked) {
                     localStorage.removeItem('user');
                     clearAuthToken();
                     window.dispatchEvent(new Event('auth:logout'));
@@ -70,13 +70,13 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
         }
         
         const errorMessage = data.message || 'Something went wrong';
-        throw { ...data, message: errorMessage };
+        throw { ...data, message: errorMessage, status: response.status };
     } catch (err: unknown) {
         if (err && typeof err === 'object' && !('name' in err)) {
             return Promise.reject(err);
         }
         const message = err instanceof Error ? err.message : String(err);
-        return Promise.reject(message);
+        return Promise.reject({ message });
     }
 };
 
