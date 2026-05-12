@@ -84,8 +84,6 @@ app.use(helmet({
     },
   },
 })); // Secure HTTP headers
-app.use(express.json());
-
 // Global Rate Limiter for all routes (prevent basic DDoS)
 // Configuration defined in middleware/rateLimiter.js
 app.use('/api', globalLimiter);

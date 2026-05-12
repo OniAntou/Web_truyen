@@ -83,9 +83,37 @@ async function syncLatestChapter(comicId) {
   }
 }
 
+// Helper: Validate MongoDB ObjectId
+const isValidObjectId = (id: string) => {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
+// Helper: Check if chapter should be locked based on price and early access
+const isChapterRequiresLock = (chapter: any) => {
+  if (!chapter.price || chapter.price <= 0) return false;
+  if (chapter.early_access_end_date && new Date(chapter.early_access_end_date) <= new Date()) return false;
+  return true;
+};
+
+// Helper: Full locking logic including user permissions
+const isChapterLocked = (chapter: any, user: any, userDoc: any, unlockedChapters: Set<string>) => {
+  if (!isChapterRequiresLock(chapter)) return false;
+  
+  if (user && userDoc) {
+    if (userDoc.role === 'admin' || userDoc.role === 'creator') return false;
+    if (userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) return false;
+    if (unlockedChapters.has(chapter._id.toString())) return false;
+  }
+  
+  return true;
+};
+
 export { 
   getChapterCounts,
   processGenres,
   formatExactDate,
   syncLatestChapter,
+  isValidObjectId,
+  isChapterRequiresLock,
+  isChapterLocked
  };
