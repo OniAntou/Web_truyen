@@ -120,7 +120,7 @@ const ReadPage: React.FC = () => {
 
     const currentIndex = comic?.chapters?.findIndex(c => c._id === chapter?._id) ?? -1;
     const hasPrev = currentIndex > 0;
-    const hasNext = comic?.chapters && currentIndex < comic.chapters.length - 1;
+    const hasNext = !!(comic?.chapters && currentIndex < comic.chapters.length - 1);
 
     // PREFETCH NEXT CHAPTER
     useEffect(() => {
