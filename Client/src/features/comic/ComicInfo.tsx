@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User as UserIcon, Share2, Heart } from 'lucide-react';
-import { formatViews, translateStatus } from '../../utils/format';
+import { formatViews, translateStatus, slugify } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
 import { comicService } from '../../services/comicService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -197,7 +197,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                     <div className="info-actions">
                         <Link
                             to={comic.chapters && comic.chapters.length > 0 
-                                ? `/read/${comicId}/${comic.chapters[0]._id || comic.chapters[0].id}`
+                                ? `/read/${slugify(comic.title)}-${comicId}/${comic.chapters[0]._id || comic.chapters[0].id}`
                                 : '#'
                             }
                             className="btn btn-primary"
@@ -214,7 +214,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
 
                         {readingProgress && !loadingProgress && (
                             <Link
-                                to={`/read/${comicId}/${readingProgress.chapter_id}`}
+                                to={`/read/${slugify(comic.title)}-${comicId}/${readingProgress.chapter_id}`}
                                 className="btn btn-secondary"
                                 style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none' }}
                             >
@@ -237,7 +237,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                 <div className="flex gap-3">
                     <Link
                         to={comic.chapters && comic.chapters.length > 0 
-                            ? `/read/${comicId}/${comic.chapters[0]._id || comic.chapters[0].id}`
+                            ? `/read/${slugify(comic.title)}-${comicId}/${comic.chapters[0]._id || comic.chapters[0].id}`
                             : '#'
                         }
                         className="flex-1 btn btn-primary py-4 font-bold shadow-lg shadow-[var(--accent)]/30"

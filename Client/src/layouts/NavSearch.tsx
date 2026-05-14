@@ -5,6 +5,7 @@ import { comicService } from '../services/comicService';
 import { Comic, Genre } from '../types/comic';
 import { useTranslation } from '../hooks/useTranslation';
 import LazyImage from '../components/ui/LazyImage';
+import { slugify } from '../utils/format';
 
 interface NavSearchProps {
     onSearchComplete?: () => void;
@@ -103,7 +104,7 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                             {searchResults.map(comic => (
                                 <Link
                                     key={comic._id || comic.id}
-                                    to={`/p/${comic._id || comic.id}`}
+                                    to={`/p/${slugify(comic.title)}-${comic._id || comic.id}`}
                                     className="search-dropdown-item"
                                     onClick={() => { setShowDropdown(false); setSearchQuery(''); if (onSearchComplete) onSearchComplete(); }}
                                 >

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Eye, Star } from 'lucide-react';
 import LazyImage from '../../components/ui/LazyImage';
-import { translateStatus } from '../../utils/format';
+import { translateStatus, slugify } from '../../utils/format';
 
 import { Comic } from '../../types/comic';
 
@@ -72,7 +72,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                 
                 <div className="mobile-hero-content" key={currentComic._id || currentComic.id}>
                     {/* Mobile Cover */}
-                    <Link to={`/p/${currentComic.id || currentComic._id}`} className="mobile-hero-cover">
+                    <Link to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} className="mobile-hero-cover">
                         <LazyImage 
                             src={currentComic.cover_url || currentComic.cover || ''} 
                             fill={true}
@@ -97,7 +97,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                         </div>
                         
                         <Link 
-                            to={`/p/${currentComic.id || currentComic._id}`} 
+                            to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} 
                             className="mobile-hero-cta"
                         >
                             <Play fill="currentColor" size={14} />
@@ -154,7 +154,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                         </div>
 
                         <div className="flex items-center gap-4 mt-8 pt-2">
-                            <Link to={`/p/${currentComic.id || currentComic._id}`} className="px-8 py-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-xs tracking-widest uppercase border border-white/10" style={{ background: 'var(--accent)', color: 'white' }}>
+                            <Link to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} className="px-8 py-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-xs tracking-widest uppercase border border-white/10" style={{ background: 'var(--accent)', color: 'white' }}>
                                 <Play fill="currentColor" size={16} />
                                 Đọc Ngay Bây Giờ
                             </Link>

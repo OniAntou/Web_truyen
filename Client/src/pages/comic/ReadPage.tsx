@@ -50,7 +50,8 @@ interface LockedError {
 }
 
 const ReadPage: React.FC = () => {
-    const { comicId, chapterId } = useParams<{ comicId: string; chapterId: string }>();
+    const { slugAndId, chapterId } = useParams<{ slugAndId: string; chapterId: string }>();
+    const comicId = slugAndId?.includes('-') ? slugAndId.split('-').pop() : slugAndId;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     
@@ -225,10 +226,38 @@ const ReadPage: React.FC = () => {
             <Helmet>
                 <title>{comic.title} - {chapter.title} | Web Truyện</title>
                 <meta name="description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
-                <meta property="og:title" content={`${comic.title} - ${chapter.title} | Web Truyện`} />
+                <link rel="canonical" href={window.location.href} />
+                <meta property="og:title" content={`${comic.title} - {chapter.title} | Web Truyện`} />
                 <meta property="og:description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
                 <meta property="og:image" content={comic.cover || comic.cover_url} />
+                <meta property="og:url" content={window.location.href} />
                 <meta property="og:type" content="article" />
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Trang chủ",
+                                "item": window.location.origin
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": comic.title,
+                                "item": `${window.location.origin}/p/${comicId}`
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 3,
+                                "name": chapter.title,
+                                "item": window.location.href
+                            }
+                        ]
+                    })}
+                </script>
             </Helmet>
             <Navbar />
             <main>
@@ -259,6 +288,7 @@ const ReadPage: React.FC = () => {
 
                     <ReaderControls 
                         comicId={comicId!} 
+                        comicTitle={comic.title}
                         chapters={comic?.chapters || []}
                         currentChapterId={chapter?._id as string}
                         onPrev={handlePrevChapter} 
@@ -268,6 +298,7 @@ const ReadPage: React.FC = () => {
             
                 <ReaderFooterSection 
                     comicId={comicId!}
+                    comicTitle={comic.title}
                     hasPrev={hasPrev}
                     hasNext={hasNext}
                     onPrev={handlePrevChapter}

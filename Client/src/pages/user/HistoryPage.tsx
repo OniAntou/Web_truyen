@@ -7,6 +7,7 @@ import { BookOpen, ChevronRight, Trash2, History } from 'lucide-react';
 import LazyImage from '../../components/ui/LazyImage';
 import { clearReadingHistory } from '../../utils/readingHistory';
 import { comicService } from '../../services/comicService';
+import { slugify } from '../../utils/format';
 
 interface HistoryItem {
     comicId: string;
@@ -106,7 +107,7 @@ const HistoryPage: React.FC = () => {
                         {history.map(item => (
                             <div key={item.comicId} className="group relative flex flex-col gap-2.5">
                                 <Link 
-                                    to={`/p/${item.comicId}`}
+                                    to={`/p/${slugify(item.comicTitle)}-${item.comicId}`}
                                     className="block transition-transform hover:-translate-y-1"
                                 >
                                     {/* Cover */}
@@ -141,7 +142,7 @@ const HistoryPage: React.FC = () => {
 
                                 {/* Title + Chapter */}
                                 <div className="px-0.5">
-                                    <Link to={`/p/${item.comicId}`}>
+                                    <Link to={`/p/${slugify(item.comicTitle)}-${item.comicId}`}>
                                         <p 
                                             className="font-semibold text-sm md:text-base line-clamp-1 transition-colors hover:text-[var(--accent)]"
                                             style={{ color: 'var(--text-primary)' }}
@@ -150,7 +151,7 @@ const HistoryPage: React.FC = () => {
                                         </p>
                                     </Link>
                                     <Link 
-                                        to={`/read/${item.comicId}/${item.chapterId}`}
+                                        to={`/read/${slugify(item.comicTitle)}-${item.comicId}/${item.chapterId}`}
                                         className="text-xs md:text-sm mt-1.5 block transition-colors text-[var(--text-secondary)] hover:text-[var(--accent)] font-medium" 
                                     >
                                         Đọc tiếp Chapter {item.chapterNumber}

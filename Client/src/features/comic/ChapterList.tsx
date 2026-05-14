@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock } from 'lucide-react';
+import { slugify } from '../../utils/format';
 
 import { Chapter } from '../../types/comic';
 
 interface ChapterListProps {
     chapters: Chapter[];
     comicId: string;
+    comicTitle: string;
 }
 
-const ChapterList: React.FC<ChapterListProps> = ({ chapters, comicId }) => {
+const ChapterList: React.FC<ChapterListProps> = ({ chapters, comicId, comicTitle }) => {
     const [readChapters, setReadChapters] = useState<Set<string>>(new Set());
     const [isDarkTheme, setIsDarkTheme] = useState(true);
 
@@ -71,7 +73,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ chapters, comicId }) => {
                         return (
                             <Link
                                 key={chapterId}
-                                to={`/read/${comicId}/${chapterId}`}
+                                to={`/read/${slugify(comicTitle)}-${comicId}/${chapterId}`}
                                 className={`chapter-item ${isRead ? 'chapter-read' : 'chapter-unread'}`}
                                 style={{
                                     background: isRead 

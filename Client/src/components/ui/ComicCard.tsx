@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, Eye, Clock } from 'lucide-react';
-import { formatViews } from '../../utils/format';
+import { formatViews, slugify } from '../../utils/format';
 import LazyImage from './LazyImage';
 
 import { Comic } from '../../types/comic';
@@ -35,7 +35,7 @@ const ComicCard: React.FC<ComicCardProps> = ({
     const displayViews = formatViews(comic.views);
 
     return (
-        <Link to={`/p/${comic.id || comic._id}`} className="group flex flex-col gap-3 w-full">
+        <Link to={`/p/${slugify(comic.title)}-${comic.id || comic._id}`} className="group flex flex-col gap-3 w-full">
             <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)] bg-[var(--bg-secondary)]">
                 <LazyImage
                     src={comic.cover_url || comic.cover || ''}

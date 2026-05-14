@@ -62,11 +62,11 @@ export const router = createBrowserRouter([
                 element: withSuspense(<HomePage />),
             },
             {
-                path: '/p/:id',
+                path: '/p/:slugAndId',
                 element: withSuspense(<ComicInfoPage />),
             },
             {
-                path: '/read/:comicId/:chapterId',
+                path: '/read/:slugAndId/:chapterId',
                 element: withSuspense(<ReadPage />),
             },
             {

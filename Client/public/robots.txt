@@ -4,6 +4,7 @@ Disallow: /admin/
 Disallow: /profile
 Disallow: /auth
 Disallow: /payment/
+Disallow: /studio/
 
-# TODO: Thay thế URL dưới đây bằng Domain Backend thực tế khi deploy
-Sitemap: http://localhost:5000/api/sitemap.xml
+# Thay thế bằng Domain thực tế khi deploy
+Sitemap: https://web-truyen.vercel.app/api/sitemap.xml

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { comicService } from "../../services/comicService";
+import { slugify } from "../../utils/format";
 import { Chapter } from "../../types/comic";
 
 interface ReaderChapter extends Chapter {
@@ -12,13 +13,14 @@ interface ReaderChapter extends Chapter {
 
 interface ReaderControlsProps {
     comicId: string;
+    comicTitle: string;
     chapters: Chapter[];
     currentChapterId: string;
     onPrev: () => void;
     onNext: () => void;
 }
 
-const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, chapters, currentChapterId, onPrev, onNext }) => {
+const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, chapters, currentChapterId, onPrev, onNext }) => {
   const [showChapters, setShowChapters] = useState(false);
   const [chaptersWithStatus, setChaptersWithStatus] = useState<ReaderChapter[]>([]);
   const [loadingStatus, setLoadingStatus] = useState(true);
@@ -120,7 +122,7 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, chapters, curr
                     return (
                       <Link
                         key={ch._id || ch.id}
-                        to={`/read/${comicId}/${ch._id || ch.id}`}
+                        to={`/read/${slugify(comicTitle)}-${comicId}/${ch._id || ch.id}`}
                         onClick={() => setShowChapters(false)}
                         ref={isActive ? activeChapterRef : null}
                         className={`px-5 py-4 rounded-2xl transition-all duration-300 flex justify-between items-center border ${

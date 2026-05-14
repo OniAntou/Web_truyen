@@ -44,8 +44,10 @@ const HomePage: React.FC = () => {
             <Helmet>
                 <title>Web Truyện - Đọc truyện tranh online</title>
                 <meta name="description" content="Đọc truyện tranh bản quyền, chất lượng cao cực nhanh, cập nhật liên tục mỗi ngày." />
+                <link rel="canonical" href={window.location.origin} />
                 <meta property="og:title" content="Web Truyện - Đọc truyện tranh online" />
                 <meta property="og:description" content="Đọc truyện tranh bản quyền, chất lượng cao cực nhanh, cập nhật liên tục mỗi ngày." />
+                <meta property="og:url" content={window.location.origin} />
                 <meta property="og:type" content="website" />
             </Helmet>
             <h1 className="sr-only" style={{ display: 'none' }}>Web Truyện - Đọc truyện tranh online, truyện tranh bản quyền, cập nhật nhanh nhất</h1>

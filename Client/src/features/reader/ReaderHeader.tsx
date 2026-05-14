@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Flag } from 'lucide-react';
+import { slugify } from '../../utils/format';
 
 interface ReaderHeaderProps {
     comicId: string;
@@ -18,7 +19,7 @@ const ReaderHeader: React.FC<ReaderHeaderProps> = ({
     return (
         <div className="reader-info-bar">
             <div className="reader-info-content">
-                <Link to={`/p/${comicId}`} className="reader-info-back" title={comicTitle}>
+                <Link to={`/p/${slugify(comicTitle)}-${comicId}`} className="reader-info-back" title={comicTitle}>
                     <ArrowLeft size={16} />
                     <span className="reader-info-back-title">{comicTitle}</span>
                 </Link>

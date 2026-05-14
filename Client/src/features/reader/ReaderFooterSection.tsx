@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { slugify } from '../../utils/format';
 
 interface ReaderFooterSectionProps {
     comicId: string;
+    comicTitle: string;
     hasPrev: boolean;
     hasNext: boolean;
     onPrev: () => void;
@@ -12,6 +14,7 @@ interface ReaderFooterSectionProps {
 
 const ReaderFooterSection: React.FC<ReaderFooterSectionProps> = ({
     comicId,
+    comicTitle,
     hasPrev,
     hasNext,
     onPrev,
@@ -29,7 +32,7 @@ const ReaderFooterSection: React.FC<ReaderFooterSectionProps> = ({
                         <ChevronLeft size={18} />
                         Previous
                     </button>
-                    <Link to={`/p/${comicId}`} className="reader-end-btn reader-end-btn-outline">
+                    <Link to={`/p/${slugify(comicTitle)}-${comicId}`} className="reader-end-btn reader-end-btn-outline">
                         <BookOpen size={16} />
                         Comic Info
                     </Link>

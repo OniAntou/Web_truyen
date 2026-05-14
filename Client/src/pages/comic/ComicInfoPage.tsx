@@ -9,7 +9,8 @@ import { comicService } from '../../services/comicService';
 import ComicInfoSkeleton from '../../features/comic/ComicInfoSkeleton';
 
 const ComicInfoPage = () => {
-    const { id } = useParams();
+    const { slugAndId } = useParams();
+    const id = slugAndId?.includes('-') ? slugAndId.split('-').pop() : slugAndId;
     
     const { data: comic, isLoading: loading } = useQuery({
         queryKey: ['comic', id],
@@ -34,9 +35,11 @@ const ComicInfoPage = () => {
             <Helmet>
                 <title>{comic.title} | Web Truyện</title>
                 <meta name="description" content={comic.description?.substring(0, 160) || `Đọc truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
+                <link rel="canonical" href={window.location.href} />
                 <meta property="og:title" content={`${comic.title} | Web Truyện`} />
                 <meta property="og:description" content={comic.description?.substring(0, 160) || `Đọc truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
                 <meta property="og:image" content={comic.cover || comic.cover_url} />
+                <meta property="og:url" content={window.location.href} />
                 <meta property="og:type" content="book" />
                 <script type="application/ld+json">
                     {JSON.stringify({
@@ -51,9 +54,29 @@ const ComicInfoPage = () => {
                         }
                     })}
                 </script>
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Trang chủ",
+                                "item": window.location.origin
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": comic.title,
+                                "item": window.location.href
+                            }
+                        ]
+                    })}
+                </script>
             </Helmet>
             <ComicInfo comic={comic} />
-            <ChapterList chapters={comic.chapters || []} comicId={comic.id || comic._id || ''} />
+            <ChapterList chapters={comic.chapters || []} comicId={comic.id || comic._id || ''} comicTitle={comic.title} />
             <CommentSection comicId={comic.id || comic._id || ''} />
         </div>
     );

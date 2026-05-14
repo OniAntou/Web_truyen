@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight, X } from 'lucide-react';
+import { slugify } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
 import { getReadingHistory, clearReadingHistory, HistoryEntry } from '../../utils/readingHistory';
 
@@ -54,7 +55,7 @@ const ContinueReading = () => {
                 {displayHistory.map(item => (
                     <Link 
                         key={item.comicId} 
-                        to={`/read/${item.comicId}/${item.chapterId}`}
+                        to={`/read/${slugify(item.comicTitle)}-${item.comicId}/${item.chapterId}`}
                         className="group relative flex flex-col gap-2.5 transition-transform hover:-translate-y-1"
                     >
                         {/* Cover */}
