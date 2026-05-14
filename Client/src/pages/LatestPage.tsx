@@ -127,13 +127,13 @@ const LatestPage: React.FC = () => {
 
                 {/* Comics Grid */}
                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-x-6 md:gap-y-10">
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-10">
                         {Array.from({ length: 12 }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
                     </div>
                 ) : comics.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-x-6 md:gap-y-10">
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-10">
                         {comics.map((comic: Comic) => (
                             <ComicCard key={comic._id || comic.id} comic={comic} showTime={true} />
                         ))}

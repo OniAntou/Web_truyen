@@ -33,7 +33,7 @@ const ComicGrid: React.FC<ComicGridProps> = ({
                 </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-x-6 md:gap-y-10">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-10">
                 {displayComics.map(comic => (
                     <ComicCard key={comic.id || comic._id} comic={comic} showHoverStats={showHoverStats} />
                 ))}
