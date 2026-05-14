@@ -3,9 +3,11 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import BottomNav from './BottomNav';
+import { useAuthInitialization } from '../hooks/useAuthInitialization';
 
 const ClientLayout: React.FC = () => {
     const location = useLocation();
+    useAuthInitialization();
     
     // Check if we should hide normal navbar/footer (e.g. for reader)
     const isReader = location.pathname.startsWith('/read/');

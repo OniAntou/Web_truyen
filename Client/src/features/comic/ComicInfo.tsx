@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Star, User as UserIcon, Share2, Heart } from 'lucide-react';
 import { formatViews, translateStatus } from '../../utils/format';
-import LazyImage from '../ui/LazyImage';
-import { comicService } from '../../api/comicService';
+import LazyImage from '../../components/ui/LazyImage';
+import { comicService } from '../../services/comicService';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Comic } from '../../types/comic';

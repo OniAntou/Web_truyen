@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, AlertTriangle, Send, CheckCircle } from 'lucide-react';
 import { CHAPTER_REPORT_REASONS, COMMENT_REPORT_REASONS } from '../../constants/reportReasons';
-import { reportService } from '../../api/reportService';
+import { reportService } from '../../services/reportService';
 
 interface ReportModalProps {
     isOpen: boolean;

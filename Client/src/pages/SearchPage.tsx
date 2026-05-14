@@ -2,8 +2,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 
-import ComicGrid from '../components/Home/ComicGrid';
-import { comicService, ComicsResponse } from '../api/comicService';
+import ComicGrid from '../features/home/ComicGrid';
+import { comicService, ComicsResponse } from '../services/comicService';
 
 const SearchPage: React.FC = () => {
     const [searchParams] = useSearchParams();

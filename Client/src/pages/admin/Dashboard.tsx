@@ -11,7 +11,7 @@ import {
     ArrowUpRight,
     Calendar
 } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 interface ComicStats {
     _id: string;

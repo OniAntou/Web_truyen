@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import ComicCard from '../ui/ComicCard';
+import ComicCard from '../../components/ui/ComicCard';
 import { Comic } from '../../types/comic';
 
 interface ComicGridProps {

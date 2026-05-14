@@ -3,29 +3,29 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import Navbar from '../components/Layout/Navbar';
-import ReaderControls from '../components/Reader/ReaderControls';
-import LazyImage from '../components/ui/LazyImage';
-import Footer from '../components/Layout/Footer';
-import CommentSection from '../components/Comic/CommentSection';
-import ReadPageSkeleton from '../components/ui/ReadPageSkeleton';
-import ReportModal from '../components/common/ReportModal';
+import Navbar from '../../layouts/Navbar';
+import ReaderControls from '../../features/reader/ReaderControls';
+import LazyImage from '../../components/ui/LazyImage';
+import Footer from '../../layouts/Footer';
+import CommentSection from '../../features/comic/CommentSection';
+import ReadPageSkeleton from '../../components/ui/ReadPageSkeleton';
+import ReportModal from '../../components/common/ReportModal';
 
 // New extracted components
-import LockedChapterView from '../components/Reader/LockedChapterView';
-import ReaderModals, { ConfirmModalState, AlertModalState } from '../components/Reader/ReaderModals';
-import ReaderHeader from '../components/Reader/ReaderHeader';
-import ReaderFooterSection from '../components/Reader/ReaderFooterSection';
+import LockedChapterView from '../../features/reader/LockedChapterView';
+import ReaderModals, { ConfirmModalState, AlertModalState } from '../../features/reader/ReaderModals';
+import ReaderHeader from '../../features/reader/ReaderHeader';
+import ReaderFooterSection from '../../features/reader/ReaderFooterSection';
 
-import { comicService } from '../api/comicService';
-import { chapterService } from '../api/chapterService';
-import { userService } from '../api/userService';
-import { saveReadingHistory } from '../utils/readingHistory';
+import { comicService } from '../../services/comicService';
+import { chapterService } from '../../services/chapterService';
+import { userService } from '../../services/userService';
+import { saveReadingHistory } from '../../utils/readingHistory';
 
-import { useThemeStore } from '../store/themeStore';
-import { useAuthStore } from '../store/authStore';
+import { useThemeStore } from '../../store/themeStore';
+import { useAuthStore } from '../../store/authStore';
 
-import { Comic, Chapter } from '../types/comic';
+import { Comic, Chapter } from '../../types/comic';
 
 interface ReaderPageChapter extends Chapter {
     pages?: { image_url: string }[];

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight, X } from 'lucide-react';
-import LazyImage from '../ui/LazyImage';
+import LazyImage from '../../components/ui/LazyImage';
 import { getReadingHistory, clearReadingHistory, HistoryEntry } from '../../utils/readingHistory';
 
 const ContinueReading = () => {

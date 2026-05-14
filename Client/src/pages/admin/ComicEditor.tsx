@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 /**
  * Sanitize a URL to only allow safe protocols (http, https, blob).

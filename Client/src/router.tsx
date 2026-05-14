@@ -3,29 +3,29 @@ import { createBrowserRouter } from 'react-router-dom';
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage'));
-const ComicInfoPage = lazy(() => import('./pages/ComicInfoPage'));
-const ReadPage = lazy(() => import('./pages/ReadPage'));
+const ComicInfoPage = lazy(() => import('./pages/comic/ComicInfoPage'));
+const ReadPage = lazy(() => import('./pages/comic/ReadPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const PopularPage = lazy(() => import('./pages/PopularPage'));
 const GenresPage = lazy(() => import('./pages/GenresPage'));
 const LatestPage = lazy(() => import('./pages/LatestPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
+const AuthPage = lazy(() => import('./pages/auth/AuthPage'));
 const FollowingPage = lazy(() => import('./pages/user/FollowingPage'));
 const ProfilePage = lazy(() => import('./pages/user/ProfilePage'));
-const CreatorApplication = lazy(() => import('./pages/CreatorApplication'));
-const CreatorStudio = lazy(() => import('./pages/CreatorStudio'));
+const CreatorApplication = lazy(() => import('./pages/creator/CreatorApplication'));
+const CreatorStudio = lazy(() => import('./pages/creator/CreatorStudio'));
 const TopUpPage = lazy(() => import('./pages/user/TopUpPage'));
 const PaymentReturnPage = lazy(() => import('./pages/user/PaymentReturnPage'));
-const HistoryPage = lazy(() => import('./pages/HistoryPage'));
+const HistoryPage = lazy(() => import('./pages/user/HistoryPage'));
 const AboutPage = lazy(() => import('./pages/info/AboutPage'));
 const TermsOfService = lazy(() => import('./pages/info/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/info/PrivacyPolicy'));
 const ContactPage = lazy(() => import('./pages/info/ContactPage'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const RankingPage = lazy(() => import('./pages/RankingPage'));
 
-const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
-import ClientLayout from './components/Layout/ClientLayout';
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+import ClientLayout from './layouts/ClientLayout';
 const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
 const ComicList = lazy(() => import('./pages/admin/ComicList'));
 const ComicEditor = lazy(() => import('./pages/admin/ComicEditor'));
@@ -36,8 +36,8 @@ const UserManager = lazy(() => import('./pages/admin/UserManager'));
 const CommentManager = lazy(() => import('./pages/admin/CommentManager'));
 const ReportManager = lazy(() => import('./pages/admin/ReportManager'));
 
-import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute';
-import ProtectedCreatorRoute from './components/auth/ProtectedCreatorRoute';
+import ProtectedAdminRoute from './features/auth/ProtectedAdminRoute';
+import ProtectedCreatorRoute from './features/auth/ProtectedCreatorRoute';
 
 // Loading Component
 const Loading = () => (

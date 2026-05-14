@@ -4,8 +4,9 @@ import { useTranslation } from '../../hooks/useTranslation';
 
 
 import { Crown, Plus, Clock, Pencil, Check, X, Trash2, AlertTriangle, History } from 'lucide-react';
-import { clearSession } from '../../utils/auth';
-import { userService } from '../../api/userService';
+import { useAuthStore } from '../../store/authStore';
+import { authService } from '../../services/authService';
+import { userService } from '../../services/userService';
 
 import { User } from '../../types/user';
 
@@ -108,7 +109,8 @@ const ProfilePage: React.FC = () => {
         setSaving(true);
         try {
             await userService.deleteAccount();
-            clearSession();
+            authService.logout().catch(console.error);
+            useAuthStore.getState().logout();
             navigate('/');
         } catch (err: any) {
             showToast(err.message, 'err');
@@ -187,7 +189,7 @@ const ProfilePage: React.FC = () => {
                     <p style={{ maxWidth: '300px', textAlign: 'center', fontSize: '0.9rem' }}>{language === 'vi' ? 'Vui lòng kiểm tra lại kết nối hoặc đăng nhập lại nếu phiên làm việc đã hết hạn.' : 'Please check your connection or log in again if your session has expired.'}</p>
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                         <button className="btn btn-glass" onClick={() => window.location.reload()}>{t('retry')}</button>
-                        <button className="btn btn-primary" onClick={() => { clearSession(); navigate('/auth'); }}>{t('login')}</button>
+                        <button className="btn btn-primary" onClick={() => { useAuthStore.getState().logout(); navigate('/auth'); }}>{t('login')}</button>
                     </div>
                 </div>
             </div>

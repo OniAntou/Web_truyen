@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Search, Trash2, Shield, Crown, ChevronLeft, ChevronRight, X, Users, Eye, MessageSquare, Heart, DollarSign, Coins, Star, RefreshCw, Filter } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 interface User {
     _id: string;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, LogOut, UserPlus, Users, MessageSquare, Flag } from 'lucide-react';
-import { authService } from '../../api/authService';
+import { authService } from '../services/authService';
 
 const AdminLayout: React.FC = () => {
     const location = useLocation();
@@ -21,7 +21,7 @@ const AdminLayout: React.FC = () => {
             console.error('Logout failed:', err);
         }
         localStorage.removeItem('admin');
-        const { clearAdminToken } = await import('../../utils/authToken');
+        const { clearAdminToken } = await import('../utils/authToken');
         clearAdminToken();
         window.location.href = '/admin/login';
     };

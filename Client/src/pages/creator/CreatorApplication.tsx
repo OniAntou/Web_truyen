@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Send, CheckCircle2 } from 'lucide-react';
 
 
-import apiClient from '../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 const CreatorApplication: React.FC = () => {
     const [formData, setFormData] = useState({

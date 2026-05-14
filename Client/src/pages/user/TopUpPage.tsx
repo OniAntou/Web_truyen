@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 
 import { CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 const TopUpPage: React.FC = () => {
     const [amount, setAmount] = useState(50000);

@@ -4,9 +4,9 @@ import { Helmet } from 'react-helmet-async';
 import { BookOpen, ChevronRight, Trash2, History } from 'lucide-react';
 
 
-import LazyImage from '../components/ui/LazyImage';
-import { clearReadingHistory } from '../utils/readingHistory';
-import { comicService } from '../api/comicService';
+import LazyImage from '../../components/ui/LazyImage';
+import { clearReadingHistory } from '../../utils/readingHistory';
+import { comicService } from '../../services/comicService';
 
 interface HistoryItem {
     comicId: string;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { commentService } from '../../api/commentService';
-import ReportModal from '../common/ReportModal';
+import { commentService } from '../../services/commentService';
+import ReportModal from '../../components/common/ReportModal';
 import { Flag } from 'lucide-react';
 
 interface Comment {

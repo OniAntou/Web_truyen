@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import HeroSection from '../components/Home/HeroSection';
-import ComicGrid from '../components/Home/ComicGrid';
-import { comicService } from '../api/comicService';
-import HomePageSkeleton from '../components/Home/HomePageSkeleton';
+import HeroSection from '../features/home/HeroSection';
+import ComicGrid from '../features/home/ComicGrid';
+import { comicService } from '../services/comicService';
+import HomePageSkeleton from '../features/home/HomePageSkeleton';
 
 import { Comic } from '../types/comic';
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Star, Eye, Filter, ChevronDown, Flame } from 'lucide-react';
-import { comicService, ComicsResponse } from '../api/comicService';
+import { comicService, ComicsResponse } from '../services/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre } from '../types/comic';
 

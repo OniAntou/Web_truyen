@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 
-import { authService } from "../api/authService";
+import { authService } from "../../services/authService";
 
 const ResetPassword: React.FC = () => {
   const { token } = useParams<{ token: string }>();

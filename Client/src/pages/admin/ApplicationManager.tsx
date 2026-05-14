@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserCheck, UserX, Clock, ExternalLink, HelpCircle, Trash2 } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 interface Application {
     id: string;

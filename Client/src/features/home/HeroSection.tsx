@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Eye, Star } from 'lucide-react';
-import LazyImage from '../ui/LazyImage';
+import LazyImage from '../../components/ui/LazyImage';
 import { translateStatus } from '../../utils/format';
 
 import { Comic } from '../../types/comic';

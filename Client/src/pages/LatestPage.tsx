@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Clock, Filter, ChevronDown, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 
 
-import { comicService, ComicsResponse } from '../api/comicService';
+import { comicService, ComicsResponse } from '../services/comicService';
 import ComicCard from '../components/ui/ComicCard';
 import { Comic, Genre, Pagination } from '../types/comic';
 

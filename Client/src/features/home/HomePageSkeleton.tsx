@@ -1,6 +1,6 @@
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
-import SkeletonCard from '../ui/SkeletonCard';
+import SkeletonCard from '../../components/ui/SkeletonCard';
 
 const HomePageSkeleton: React.FC = () => {
     return (

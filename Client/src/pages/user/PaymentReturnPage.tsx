@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
 
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 const PaymentReturnPage: React.FC = () => {
     const [searchParams] = useSearchParams();

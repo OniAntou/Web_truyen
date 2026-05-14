@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 
 
-import ComicGrid from '../../components/Home/ComicGrid';
+import ComicGrid from '../../features/home/ComicGrid';
 import { BookMarked } from 'lucide-react';
-import { comicService } from '../../api/comicService';
+import { comicService } from '../../services/comicService';
 import { Comic } from '../../types/comic';
 
 const FollowingPage: React.FC = () => {

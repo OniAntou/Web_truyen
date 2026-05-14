@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { comicService } from "../../api/comicService";
+import { comicService } from "../../services/comicService";
 import { Chapter } from "../../types/comic";
 
 interface ReaderChapter extends Chapter {

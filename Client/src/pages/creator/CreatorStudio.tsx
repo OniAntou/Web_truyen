@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, BookOpen, Edit, Eye, Star, Home, LayoutDashboard, Trash2 } from 'lucide-react';
-import LazyImage from '../components/ui/LazyImage';
-import { API_BASE_URL } from '../constants/api';
-import { clearSession } from '../utils/auth';
-import { getAuthToken } from '../utils/authToken';
-import { withUserAuthHeaders } from '../utils/authFetch';
+import LazyImage from '../../components/ui/LazyImage';
+import apiClient from '../../services/apiClient';
 
 interface StudioComic {
     _id?: string;
@@ -26,37 +23,17 @@ const CreatorStudio: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = getAuthToken();
-
-        // Add a check in a real app to ensure role === 'creator' from context
-        fetch(`${API_BASE_URL}/studio/comics`, {
-            headers: withUserAuthHeaders(),
-            credentials: 'include'
-        })
-        .then(res => {
-            if (res.status === 401) {
-                if (token) {
-                    clearSession();
-                    return null;
-                }
-                throw new Error('Phien dang nhap can duoc lam moi. Vui long dang nhap lai.');
-            }
-            if (res.status === 403) {
-                throw new Error('Bạn không có quyền truy cập trang này. Vui lòng nộp đơn xin cấp quyền tác giả.');
-            }
-            return res.json();
-        })
+        apiClient<StudioComic[]>('/studio/comics')
         .then(data => {
-            if (Array.isArray(data)) {
-                setComics(data);
-            } else if (data) {
-                throw new Error(data.message || 'Lỗi tải dữ liệu');
-            }
+            setComics(data);
             setLoading(false);
         })
         .catch(err => {
-            setError(err.message);
+            setError(err.message || 'Lỗi tải dữ liệu');
             setLoading(false);
+            if (err.status === 401) {
+                navigate('/auth');
+            }
         });
     }, [navigate]);
 
@@ -64,19 +41,11 @@ const CreatorStudio: React.FC = () => {
         if (!window.confirm('Bạn có chắc chắn muốn xóa truyện này? Hành động này không thể hoàn tác.')) return;
         
         try {
-            const res = await fetch(`${API_BASE_URL}/comics/${id}`, {
-                method: 'DELETE',
-                headers: withUserAuthHeaders(),
-                credentials: 'include'
-            });
-            if (res.ok) {
-                setComics(comics.filter(c => (c._id || c.id) !== id));
-            } else {
-                alert('Không thể xóa truyện lúc này.');
-            }
-        } catch (err) {
+            await apiClient(`/comics/${id}`, { method: 'DELETE' });
+            setComics(comics.filter(c => (c._id || c.id) !== id));
+        } catch (err: any) {
             console.error('Lỗi khi xóa truyện:', err);
-            alert('Lỗi kết nối khi xóa truyện.');
+            alert(err.message || 'Không thể xóa truyện lúc này.');
         }
     };
 

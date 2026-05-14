@@ -19,6 +19,7 @@ interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     className?: string;
     aspectRatio?: number;
     releaseAspectRatioOnLoad?: boolean;
+    fill?: boolean;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({
@@ -28,6 +29,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
     style,
     aspectRatio = 0.7,
     releaseAspectRatioOnLoad = false,
+    fill = false,
     ...props
 }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -35,11 +37,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
     const [error, setError] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Detect if this image is meant to fill its parent absolutely or completely
-    const isAbsoluteFill = className.includes('absolute') && className.includes('inset-0');
-    const isFullHeight = className.includes('h-full') || className.includes('h-[');
-    const isFullWidth = className.includes('w-full') || className.includes('w-[');
-    const isFillMode = isAbsoluteFill || (isFullHeight && isFullWidth);
+    // Fill mode means the image should occupy its container completely
+    const isFillMode = fill;
 
     useEffect(() => {
         const observer = new IntersectionObserver(

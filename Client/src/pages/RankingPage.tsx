@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trophy, Calendar, Clock } from 'lucide-react';
-import { comicService, ComicsResponse } from '../api/comicService';
+import { comicService, ComicsResponse } from '../services/comicService';
 import ComicCard from '../components/ui/ComicCard';
 
 const RankingPage: React.FC = () => {

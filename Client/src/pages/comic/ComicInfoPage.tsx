@@ -2,11 +2,11 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import ComicInfo from '../components/Comic/ComicInfo';
-import ChapterList from '../components/Comic/ChapterList';
-import CommentSection from '../components/Comic/CommentSection';
-import { comicService } from '../api/comicService';
-import ComicInfoSkeleton from '../components/Comic/ComicInfoSkeleton';
+import ComicInfo from '../../features/comic/ComicInfo';
+import ChapterList from '../../features/comic/ChapterList';
+import CommentSection from '../../features/comic/CommentSection';
+import { comicService } from '../../services/comicService';
+import ComicInfoSkeleton from '../../features/comic/ComicInfoSkeleton';
 
 const ComicInfoPage = () => {
     const { id } = useParams();

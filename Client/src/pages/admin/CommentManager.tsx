@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Search, Trash2, MessageSquare, ChevronLeft, ChevronRight, X, RefreshCw, Filter, CheckSquare, Square, AlertTriangle, BookOpen, Clock, Reply } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 interface AdminComment {
     _id: string;

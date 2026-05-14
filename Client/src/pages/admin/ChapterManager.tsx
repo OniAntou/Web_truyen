@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 
 const MAX_FILES_PER_UPLOAD_BATCH = 2;
 const MAX_BYTES_PER_UPLOAD_BATCH = 3.5 * 1024 * 1024; // 3.5MB to stay safely under Vercel's 4.5MB limit

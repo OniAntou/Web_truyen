@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, List, Search, LayoutGrid, LayoutList, Eye, Star } from 'lucide-react';
-import apiClient from '../../api/apiClient';
+import apiClient from '../../services/apiClient';
 import { translateStatus } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
-import { comicService } from '../../api/comicService';
+import { comicService } from '../../services/comicService';
 import { Comic } from '../../types/comic';
 
 
