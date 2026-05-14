@@ -4,14 +4,6 @@ import {
     Twitter, 
     Instagram, 
     Github,
-    Heart,
-    Mail,
-    Shield,
-    Info,
-    Clock,
-    TrendingUp,
-    Grid3X3,
-    Trophy,
     Languages
 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
