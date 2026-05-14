@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, X, Sun, Moon, Languages } from 'lucide-react';
+import { Search, Menu, X, Sun, Moon } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { useTranslation } from '../hooks/useTranslation';
@@ -13,12 +13,10 @@ import MobileMenu from './MobileMenu';
 const Navbar: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     
     const { user } = useAuthStore();
-    const { t, language, toggleLanguage } = useTranslation();
+    const { t } = useTranslation();
     const { theme, toggleTheme } = useThemeStore();
-    const mobileSearchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -28,18 +26,14 @@ const Navbar: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        if (isMobileSearchOpen && mobileSearchRef.current) {
-            setTimeout(() => mobileSearchRef.current?.focus(), 300);
-        }
-    }, [isMobileSearchOpen]);
+
 
     return (
         <>
             <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`} id="main-navbar">
                 <div className="container navbar-content">
                     {/* Logo */}
-                    <Link to="/" className="nav-logo">
+                    <Link to="/" className="nav-logo hidden md:block">
                         Comic<span>Verse</span>
                     </Link>
 
@@ -72,27 +66,13 @@ const Navbar: React.FC = () => {
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
 
-                        <button 
-                            className="theme-toggle-btn ml-2" 
-                            onClick={toggleLanguage} 
-                            title={t('switch_lang')}
-                            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '0 8px' }}
-                        >
-                            <Languages size={18} />
-                            <span style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>{language.toUpperCase()}</span>
-                        </button>
+
 
                         <NavProfile />
                     </div>
 
                     <div className="mobile-nav-actions">
-                        <button
-                            className="mobile-nav-btn"
-                            onClick={() => setIsMobileSearchOpen(true)}
-                            aria-label="Search"
-                        >
-                            <Search size={20} strokeWidth={2} />
-                        </button>
+
                         <button
                             className="mobile-nav-btn"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -104,18 +84,7 @@ const Navbar: React.FC = () => {
                 </div>
             </nav>
 
-            {/* Mobile Search Overlay */}
-            <div className={`mobile-search-overlay ${isMobileSearchOpen ? 'open' : ''}`}>
-                <div className="mobile-search-bar">
-                    <NavSearch onSearchComplete={() => setIsMobileSearchOpen(false)} />
-                    <button
-                        className="mobile-search-close"
-                        onClick={() => setIsMobileSearchOpen(false)}
-                    >
-                        <X size={18} />
-                    </button>
-                </div>
-            </div>
+
 
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
         </>

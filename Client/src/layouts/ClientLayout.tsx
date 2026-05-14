@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import BottomNav from './BottomNav';
 import { useAuthInitialization } from '../hooks/useAuthInitialization';
 
 const ClientLayout: React.FC = () => {
@@ -22,7 +21,6 @@ const ClientLayout: React.FC = () => {
                 <Outlet />
             </main>
             {!isReader && <Footer />}
-            <BottomNav />
         </div>
     );
 };

@@ -11,11 +11,14 @@ import {
     Clock,
     TrendingUp,
     Grid3X3,
-    Trophy
+    Trophy,
+    Languages
 } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
+    const { t, language, toggleLanguage } = useTranslation();
 
     const sections = [
         {
@@ -115,6 +118,15 @@ const Footer: React.FC = () => {
                             <Link to="/contact" className="hover:opacity-100 transition-opacity">Liên Hệ</Link>
                             <span className="w-1 h-1 rounded-full bg-current opacity-20"></span>
                             <Link to="/terms" className="hover:opacity-100 transition-opacity">Điều Khoản</Link>
+                            <span className="w-1 h-1 rounded-full bg-current opacity-20"></span>
+                            <button 
+                                onClick={toggleLanguage} 
+                                className="flex items-center gap-1.5 hover:opacity-100 transition-opacity uppercase font-bold"
+                                title={t('switch_lang')}
+                            >
+                                <Languages size={14} />
+                                <span>{language}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -186,6 +198,14 @@ const Footer: React.FC = () => {
                         <p className="text-[0.6rem] opacity-40 uppercase tracking-[0.2em] text-center font-medium" style={{ color: 'var(--text-primary)' }}>
                             © {currentYear} ComicVerse · Crafted with <Heart size={8} fill="currentColor" className="inline mb-0.5" /> in VN
                         </p>
+                        <button 
+                            onClick={toggleLanguage} 
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-[0.7rem] font-bold uppercase tracking-widest transition-all active:scale-95"
+                            style={{ color: 'var(--text-primary)' }}
+                        >
+                            <Languages size={14} />
+                            <span>{language}</span>
+                        </button>
                     </div>
                 </div>
 

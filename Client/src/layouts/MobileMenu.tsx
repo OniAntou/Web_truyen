@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { X, User as UserIcon, Home, Trophy, TrendingUp, Grid3X3, Clock, BookOpen, Heart, Palette, Languages, Shield, Moon, Sun } from 'lucide-react';
+import { X, User as UserIcon, Home, Trophy, TrendingUp, Grid3X3, Clock, BookOpen, Heart, Palette, Shield, Moon, Sun } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useTranslation } from '../hooks/useTranslation';
 import { useThemeStore } from '../store/themeStore';
@@ -12,7 +12,7 @@ interface MobileMenuProps {
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
     const { user, logout: storeLogout } = useAuthStore();
-    const { t, language, toggleLanguage } = useTranslation();
+    const { t } = useTranslation();
     const { theme, toggleTheme } = useThemeStore();
     const navigate = useNavigate();
 
@@ -121,15 +121,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                             </span>
                         </button>
 
-                        <button className="drawer-nav-link" onClick={toggleLanguage}>
-                            <span className="drawer-link-icon">
-                                <Languages size={18} />
-                            </span>
-                            {t('language')}: {language === 'vi' ? 'Tiếng Việt' : 'English'}
-                            <span className="drawer-link-badge">
-                                {language.toUpperCase()}
-                            </span>
-                        </button>
+
 
                         {user?.role === 'admin' && (
                             <Link to="/admin" className="drawer-nav-link drawer-nav-admin" onClick={onClose}>
