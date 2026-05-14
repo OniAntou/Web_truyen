@@ -62,7 +62,8 @@ const ContinueReading = () => {
                             <LazyImage
                                 src={item.coverUrl || ''}
                                 alt={item.comicTitle}
-                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                fill={true}
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                             {/* Dark gradient overlay at bottom */}
                             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent" />

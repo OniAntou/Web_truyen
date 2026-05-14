@@ -71,7 +71,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
     const shouldReserveAspectRatio = !isFillMode && aspectRatio && !(releaseAspectRatioOnLoad && isLoaded);
 
     const containerStyle: React.CSSProperties = isFillMode
-        ? { overflow: 'hidden', ...style }
+        ? { position: 'absolute', inset: 0, overflow: 'hidden', ...style }
         : {
             width: '100%',
             ...(shouldReserveAspectRatio ? { aspectRatio: `${aspectRatio}`, overflow: 'hidden' } : {}),
@@ -80,7 +80,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         };
 
     const containerClasses = isFillMode
-        ? 'lazy-image-container lazy-image-fill'
+        ? 'lazy-image-container lazy-image-fill w-full h-full'
         : 'lazy-image-container relative';
 
     return (
@@ -103,7 +103,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
                     <img
                         src={src}
                         alt={alt || ''}
-                        className={`lazy-img ${isLoaded ? 'lazy-img-loaded' : ''} ${className}`}
+                        className={`lazy-img ${isLoaded ? 'lazy-img-loaded' : ''} ${isFillMode ? 'w-full h-full' : ''} ${className}`}
                         onLoad={() => setIsLoaded(true)}
                         onError={() => setError(true)}
                         {...props}

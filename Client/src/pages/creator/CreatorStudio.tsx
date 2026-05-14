@@ -134,7 +134,7 @@ const CreatorStudio: React.FC = () => {
                         {comics.map(comic => (
                             <div key={comic._id || comic.id} className="group relative flex flex-col gap-4">
                                 <Link to={`/p/${comic._id || comic.id}`} className="aspect-[2/3] w-full rounded-2xl overflow-hidden relative ring-1 ring-[var(--border)] block">
-                                    <LazyImage src={(comic.cover_url || comic.cover) || ''} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={comic.title} />
+                                    <LazyImage src={(comic.cover_url || comic.cover) || ''} fill={true} className="object-cover transition-transform duration-700 group-hover:scale-110" alt={comic.title} />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                                     
                                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-white">

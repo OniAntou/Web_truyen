@@ -63,7 +63,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                 <div className="mobile-hero-bg">
                     <LazyImage 
                         src={currentComic.cover_url || currentComic.cover || ''} 
-                        className="mobile-hero-bg-img w-full h-full" 
+                        fill={true}
+                        className="mobile-hero-bg-img object-cover" 
                         alt="" 
                     />
                     <div className="mobile-hero-gradient" />
@@ -74,7 +75,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                     <Link to={`/p/${currentComic.id || currentComic._id}`} className="mobile-hero-cover">
                         <LazyImage 
                             src={currentComic.cover_url || currentComic.cover || ''} 
-                            className="mobile-hero-cover-img w-full h-full" 
+                            fill={true}
+                            className="mobile-hero-cover-img object-cover" 
                             alt={currentComic.title} 
                         />
                     </Link>
@@ -182,7 +184,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                             onMouseEnter={handleMouseEnter}
                             style={{ transformStyle: 'preserve-3d', boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8)' }}
                         >
-                            <LazyImage src={currentComic.cover_url || currentComic.cover || ''} className="w-full h-full object-cover" alt={currentComic.title} />
+                            <LazyImage src={currentComic.cover_url || currentComic.cover || ''} fill={true} className="object-cover" alt={currentComic.title} />
                             {/* Elegant reflection/shimmer overlay */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent mix-blend-overlay pointer-events-none rounded-[2rem]"></div>
                             <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none"></div>
