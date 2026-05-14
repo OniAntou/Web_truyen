@@ -781,7 +781,7 @@ img {
 
 .app-main.has-navbar {
   padding-top: 0;
-  padding-bottom: 0;
+  padding-bottom: 4rem;
 }
 
 @media (min-width: 768px) {
@@ -3916,8 +3916,8 @@ body * {
 /* ------ MOBILE: Footer ------ */
 @media (max-width: 767px) {
   .footer {
-    padding: 2.5rem 0 calc(1.5rem + var(--nav-bottom-height) + var(--safe-area-bottom));
-    margin-top: 2rem;
+    padding: 3rem 0 calc(2rem + var(--safe-area-bottom));
+    margin-top: 4rem;
   }
 
   .footer-grid {

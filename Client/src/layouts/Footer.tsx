@@ -132,102 +132,79 @@ const Footer: React.FC = () => {
                 </div>
             </footer>
 
-            {/* ── MOBILE FOOTER (RE-DESIGNED) ── */}
-            <footer className="md:hidden relative overflow-hidden pt-12 pb-8 px-6 border-t border-white/5" style={{ background: 'var(--bg-secondary)' }}>
-                {/* Decorative Elements */}
-                <div className="absolute -top-24 -left-24 w-64 h-64 bg-pink-500/5 blur-[100px] rounded-full"></div>
-                <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full"></div>
+            <footer className="md:hidden pt-12 pb-12 px-6 border-t" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+                <div className="container mx-auto">
+                    <div className="flex flex-col gap-12">
+                        {/* Brand & Mission */}
+                        <div className="space-y-4">
+                            <Link to="/" className="inline-block">
+                                <h3 className="text-2xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>
+                                    COMIC<span style={{ color: 'var(--accent)' }}>VERSE</span>
+                                </h3>
+                            </Link>
+                            <p className="text-sm leading-relaxed opacity-70" style={{ color: 'var(--text-secondary)' }}>
+                                Nền tảng đọc truyện tranh trực tuyến hiện đại. Nơi hội tụ những bộ truyện đỉnh cao và trải nghiệm đọc mượt mà nhất.
+                            </p>
+                        </div>
 
-                <div className="relative z-10 flex flex-col items-center gap-10">
-                    {/* Brand Section */}
-                    <div className="text-center">
-                        <Link to="/" className="inline-block mb-2">
-                            <h3 className="text-3xl font-black italic tracking-tighter" style={{ color: 'var(--text-primary)' }}>
-                                COMIC<span style={{ color: 'var(--accent)' }}>VERSE</span>
-                            </h3>
-                        </Link>
-                        <p className="text-[0.65rem] opacity-50 uppercase tracking-[0.4em] font-medium" style={{ color: 'var(--text-primary)' }}>
-                            Premium Manga Universe
-                        </p>
-                    </div>
+                        {/* Navigation Groups */}
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <h4 className="text-[0.65rem] font-bold uppercase tracking-[0.2em] opacity-40" style={{ color: 'var(--text-primary)' }}>Khám phá</h4>
+                                <ul className="space-y-3">
+                                    <li><Link to="/latest" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Mới Cập Nhật</Link></li>
+                                    <li><Link to="/popular" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Thịnh Hành</Link></li>
+                                    <li><Link to="/genres" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Thể Loại</Link></li>
+                                    <li><Link to="/ranking" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Xếp Hạng</Link></li>
+                                </ul>
+                            </div>
+                            <div className="space-y-4">
+                                <h4 className="text-[0.65rem] font-bold uppercase tracking-[0.2em] opacity-40" style={{ color: 'var(--text-primary)' }}>Thông tin</h4>
+                                <ul className="space-y-3">
+                                    <li><Link to="/about" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Về Chúng Tôi</Link></li>
+                                    <li><Link to="/contact" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Liên Hệ</Link></li>
+                                    <li><Link to="/privacy" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Bảo Mật</Link></li>
+                                    <li><Link to="/terms" className="text-sm font-medium opacity-80" style={{ color: 'var(--text-primary)' }}>Điều Khoản</Link></li>
+                                </ul>
+                            </div>
+                        </div>
 
-                    {/* Navigation Grid */}
-                    <div className="w-full grid grid-cols-2 gap-y-6 gap-x-4">
-                        <Link to="/latest" className="mobile-footer-card">
-                            <Clock size={16} className="text-blue-400" />
-                            <span>Mới Nhất</span>
-                        </Link>
-                        <Link to="/popular" className="mobile-footer-card">
-                            <TrendingUp size={16} className="text-orange-400" />
-                            <span>Thịnh Hành</span>
-                        </Link>
-                        <Link to="/genres" className="mobile-footer-card">
-                            <Grid3X3 size={16} className="text-pink-400" />
-                            <span>Thể Loại</span>
-                        </Link>
-                        <Link to="/ranking" className="mobile-footer-card">
-                            <Trophy size={16} className="text-yellow-400" />
-                            <span>Xếp Hạng</span>
-                        </Link>
-                    </div>
-
-                    {/* Simple Links */}
-                    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 opacity-60">
-                        <Link to="/about" className="text-[0.75rem] font-semibold flex items-center gap-1.5"><Info size={12}/> Về chúng tôi</Link>
-                        <Link to="/contact" className="text-[0.75rem] font-semibold flex items-center gap-1.5"><Mail size={12}/> Liên hệ</Link>
-                        <Link to="/privacy" className="text-[0.75rem] font-semibold flex items-center gap-1.5"><Shield size={12}/> Bảo mật</Link>
-                    </div>
-
-                    {/* Socials */}
-                    <div className="flex gap-6">
-                        {socialLinks.map((social, idx) => (
-                            <a 
-                                key={idx} 
-                                href={social.href} 
-                                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/5 transition-all active:scale-95"
-                                style={{ color: 'var(--text-primary)' }}
-                            >
-                                {social.icon}
-                            </a>
-                        ))}
-                    </div>
-
-                    {/* Footer Info */}
-                    <div className="flex flex-col items-center gap-4 w-full mt-2">
-                        <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-30"></div>
-                        <p className="text-[0.6rem] opacity-40 uppercase tracking-[0.2em] text-center font-medium" style={{ color: 'var(--text-primary)' }}>
-                            © {currentYear} ComicVerse · Crafted with <Heart size={8} fill="currentColor" className="inline mb-0.5" /> in VN
-                        </p>
-                        <button 
-                            onClick={toggleLanguage} 
-                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-[0.7rem] font-bold uppercase tracking-widest transition-all active:scale-95"
-                            style={{ color: 'var(--text-primary)' }}
-                        >
-                            <Languages size={14} />
-                            <span>{language}</span>
-                        </button>
+                        {/* Social & Language */}
+                        <div className="flex flex-col gap-6 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex gap-4">
+                                    {socialLinks.map((social, idx) => (
+                                        <a 
+                                            key={idx} 
+                                            href={social.href} 
+                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                                            style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                        >
+                                            {social.icon}
+                                        </a>
+                                    ))}
+                                </div>
+                                <button 
+                                    onClick={toggleLanguage} 
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-[0.7rem] font-bold uppercase tracking-widest transition-all active:scale-95"
+                                    style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                >
+                                    <Languages size={14} />
+                                    <span>{language}</span>
+                                </button>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[0.65rem] opacity-40 font-medium" style={{ color: 'var(--text-primary)' }}>
+                                    © {currentYear} ComicVerse. Bản quyền thuộc về đội ngũ phát triển.
+                                </p>
+                                <p className="text-[0.65rem] opacity-30 italic" style={{ color: 'var(--text-primary)' }}>
+                                    Made with passion for the manga community.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <style>{`
-                    .mobile-footer-card {
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        padding: 12px 16px;
-                        background: rgba(255, 255, 255, 0.03);
-                        border: 1px solid rgba(255, 255, 255, 0.05);
-                        border-radius: 12px;
-                        font-size: 0.8rem;
-                        font-weight: 600;
-                        color: var(--text-primary);
-                        transition: all 0.2s;
-                    }
-                    .mobile-footer-card:active {
-                        background: rgba(255, 255, 255, 0.08);
-                        transform: translateY(2px);
-                    }
-                `}</style>
             </footer>
         </>
     );
