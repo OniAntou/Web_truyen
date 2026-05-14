@@ -1,12 +1,10 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { userService } from '../services/userService';
 import { User } from '../types/user';
 
 export const useAuthInitialization = () => {
     const { user, logout: storeLogout, updateUser } = useAuthStore();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const checkAuth = async (shouldVerifyWithServer = false) => {

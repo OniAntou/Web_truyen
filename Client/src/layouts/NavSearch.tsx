@@ -16,7 +16,7 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [searching, setSearching] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
-    const debounceRef = useRef<NodeJS.Timeout | null>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const navigate = useNavigate();
     const { t } = useTranslation();
 

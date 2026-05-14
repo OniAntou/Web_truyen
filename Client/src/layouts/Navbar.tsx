@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Search, Menu, X, Sun, Moon, Languages } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
@@ -18,7 +18,6 @@ const Navbar: React.FC = () => {
     const { user } = useAuthStore();
     const { t, language, toggleLanguage } = useTranslation();
     const { theme, toggleTheme } = useThemeStore();
-    const navigate = useNavigate();
     const mobileSearchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {

@@ -1,5 +1,5 @@
-import Navbar from '../Layout/Navbar';
-import Footer from '../Layout/Footer';
+import Navbar from '../../layouts/Navbar';
+import Footer from '../../layouts/Footer';
 
 const ComicInfoSkeleton = () => {
     return (

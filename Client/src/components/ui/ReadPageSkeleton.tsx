@@ -1,4 +1,4 @@
-import Navbar from '../Layout/Navbar';
+import Navbar from '../../layouts/Navbar';
 
 const ReadPageSkeleton: React.FC = () => (
     <div className="reader-page bg-[var(--bg-primary)] min-h-screen">
