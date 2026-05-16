@@ -9,8 +9,6 @@ const getChapterPages = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
 
-
-
   // Check Early Access / Premium Lock
   if (isChapterRequiresLock(chapter)) {
     let hasAccess = false;

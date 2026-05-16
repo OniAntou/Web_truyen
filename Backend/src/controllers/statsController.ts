@@ -71,8 +71,6 @@ const getStats = asyncHandler(async (req, res) => {
     });
   }
 
-
-
   // System Health
   // Top Performing Comics - Use raw collection to bypass Mongoose schema strips
   const topComicsRaw = await Comic.collection.find().sort({ views: -1 }).limit(5).toArray();

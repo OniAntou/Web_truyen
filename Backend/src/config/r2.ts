@@ -133,6 +133,12 @@ async function deleteFromR2(keyOrR2Key) {
   }
 }
 
+export { 
+  R2_ENABLED,
+  uploadToR2,
+  getFileUrl,
+  resolveR2Url,
+  resolveR2Urls,
   deleteFromR2,
   bucket,
  };
