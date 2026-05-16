@@ -1,20 +1,15 @@
 import {  Comic, Rating, ComicView, Comment, Favorite, ReadingProgress, Chapter, Pages  } from "../database";
-import {  getChapterCounts  } from "../utils/helpers";
+import {  getChapterCounts, findComicById  } from "../utils/helpers";
 import {  resolveR2Url  } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import apiCache from "../utils/cache";
 
-// Helper: find comic by ObjectId or legacy numeric id
-const findComic = async (id) => {
-  const idStr = String(id);
-  if (idStr.match(/^[0-9a-fA-F]{24}$/)) return Comic.findById(idStr);
-  return Comic.findOne({ id: parseInt(idStr) });
-};
+
 
 // Ratings
 const getUserRating = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const rating = await Rating.findOne({ user_id: req.user.id, comic_id: comic._id });
@@ -28,7 +23,7 @@ const submitRating = asyncHandler(async (req, res) => {
     throw new AppError("Rating phải từ 1 đến 5", 400);
   }
 
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const existingRating = await Rating.findOne({ user_id: req.user.id, comic_id: comic._id });
@@ -68,7 +63,7 @@ const submitRating = asyncHandler(async (req, res) => {
 
 // Views
 const recordView = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const existingView = await ComicView.findOne({ user_id: req.user.id, comic_id: comic._id });
@@ -89,7 +84,7 @@ const recordView = asyncHandler(async (req, res) => {
 // Comments
 const getComments = asyncHandler(async (req, res) => {
   const { chapterId } = req.query;
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   let filter: any = { comic_id: comic._id };
@@ -112,7 +107,7 @@ const postComment = asyncHandler(async (req, res) => {
   
   if (!content || !content.trim()) throw new AppError("Nội dung không được để trống", 400);
 
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const payload: any = {
@@ -153,7 +148,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 // Favorites
 const checkFavorite = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const favorite = await Favorite.findOne({ user_id: req.user.id, comic_id: comic._id });
@@ -186,7 +181,7 @@ const getUserFavorites = asyncHandler(async (req, res) => {
 });
 
 const toggleFavorite = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const existingFavorite = await Favorite.findOne({ user_id: req.user.id, comic_id: comic._id });
@@ -212,7 +207,7 @@ const toggleFavorite = asyncHandler(async (req, res) => {
 
 // Reading Progress
 const getReadingProgress = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const progress = await ReadingProgress.findOne({ 
@@ -241,7 +236,7 @@ const updateReadingProgress = asyncHandler(async (req, res) => {
     throw new AppError("Thiếu chapter_id", 400);
   }
 
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const chapter = await Chapter.findOne({ _id: String(chapter_id), comic_id: comic._id });
@@ -305,7 +300,7 @@ const getAllReadingProgress = asyncHandler(async (req, res) => {
 });
 
 const getChapterReadStatus = asyncHandler(async (req, res) => {
-  const comic = await findComic(req.params.id);
+  const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const chapters = await Chapter.find({ comic_id: comic._id })

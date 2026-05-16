@@ -1,6 +1,7 @@
 import {  Comic, User, Chapter, Payment, mongoose  } from "../database";
 import asyncHandler from "../middleware/asyncHandler";
 import {  resolveR2Url  } from "../config/r2";
+import {  formatViews  } from "../utils/helpers";
 
 const getStats = asyncHandler(async (req, res) => {
   const comicCount = await Comic.countDocuments();
@@ -70,11 +71,7 @@ const getStats = asyncHandler(async (req, res) => {
     });
   }
 
-  const formatViews = (num) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-    return num.toString();
-  };
+
 
   // System Health
   // Top Performing Comics - Use raw collection to bypass Mongoose schema strips

@@ -88,9 +88,6 @@ app.use(helmet({
 // Configuration defined in middleware/rateLimiter.js
 app.use('/api', globalLimiter);
 
-// Initialize Cron Jobs (Legacy - now handled by Vercel Crons via /api/cron)
-// initCronJobs();
-
 // Routes
 app.get("/", (req, res) => {
   res.send("API is running...");
@@ -129,11 +126,6 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api', seoRoutes);
 app.use('/api/cron', cronRoutes);
-
-// Compatibility / Special cases
-// Some routes in interactionRoutes were originally at /api/users/
-// I'll add redirect or mirror them here if needed, but it's better to update frontend if possible.
-// However, the task is to refactor, so I should try to keep the API contract.
 
 // Centralized Error Handler (must be last middleware)
 app.use(errorHandler);

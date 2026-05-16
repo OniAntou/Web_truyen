@@ -3,6 +3,7 @@ import {  R2_ENABLED, getFileUrl, uploadToR2, resolveR2Url  } from "../config/r2
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import {  convertToWebp  } from "../utils/imageHelper";
+import {  findComicById  } from "../utils/helpers";
 
 const getR2Status = (req, res) => {
   res.json({
@@ -22,12 +23,7 @@ const getSignedUrl = asyncHandler(async (req, res) => {
 const uploadCover = asyncHandler(async (req, res) => {
   if (!R2_ENABLED) throw new AppError("R2 chưa được cấu hình", 503);
   const comicId = req.params.comicId;
-  let comic;
-  if (comicId.match(/^[0-9a-fA-F]{24}$/)) {
-    comic = await Comic.findById(comicId);
-  } else {
-    comic = await Comic.findOne({ id: parseInt(comicId) });
-  }
+  const comic = await findComicById(comicId, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
   if (!req.file) throw new AppError("Cần gửi file ảnh (field: cover)", 400);
 

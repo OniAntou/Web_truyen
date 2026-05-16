@@ -1,6 +1,6 @@
 import {  Chapter, Pages, Upload, User, ChapterUnlock, Comic  } from "../database";
 import {  resolveR2Url, resolveR2Urls, deleteFromR2  } from "../config/r2";
-import {  syncLatestChapter  } from "../utils/helpers";
+import {  syncLatestChapter, isChapterRequiresLock  } from "../utils/helpers";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import apiCache from "../utils/cache";
@@ -9,11 +9,7 @@ const getChapterPages = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
 
-  const isChapterRequiresLock = (ch) => {
-    if (!ch.price || ch.price <= 0) return false;
-    if (ch.early_access_end_date && new Date(ch.early_access_end_date) <= new Date()) return false;
-    return true;
-  };
+
 
   // Check Early Access / Premium Lock
   if (isChapterRequiresLock(chapter)) {
