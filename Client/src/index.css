@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #121212;
-  --bg-secondary: #1c1c1c;
-  --bg-card: #242424;
+  --bg-primary: #18181b;
+  --bg-secondary: #202024;
+  --bg-card: #2a2a2e;
   --accent: #f43f5e;
   /* Rose 500 */
   --accent-hover: #e11d48;
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
-  --border: #333333;
+  --border: #3f3f46;
 
-  --glass-bg: rgba(28, 28, 28, 0.85);
+  --glass-bg: rgba(32, 32, 36, 0.85);
   --glass-border: rgba(255, 255, 255, 0.1);
   --blur: 16px;
 
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --search-bg: #242424;
-  --search-border: #404040;
+  --search-bg: #2a2a2e;
+  --search-border: #3f3f46;
   --search-text: #a1a1aa;
   --nav-bottom-height: 68px;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -2035,6 +2035,18 @@ body * {
 [data-theme="light"] .popular-card-genre-tag {
   background: rgba(0, 0, 0, 0.06);
   color: var(--text-secondary);
+}
+
+[data-theme="light"] .genre-tag {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .genre-tag:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .popular-dropdown-menu {
