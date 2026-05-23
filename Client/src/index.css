@@ -4242,6 +4242,201 @@ body * {
   border-top-color: var(--border);
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
+/* ------ MOBILE: Genre Grid ------ */
+@media (max-width: 767px) {
+  .genres-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .genre-card {
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+  }
+
+  .genre-card-name {
+    font-size: 0.82rem;
+  }
+
+  .genres-search-bar {
+    padding: 0.6rem 1rem;
+    border-radius: 0.85rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* ------ MOBILE: Pagination ------ */
+@media (max-width: 767px) {
+  .latest-pagination {
+    gap: 0.3rem;
+    margin-top: 2rem;
+  }
+
+  .latest-page-btn {
+    min-width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+    border-radius: 0.4rem;
+  }
+}
+
+/* ------ MOBILE: Search Dropdown on Mobile ------ */
+@media (max-width: 767px) {
+  .search-dropdown {
+    position: fixed;
+    top: 60px;
+    left: 0.5rem;
+    right: 0.5rem;
+    width: auto;
+    max-height: 50vh;
+    border-radius: 1rem;
+  }
+}
+
+/* ------ MOBILE: Auth Page ------ */
+@media (max-width: 767px) {
+  .auth-container {
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* ------ MOBILE: Smooth Touch Interactions ------ */
+@media (max-width: 767px) {
+  /* Disable hover effects on touch - rely on :active instead */
+  .comic-card:hover .card-image,
+  .latest-comic-card:hover .card-image,
+  .popular-comic-card:hover .card-image {
+    transform: none;
+  }
+
+  .comic-card:hover .card-overlay,
+  .latest-comic-card:hover .card-overlay,
+  .popular-comic-card:hover .card-overlay {
+    opacity: 0;
+  }
+
+  /* Use active state for touch feedback */
+  .comic-card:active,
+  .latest-comic-card:active,
+  .popular-comic-card:active {
+    transform: scale(0.97);
+  }
+
+  .chapter-item:active {
+    transform: scale(0.99);
+  }
+
+  .genre-card:active {
+    transform: scale(0.97);
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+}
+
+/* ------ MOBILE: Comment Section ------ */
+@media (max-width: 767px) {
+  .comment-section {
+    padding: 1rem;
+  }
+
+  .comment-input {
+    font-size: 0.9rem;
+  }
+}
+
+/* ------ MOBILE: Sticky Action Bar (Comic Info) ------ */
+@media (max-width: 767px) {
+  .mobile-sticky-action-bar {
+    position: fixed;
+    bottom: calc(var(--nav-bottom-height) + var(--safe-area-bottom));
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 0.85rem 1rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ===== LIGHT MODE: Mobile Elements ===== */
+[data-theme="light"] .mobile-nav-btn {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .mobile-nav-btn:active {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .mobile-search-overlay {
+  background: var(--bg-primary);
+}
+
+[data-theme="light"] .mobile-search-bar {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .mobile-search-close {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .mobile-search-results {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .mobile-drawer-backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .mobile-drawer {
+  background: var(--bg-card);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .drawer-close-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .drawer-close-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .drawer-user-card {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.04), rgba(139, 92, 246, 0.03));
+  border-color: rgba(244, 63, 94, 0.08);
+}
+
+[data-theme="light"] .drawer-nav-link:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .drawer-link-icon {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .drawer-footer {
+  border-top-color: var(--border);
+}
+
+[data-theme="light"] .drawer-logout-btn {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.1);
+}
+
+[data-theme="light"] .mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.92);
+  border-top-color: var(--border);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
 
 [data-theme="light"] .bottom-nav-indicator {
   background: rgba(244, 63, 94, 0.08);
@@ -4253,4 +4448,27 @@ body * {
 
 [data-theme="light"] .bottom-nav-item.active {
   color: var(--accent);
+}
+
+/* --- Desktop Hero Enhancements --- */
+.desktop-hero-overlay {
+  background: linear-gradient(to right, var(--bg-primary) 0%, var(--bg-primary) 15%, transparent 80%),
+              linear-gradient(to top, var(--bg-primary) 0%, transparent 40%),
+              linear-gradient(to bottom, var(--bg-primary) 0%, transparent 20%);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  opacity: 0;
+  animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }

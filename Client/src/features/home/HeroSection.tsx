@@ -120,31 +120,51 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
             </div>
 
             {/* Desktop Hero Layout */}
-            <div className="relative w-full h-[85vh] min-h-[600px] items-center justify-center overflow-hidden pt-20 hidden lg:flex">
+            <div className="relative w-full h-[85vh] min-h-[600px] items-center justify-center overflow-hidden pt-20 hidden lg:flex desktop-hero-wrapper">
+                
+                {/* Dynamic Blurred Background */}
+                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                    {featuredComics.map((comic, idx) => (
+                        <div 
+                            key={`bg-${comic._id || comic.id}`}
+                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+                        >
+                            <img 
+                                src={comic.cover_url || comic.cover || ''} 
+                                className="w-full h-full object-cover blur-[80px] scale-125 saturate-[1.5] brightness-75" 
+                                alt="" 
+                            />
+                            <div className="absolute inset-0 desktop-hero-overlay" />
+                        </div>
+                    ))}
+                </div>
+
                 <div className="container mx-auto px-6 max-w-7xl relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center h-full">
                     {/* Text Content */}
-                    <div className="space-y-8 animate-fade-in" key={currentComic._id || currentComic.id}>
-                        <div className="inline-block px-4 py-1.5 rounded-full text-[0.65rem] font-bold tracking-widest uppercase border backdrop-blur-md transition-colors" style={{ background: 'var(--bg-secondary)', color: 'var(--accent)', borderColor: 'var(--accent)' }}>
-                            Truyện Đề Xuất
+                    <div className="space-y-8 relative" key={`content-${currentComic._id || currentComic.id}`}>
+                        <div className="animate-slide-up-fade" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
+                            <div className="inline-block px-4 py-1.5 rounded-full text-[0.65rem] font-bold tracking-widest uppercase border backdrop-blur-md transition-colors" style={{ background: 'var(--glass-bg)', color: 'var(--accent)', borderColor: 'var(--glass-border)' }}>
+                                Truyện Đề Xuất
+                            </div>
                         </div>
                         
-                        <h1 className="text-5xl lg:text-7xl font-light tracking-tighter leading-[1.1] line-clamp-2" style={{ color: 'var(--text-primary)' }}>
+                        <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter leading-[1.1] line-clamp-2 animate-slide-up-fade drop-shadow-xl" style={{ color: 'var(--text-primary)', animationDelay: '0.2s', animationFillMode: 'both' }}>
                             {currentComic.title}
                         </h1>
                         
-                        <p className="text-base lg:text-lg leading-relaxed line-clamp-3 max-w-lg" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-base lg:text-lg leading-relaxed line-clamp-3 max-w-lg animate-slide-up-fade" style={{ color: 'rgba(255, 255, 255, 0.8)', animationDelay: '0.3s', animationFillMode: 'both', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                             {currentComic.description || 'Hoà mình vào chặng đường phiêu lưu cực kỳ kỳ bí và hấp dẫn. Trải nghiệm cảm giác độc nhất vô nhị chỉ có tại nền tảng của chúng tôi.'}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-4 text-xs font-semibold tracking-wider uppercase mb-8" style={{ color: 'var(--text-secondary)' }}>
+                        <div className="flex flex-wrap items-center gap-4 text-xs font-semibold tracking-wider uppercase mb-8 animate-slide-up-fade" style={{ color: 'rgba(255, 255, 255, 0.8)', animationDelay: '0.4s', animationFillMode: 'both', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                             <span className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full" style={{ background: currentComic.status === 'Ongoing' ? '#22c55e' : '#a8a29e' }}></span>
+                                <span className="w-2 h-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)]" style={{ background: currentComic.status === 'Ongoing' ? '#22c55e' : '#a8a29e' }}></span>
                                 {translateStatus(currentComic.status || 'Ongoing')}
                             </span>
                             <span className="opacity-30">•</span>
                             <span>{currentComic.author || 'Đang cập nhật'}</span>
                             <span className="opacity-30">•</span>
-                            <span className="flex items-center gap-1.5 text-yellow-500">
+                            <span className="flex items-center gap-1.5 text-yellow-400">
                                 <Star size={14} fill="currentColor" /> {currentComic.rating || '5.0'}
                             </span>
                             <span className="opacity-30">•</span>
@@ -153,21 +173,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                             </span>
                         </div>
 
-                        <div className="flex items-center gap-4 mt-8 pt-2">
-                            <Link to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} className="px-8 py-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 active:scale-95 shadow-lg text-xs tracking-widest uppercase border border-white/10" style={{ background: 'var(--accent)', color: 'white' }}>
+                        <div className="flex items-center gap-4 mt-8 pt-2 animate-slide-up-fade" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
+                            <Link to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} className="px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-[0_10px_30px_-10px_var(--accent)] text-xs tracking-widest uppercase border border-white/10" style={{ background: 'var(--accent)', color: 'white' }}>
                                 <Play fill="currentColor" size={16} />
                                 Đọc Ngay Bây Giờ
                             </Link>
                         </div>
 
                         {/* Slideshow Indicators */}
-                        <div className="flex gap-2 mt-12">
+                        <div className="flex gap-2 mt-12 animate-slide-up-fade" style={{ animationDelay: '0.6s', animationFillMode: 'both' }}>
                             {featuredComics.map((_, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setCurrentIndex(idx)}
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8' : 'w-2 opacity-30 hover:opacity-100'}`}
-                                    style={{ background: idx === currentIndex ? 'var(--accent)' : 'var(--text-primary)' }}
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/60'}`}
                                     aria-label={`Go to slide ${idx + 1}`}
                                 />
                             ))}
@@ -176,18 +195,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
 
                     {/* 3D Cover */}
                     <div className="hidden lg:flex items-center justify-center relative perspective-1000 h-full w-full">
+                        {/* Glow Behind Cover */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 rounded-full blur-[100px] bg-[var(--accent)] opacity-30 pointer-events-none transition-all duration-1000" />
+                        
                         <div 
                             ref={frameRef} 
-                            className="relative w-full max-w-[400px] aspect-[2/3] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-[var(--border)] transition-all bg-[var(--bg-secondary)]" 
+                            className="relative w-full max-w-[400px] aspect-[2/3] rounded-[2rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/20 transition-all bg-[var(--bg-secondary)]" 
                             onMouseMove={handleMouseMove} 
                             onMouseLeave={handleMouseLeave} 
                             onMouseEnter={handleMouseEnter}
-                            style={{ transformStyle: 'preserve-3d', boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8)' }}
+                            style={{ transformStyle: 'preserve-3d' }}
                         >
                             <LazyImage src={currentComic.cover_url || currentComic.cover || ''} fill={true} className="object-cover" alt={currentComic.title} />
                             {/* Elegant reflection/shimmer overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent mix-blend-overlay pointer-events-none rounded-[2rem]"></div>
-                            <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none"></div>
+                            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent mix-blend-overlay pointer-events-none rounded-[2rem]"></div>
+                            <div className="absolute inset-0 ring-1 ring-inset ring-white/20 rounded-[2rem] pointer-events-none"></div>
                         </div>
                     </div>
                 </div>
