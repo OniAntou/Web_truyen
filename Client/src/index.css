@@ -3,24 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #121212;
-  --bg-card: #1e1e1e;
+  --bg-primary: #121212;
+  --bg-secondary: #1c1c1c;
+  --bg-card: #242424;
   --accent: #f43f5e;
   /* Rose 500 */
   --accent-hover: #e11d48;
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
-  --border: #27272a;
+  --border: #333333;
 
-  --glass-bg: rgba(20, 20, 20, 0.85);
+  --glass-bg: rgba(28, 28, 28, 0.85);
   --glass-border: rgba(255, 255, 255, 0.1);
   --blur: 16px;
 
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --search-bg: #1e1e1e;
-  --search-border: #333;
-  --search-text: #888;
+  --search-bg: #242424;
+  --search-border: #404040;
+  --search-text: #a1a1aa;
   --nav-bottom-height: 68px;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --mobile-radius: 1.25rem;
@@ -2068,12 +2068,6 @@ body * {
 }
 
 /* Light Mode: Navbar */
-[data-theme="light"] .navbar {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-
 [data-theme="light"] .navbar.scrolled {
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
