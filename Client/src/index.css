@@ -263,7 +263,7 @@ img {
 }
 
 .nav-links a {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
@@ -272,7 +272,7 @@ img {
 }
 
 .nav-links a:hover {
-  color: white;
+  color: var(--accent);
 }
 
 .nav-links a::after {
@@ -300,13 +300,13 @@ img {
 .nav-icon-btn {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   padding: 0.5rem;
 }
 
 .nav-icon-btn:hover {
-  color: white;
+  color: var(--accent);
 }
 
 /* Mobile Menu - NEW */
@@ -2085,54 +2085,28 @@ body * {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-/* Light Mode: Navbar Transparent (Not Scrolled) */
-[data-theme="light"] .navbar:not(.scrolled) .nav-logo {
-  color: #ffffff;
-}
-
-[data-theme="light"] .navbar:not(.scrolled) .nav-links a {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-[data-theme="light"] .navbar:not(.scrolled) .nav-links a:hover {
-  color: #ffffff;
-}
-
-[data-theme="light"] .navbar:not(.scrolled) .nav-icon-btn {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-[data-theme="light"] .navbar:not(.scrolled) .nav-icon-btn:hover {
-  color: #ffffff;
-}
-
-[data-theme="light"] .navbar:not(.scrolled) .mobile-menu-toggle {
-  color: #ffffff;
-}
-
-/* Light Mode: Navbar Scrolled (White background) */
-[data-theme="light"] .navbar.scrolled .nav-logo {
+[data-theme="light"] .nav-logo {
   color: var(--text-primary);
 }
 
-[data-theme="light"] .navbar.scrolled .nav-links a {
+[data-theme="light"] .nav-links a {
   color: #3f3f46;
 }
 
-[data-theme="light"] .navbar.scrolled .nav-links a:hover {
+[data-theme="light"] .nav-links a:hover {
   color: var(--accent);
 }
 
-[data-theme="light"] .navbar.scrolled .mobile-menu-toggle {
+[data-theme="light"] .nav-icon-btn {
   color: var(--text-primary);
 }
 
-[data-theme="light"] .navbar.scrolled .nav-icon-btn {
-  color: var(--text-primary);
-}
-
-[data-theme="light"] .navbar.scrolled .nav-icon-btn:hover {
+[data-theme="light"] .nav-icon-btn:hover {
   color: var(--accent);
+}
+
+[data-theme="light"] .mobile-menu-toggle {
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .mobile-menu-overlay {
@@ -2145,8 +2119,8 @@ body * {
   background: linear-gradient(
     0deg,
     var(--bg-primary) 0%,
-    rgba(245, 245, 247, 0.7) 50%,
-    rgba(245, 245, 247, 0.3) 100%
+    rgba(245, 245, 247, 0.85) 50%,
+    rgba(255, 255, 255, 0.95) 100%
   );
 }
 
