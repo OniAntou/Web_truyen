@@ -2068,17 +2068,28 @@ body * {
 }
 
 /* Light Mode: Navbar */
+[data-theme="light"] .navbar {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
 [data-theme="light"] .navbar.scrolled {
-  background: rgba(245, 245, 247, 0.9);
-  border-bottom-color: var(--border);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="light"] .nav-logo {
   color: var(--text-primary);
 }
 
+[data-theme="light"] .nav-links a {
+  color: #3f3f46;
+  font-weight: 600;
+}
+
 [data-theme="light"] .nav-links a:hover {
-  color: var(--text-primary);
+  color: var(--accent);
 }
 
 [data-theme="light"] .mobile-menu-toggle {
@@ -2090,8 +2101,12 @@ body * {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="light"] .nav-icon-btn:hover {
+[data-theme="light"] .nav-icon-btn {
   color: var(--text-primary);
+}
+
+[data-theme="light"] .nav-icon-btn:hover {
+  color: var(--accent);
 }
 
 /* Light Mode: Hero Section */

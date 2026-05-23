@@ -69,7 +69,7 @@ const ComicCard: React.FC<ComicCardProps> = ({
                     </div>
                     
                     {showChapter && chapterCount > 0 && (
-                        <p className="text-[0.65rem] uppercase font-bold tracking-widest line-clamp-1" style={{ color: '#ffffff' }}>
+                        <p className="text-[0.65rem] uppercase font-bold tracking-widest line-clamp-1" style={{ color: 'var(--text-primary)' }}>
                             Chapter {chapterCount}
                         </p>
                     )}
