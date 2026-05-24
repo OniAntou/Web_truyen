@@ -240,8 +240,8 @@ img {
 
   .mobile-nav-actions {
     position: fixed;
-    top: 1rem;
-    right: 1.25rem;
+    top: 0.6rem;
+    right: 1rem;
     z-index: 1001;
   }
 }
@@ -863,6 +863,19 @@ img {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+.mobile-hero-title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: white;
+  line-height: 1.35;
+  padding-bottom: 0.1em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  letter-spacing: -0.02em;
 }
 
 .hero-actions {
@@ -3536,18 +3549,7 @@ body * {
   box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
 }
 
-.mobile-hero-title {
-  font-size: 2.25rem;
-  font-weight: 900;
-  color: white;
-  line-height: 1.1;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.6);
-  letter-spacing: -0.02em;
-}
+
 
 [data-theme="light"] .mobile-hero-title {
   color: var(--text-primary);
@@ -3655,11 +3657,11 @@ body * {
 /* ------ MOBILE: Navbar Compact ------ */
 @media (max-width: 767px) {
   .navbar {
-    padding: 0.6rem 0;
+    padding: 1.25rem 0;
   }
 
   .navbar.scrolled {
-    padding: 0.5rem 0;
+    padding: 1.25rem 0;
   }
 
   .nav-logo {
