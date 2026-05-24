@@ -148,7 +148,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                             </div>
                         </div>
                         
-                        <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter leading-[1.1] line-clamp-2 animate-slide-up-fade" style={{ color: 'var(--text-primary)', animationDelay: '0.2s', animationFillMode: 'both' }}>
+                        <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter leading-[1.3] pb-1 line-clamp-2 animate-slide-up-fade" style={{ color: 'var(--text-primary)', animationDelay: '0.2s', animationFillMode: 'both' }}>
                             {currentComic.title}
                         </h1>
                         
