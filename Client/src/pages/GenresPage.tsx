@@ -141,7 +141,7 @@ const GenresPage: React.FC = () => {
                 <div className="flex flex-col lg:flex-row gap-10 xl:gap-14 relative items-start">
                     
                     {/* Left Sidebar: Genres Filter & List */}
-                    <div className="w-full lg:w-1/3 xl:w-[380px] shrink-0 sticky top-24">
+                    <div className="w-full lg:w-1/3 xl:w-[380px] shrink-0 lg:sticky lg:top-24 z-10">
                         {/* Search Bar */}
                         <div className="relative flex items-center w-full mb-6">
                             <Search size={18} className="absolute left-5 pointer-events-none" style={{ color: 'var(--text-secondary)' }} />
