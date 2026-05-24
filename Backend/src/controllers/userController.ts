@@ -21,27 +21,33 @@ const deleteMe = asyncHandler(async (req, res) => {
 
   // 1. Rollback views
   const userViews = await ComicView.find({ user_id: user._id });
-  for (const view of userViews) {
-    await Comic.findByIdAndUpdate(view.comic_id, { $inc: { views: -1 } });
+  const viewComicIds = userViews.map(v => v.comic_id);
+  if (viewComicIds.length > 0) {
+    await Comic.updateMany({ _id: { $in: viewComicIds } }, { $inc: { views: -1 } });
   }
   await ComicView.deleteMany({ user_id: user._id });
 
   // 2. Rollback ratings
   const userRatings = await Rating.find({ user_id: user._id });
-  for (const rating of userRatings) {
-    const comic = await Comic.findById(rating.comic_id);
-    if (comic) {
-      const result = await Rating.aggregate([
-        { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
-        { $group: { _id: null, avgRating: { $avg: "$rating" } } }
-      ]);
-      const avg = result.length > 0 ? result[0].avgRating : 0;
-      const newAvg = Number(avg.toFixed(1));
-      const newCount = Math.max(0, (comic.rating_count || 1) - 1);
-      await Comic.updateOne(
-        { _id: comic._id },
-        { $set: { rating: newAvg, rating_count: newCount } }
-      );
+  const ratingComicIds = userRatings.map(r => r.comic_id);
+  
+  if (ratingComicIds.length > 0) {
+    // Recalculate averages for affected comics
+    for (const comicId of ratingComicIds) {
+      const comic = await Comic.findById(comicId);
+      if (comic) {
+        const result = await Rating.aggregate([
+          { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
+          { $group: { _id: null, avgRating: { $avg: "$rating" } } }
+        ]);
+        const avg = result.length > 0 ? result[0].avgRating : 0;
+        const newAvg = Number(avg.toFixed(1));
+        const newCount = Math.max(0, (comic.rating_count || 1) - 1);
+        await Comic.updateOne(
+          { _id: comic._id },
+          { $set: { rating: newAvg, rating_count: newCount } }
+        );
+      }
     }
   }
   await Rating.deleteMany({ user_id: user._id });
@@ -65,28 +71,33 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   // 1. Rollback views
   const userViews = await ComicView.find({ user_id: user._id });
-  for (const view of userViews) {
-    await Comic.findByIdAndUpdate(view.comic_id, { $inc: { views: -1 } });
+  const viewComicIds = userViews.map(v => v.comic_id);
+  if (viewComicIds.length > 0) {
+    await Comic.updateMany({ _id: { $in: viewComicIds } }, { $inc: { views: -1 } });
   }
   await ComicView.deleteMany({ user_id: user._id });
 
   // 2. Rollback ratings
   const userRatings = await Rating.find({ user_id: user._id });
-  for (const rating of userRatings) {
-    const comic = await Comic.findById(rating.comic_id);
-    if (comic) {
-      // Recalculate average rating for comic (omitting this user's rating)
-      const result = await Rating.aggregate([
-        { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
-        { $group: { _id: null, avgRating: { $avg: "$rating" } } }
-      ]);
-      const avg = result.length > 0 ? result[0].avgRating : 0;
-      const newAvg = Number(avg.toFixed(1));
-      const newCount = Math.max(0, (comic.rating_count || 1) - 1);
-      await Comic.updateOne(
-        { _id: comic._id },
-        { $set: { rating: newAvg, rating_count: newCount } }
-      );
+  const ratingComicIds = userRatings.map(r => r.comic_id);
+  
+  if (ratingComicIds.length > 0) {
+    for (const comicId of ratingComicIds) {
+      const comic = await Comic.findById(comicId);
+      if (comic) {
+        // Recalculate average rating for comic (omitting this user's rating)
+        const result = await Rating.aggregate([
+          { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
+          { $group: { _id: null, avgRating: { $avg: "$rating" } } }
+        ]);
+        const avg = result.length > 0 ? result[0].avgRating : 0;
+        const newAvg = Number(avg.toFixed(1));
+        const newCount = Math.max(0, (comic.rating_count || 1) - 1);
+        await Comic.updateOne(
+          { _id: comic._id },
+          { $set: { rating: newAvg, rating_count: newCount } }
+        );
+      }
     }
   }
   await Rating.deleteMany({ user_id: user._id });

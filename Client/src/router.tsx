@@ -35,6 +35,7 @@ const ApplicationManager = lazy(() => import('./pages/admin/ApplicationManager')
 const UserManager = lazy(() => import('./pages/admin/UserManager'));
 const CommentManager = lazy(() => import('./pages/admin/CommentManager'));
 const ReportManager = lazy(() => import('./pages/admin/ReportManager'));
+const AuditLogManager = lazy(() => import('./pages/admin/AuditLogManager'));
 
 import ProtectedAdminRoute from './features/auth/ProtectedAdminRoute';
 import ProtectedCreatorRoute from './features/auth/ProtectedCreatorRoute';
@@ -171,6 +172,7 @@ export const router = createBrowserRouter([
                     { path: 'users', element: withSuspense(<UserManager />) },
                     { path: 'comments', element: withSuspense(<CommentManager />) },
                     { path: 'reports', element: withSuspense(<ReportManager />) },
+                    { path: 'audit-logs', element: withSuspense(<AuditLogManager />) },
                 ]
             }
         ]

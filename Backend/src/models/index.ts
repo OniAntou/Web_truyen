@@ -14,3 +14,4 @@ export * from "./ReadingProgress";
 export * from "./Payment";
 export * from "./ChapterUnlock";
 export * from "./Report";
+export * from "./AuditLog";

@@ -5,6 +5,7 @@ import {  Chapter, Pages, Upload, Rating, ComicView, Comment, Favorite  } from "
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import apiCache from "../utils/cache";
+import { logAudit } from "../utils/auditLogger";
 
 const getLatestComics = asyncHandler(async (req, res) => {
   const genre = req.query.genre ? String(req.query.genre) : undefined;
@@ -139,10 +140,14 @@ const getAllComics = asyncHandler(async (req, res) => {
     }).select('_id');
     const genreIds = matchingGenres.map(g => g._id);
 
-    filter.$or = [
-      { title: { $regex: escapedQ, $options: "i" } },
-      { genres: { $in: genreIds } }
-    ];
+    if (genreIds.length > 0) {
+      filter.$or = [
+        { $text: { $search: String(q) } },
+        { genres: { $in: genreIds } }
+      ];
+    } else {
+      filter.$text = { $search: String(q) };
+    }
   }
 
   if (genre) {
@@ -395,6 +400,8 @@ const createComic = asyncHandler(async (req, res) => {
   await apiCache.flush('popular');
   await apiCache.flush('homepage');
 
+  await logAudit(req, "CREATE_COMIC", "Comic", newComic._id, { title: newComic.title });
+
   res.status(201).json(newComic);
 });
 
@@ -431,9 +438,10 @@ const updateComic = asyncHandler(async (req, res) => {
   await apiCache.flush('latest');
   await apiCache.flush('popular');
   await apiCache.flush('trending');
-  await apiCache.flush('homepage');
   await apiCache.flush(`detail_${id}`);
   
+  await logAudit(req, "UPDATE_COMIC", "Comic", comic._id, { title: comic.title });
+
   res.json(comic);
 });
 
@@ -478,6 +486,8 @@ const deleteComic = asyncHandler(async (req, res) => {
   await apiCache.flush('homepage');
   await apiCache.flush(`detail_${id}`);
   
+  await logAudit(req, "DELETE_COMIC", "Comic", comic._id, { title: comic.title });
+
   res.json({ message: "Comic deleted successfully" });
 });
 

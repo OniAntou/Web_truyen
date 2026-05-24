@@ -9,7 +9,8 @@ import {
     TrendingUp, 
     ChevronRight,
     ArrowUpRight,
-    Calendar
+    Calendar,
+    RefreshCw
 } from 'lucide-react';
 import apiClient from '../../services/apiClient';
 
@@ -358,6 +359,21 @@ const Dashboard: React.FC = () => {
 
     const [systemStatus, setSystemStatus] = useState('Checking...');
     const [loading, setLoading] = useState(true);
+    const [clearingCache, setClearingCache] = useState(false);
+
+    const handleClearCache = async () => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa toàn bộ cache của hệ thống (API Cache)? Điều này có thể làm trang web tải chậm lại trong lần truy cập tiếp theo cho đến khi cache được tạo lại.")) return;
+        
+        setClearingCache(true);
+        try {
+            await apiClient('/admin/stats/clear-cache', { method: 'POST' });
+            alert("Xóa cache hệ thống thành công!");
+        } catch (err: any) {
+            alert("Lỗi khi xóa cache: " + err.message);
+        } finally {
+            setClearingCache(false);
+        }
+    };
 
     useEffect(() => {
         apiClient<DashboardStats>('/admin/stats')
@@ -391,6 +407,14 @@ const Dashboard: React.FC = () => {
                     <p className="text-zinc-300 mt-1 text-base font-medium">Core platform metrics and performance trends.</p>
                 </div>
                 <div className="flex items-center gap-4">
+                    <button 
+                        onClick={handleClearCache} 
+                        disabled={clearingCache}
+                        className="flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 rounded-xl transition-all"
+                    >
+                        <RefreshCw size={14} className={clearingCache ? "animate-spin" : ""} />
+                        <span className="text-xs font-bold uppercase tracking-widest">{clearingCache ? "Clearing..." : "Clear Cache"}</span>
+                    </button>
                     <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl shadow-inner">
                         <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
                         <span className={`text-xs font-bold uppercase tracking-widest ${systemStatus === 'Active' ? 'text-zinc-200' : 'text-amber-500'}`}>

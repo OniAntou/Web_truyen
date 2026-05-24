@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, LogOut, UserPlus, Users, MessageSquare, Flag } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, UserPlus, Users, MessageSquare, Flag, Shield } from 'lucide-react';
 import { authService } from '../services/authService';
 
 const AdminLayout: React.FC = () => {
@@ -94,6 +94,14 @@ const AdminLayout: React.FC = () => {
                     >
                         <Flag size={20} className={location.pathname === '/admin/reports' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
                         <span className="font-medium">Reports</span>
+                    </Link>
+
+                    <Link
+                        to="/admin/audit-logs"
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${isActive('/admin/audit-logs')}`}
+                    >
+                        <Shield size={20} className={location.pathname === '/admin/audit-logs' ? 'text-white' : 'text-gray-500 group-hover:text-white'} />
+                        <span className="font-medium">Audit Logs</span>
                     </Link>
                 </nav>
                 

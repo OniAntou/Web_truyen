@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { 
   Comic, Chapter, Pages, User, Genre, Upload, AdminLogin, 
   Rating, ComicView, Comment, Favorite, Application, 
-  ReadingProgress, Payment, ChapterUnlock, Report 
+  ReadingProgress, Payment, ChapterUnlock, Report, AuditLog
 } from "./models";
 
 const uriFromEnv = process.env.MONGO_URI;
@@ -69,6 +69,7 @@ export {
   Payment,
   ChapterUnlock,
   Report,
+  AuditLog,
   connectDB,
   mongoose,
 };

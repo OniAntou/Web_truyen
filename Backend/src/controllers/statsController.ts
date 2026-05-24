@@ -2,17 +2,17 @@ import {  Comic, User, Chapter, Payment, mongoose  } from "../database";
 import asyncHandler from "../middleware/asyncHandler";
 import {  resolveR2Url  } from "../config/r2";
 import {  formatViews  } from "../utils/helpers";
+import apiCache from "../utils/cache";
 
 const getStats = asyncHandler(async (req, res) => {
   const comicCount = await Comic.countDocuments();
   const userCount = await User.countDocuments();
   const chapterCount = await Chapter.countDocuments();
 
-  const comics = await Comic.find().lean();
-  let totalViews = 0;
-  comics.forEach((c) => {
-    totalViews += (c.views || 0);
-  });
+  const viewsAggregation = await Comic.aggregate([
+    { $group: { _id: null, totalViews: { $sum: "$views" } } }
+  ]);
+  const totalViews = viewsAggregation.length > 0 ? viewsAggregation[0].totalViews : 0;
 
   // Calculate total revenue from successful payments
   const totalRevResult = await Payment.aggregate([
@@ -152,8 +152,19 @@ const getStats = asyncHandler(async (req, res) => {
   });
 });
 
+const clearCache = asyncHandler(async (req, res) => {
+  const { pattern } = req.body;
+  if (pattern) {
+    await apiCache.flush(pattern);
+  } else {
+    await apiCache.flush(); // Xóa toàn bộ
+  }
+  res.json({ message: "Xóa cache thành công" });
+});
+
 export { 
-  getStats
+  getStats,
+  clearCache
  };
 
 
