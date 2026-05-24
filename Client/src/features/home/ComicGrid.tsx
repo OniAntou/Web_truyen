@@ -33,9 +33,15 @@ const ComicGrid: React.FC<ComicGridProps> = ({
                 </div>
             )}
 
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-10">
+            <div className="flex md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-x-6 md:gap-y-10 overflow-x-auto pb-6 md:pb-0 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {/* Custom styling to hide scrollbar while keeping functionality */}
+                <style>{`
+                    .overflow-x-auto::-webkit-scrollbar { display: none; }
+                `}</style>
                 {displayComics.map(comic => (
-                    <ComicCard key={comic.id || comic._id} comic={comic} showHoverStats={showHoverStats} />
+                    <div key={comic.id || comic._id} className="w-[140px] flex-shrink-0 md:w-auto md:flex-shrink snap-start">
+                        <ComicCard comic={comic} showHoverStats={showHoverStats} />
+                    </div>
                 ))}
             </div>
         </section>
