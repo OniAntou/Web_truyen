@@ -3529,7 +3529,7 @@ body * {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: #fff;
-  background: linear-gradient(135deg, var(--accent) 0%, #ff7eb3 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   padding: 0.35rem 1rem;
   border-radius: 999px;
   margin-bottom: 0.25rem;
@@ -3601,7 +3601,7 @@ body * {
   max-width: 280px;
   padding: 1rem;
   border-radius: 1rem;
-  background: linear-gradient(135deg, var(--accent) 0%, #ff7eb3 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
   color: white;
   font-size: 0.95rem;
   font-weight: 800;
