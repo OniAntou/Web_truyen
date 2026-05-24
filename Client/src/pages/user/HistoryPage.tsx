@@ -115,6 +115,7 @@ const HistoryPage: React.FC = () => {
                                         <LazyImage
                                             src={item.coverUrl}
                                             alt={item.comicTitle}
+                                            fill={true}
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                         {/* Gradient overlay */}
