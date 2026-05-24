@@ -3718,7 +3718,8 @@ body * {
   }
 
   .container {
-    padding: 0 0.85rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
   }
 }
 
