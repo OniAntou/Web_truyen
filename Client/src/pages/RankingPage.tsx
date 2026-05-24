@@ -57,7 +57,7 @@ const RankingPage: React.FC = () => {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-12">
                     {isLoading ? (
                         Array.from({ length: 12 }).map((_, i) => (
                             <div key={i} className="flex flex-col gap-4">
