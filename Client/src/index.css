@@ -228,11 +228,19 @@ img {
 
 @media (max-width: 767px) {
   .navbar, .navbar.scrolled {
+    position: absolute !important;
     background: transparent !important;
     backdrop-filter: none !important;
     border-bottom: none !important;
     box-shadow: none !important;
     padding: 1rem 0;
+  }
+
+  .mobile-nav-actions {
+    position: fixed;
+    top: 1rem;
+    right: 1.25rem;
+    z-index: 1001;
   }
 }
 
@@ -1194,6 +1202,10 @@ img {
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+.info-actions .btn {
+  box-shadow: none !important;
 }
 
 @media (min-width: 768px) {

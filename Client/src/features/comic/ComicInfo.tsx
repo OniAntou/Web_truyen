@@ -232,37 +232,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                     </div>
                 </div>
             </div>
-            {/* Sticky Action Bar for Mobile */}
-            <div className="mobile-only mobile-sticky-action-bar">
-                <div className="flex gap-3">
-                    <Link
-                        to={comic.chapters && comic.chapters.length > 0 
-                            ? `/read/${slugify(comic.title)}-${comicId}/${comic.chapters[0]._id || comic.chapters[0].id}`
-                            : '#'
-                        }
-                        className="flex-1 btn btn-primary py-4 font-bold shadow-lg shadow-[var(--accent)]/30"
-                        onClick={(e) => {
-                            if (!comic.chapters || comic.chapters.length === 0) {
-                                e.preventDefault();
-                                alert('Chưa có chapter nào');
-                            }
-                        }}
-                    >
-                        <BookOpen size={20} />
-                        Đọc Ngay
-                    </Link>
-                    <button 
-                        className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all border ${
-                            isFavorited 
-                                ? 'bg-[#ef4444]/10 border-[#ef4444]/20 text-[#ef4444]' 
-                                : 'bg-white/5 border-white/10 text-white'
-                        }`}
-                        onClick={handleFavorite}
-                    >
-                        <Heart size={24} fill={isFavorited ? "#ef4444" : "none"} />
-                    </button>
-                </div>
-            </div>
+
         </div>
     );
 };
