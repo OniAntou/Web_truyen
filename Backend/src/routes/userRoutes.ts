@@ -7,6 +7,7 @@ import {  readLimiter, writeLimiter  } from "../middleware/rateLimiter";
 
 router.get('/me', readLimiter, authenticateToken, userController.getMe);
 router.put('/me', writeLimiter, authenticateToken, userController.updateMe);
+router.put('/me/password', writeLimiter, authenticateToken, userController.changePassword);
 router.delete('/me', writeLimiter, authenticateToken, userController.deleteMe);
 router.get('/transactions', readLimiter, authenticateToken, userController.getTransactions);
 router.delete('/:id', writeLimiter, userController.deleteUser);

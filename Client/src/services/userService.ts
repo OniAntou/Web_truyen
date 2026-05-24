@@ -8,6 +8,10 @@ export const userService = {
         method: 'PUT',
         body: updates
     }),
+    changePassword: (data: Record<string, string>) => apiClient<{ message: string }>('/users/me/password', {
+        method: 'PUT',
+        body: data
+    }),
     deleteAccount: () => apiClient<{ message: string }>('/users/me', {
         method: 'DELETE'
     }),

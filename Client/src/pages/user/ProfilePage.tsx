@@ -52,6 +52,9 @@ const ProfilePage: React.FC = () => {
     const [toast, setToast] = useState<{ msg: string; type: string } | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+    const [savingPassword, setSavingPassword] = useState(false);
     const [transactions, setTransactions] = useState<Transactions>({ payments: [], unlocks: [] });
     const [loadingHistory, setLoadingHistory] = useState(false);
     const navigate = useNavigate();
@@ -117,6 +120,32 @@ const ProfilePage: React.FC = () => {
             setShowDeleteModal(false);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (!passwordData.oldPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+            showToast(language === 'vi' ? 'Vui lòng nhập đầy đủ thông tin' : 'Please fill in all fields', 'err');
+            return;
+        }
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            showToast(language === 'vi' ? 'Mật khẩu mới không khớp' : 'New passwords do not match', 'err');
+            return;
+        }
+        if (passwordData.newPassword.length < 6) {
+            showToast(language === 'vi' ? 'Mật khẩu mới phải có ít nhất 6 ký tự' : 'New password must be at least 6 characters', 'err');
+            return;
+        }
+        setSavingPassword(true);
+        try {
+            const res = await userService.changePassword({ oldPassword: passwordData.oldPassword, newPassword: passwordData.newPassword });
+            showToast(res.message || (language === 'vi' ? 'Đổi mật khẩu thành công' : 'Password changed successfully'));
+            setShowPasswordModal(false);
+            setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (err: any) {
+            showToast(err.message, 'err');
+        } finally {
+            setSavingPassword(false);
         }
     };
 
@@ -282,6 +311,17 @@ const ProfilePage: React.FC = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Password */}
+                            <div className="profile-field" style={{ borderBottom: 'none', borderTop: '1px solid var(--glass-border)' }}>
+                                <span className="profile-field-label">{language === 'vi' ? 'Mật khẩu' : 'Password'}</span>
+                                <div className="profile-field-display">
+                                    <span>••••••••</span>
+                                    <button className="btn btn-glass" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={() => setShowPasswordModal(true)}>
+                                        {language === 'vi' ? 'Đổi mật khẩu' : 'Change Password'}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Balance & VIP row */}
@@ -358,6 +398,59 @@ const ProfilePage: React.FC = () => {
                                 disabled={saving}
                             >
                                 {saving ? t('deleting') : t('confirm')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Change Password Modal */}
+            {showPasswordModal && (
+                <div className="modal-overlay">
+                    <div className="glass-panel modal-content" style={{ borderRadius: '1rem', padding: '2rem', maxWidth: '400px', width: '90%' }}>
+                        <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.25rem' }}>{language === 'vi' ? 'Đổi mật khẩu' : 'Change Password'}</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <input 
+                                type="password" 
+                                className="profile-input" 
+                                placeholder={language === 'vi' ? 'Mật khẩu hiện tại' : 'Current password'} 
+                                value={passwordData.oldPassword}
+                                onChange={e => setPasswordData({...passwordData, oldPassword: e.target.value})}
+                                disabled={savingPassword}
+                            />
+                            <input 
+                                type="password" 
+                                className="profile-input" 
+                                placeholder={language === 'vi' ? 'Mật khẩu mới (ít nhất 6 ký tự)' : 'New password (min 6 chars)'} 
+                                value={passwordData.newPassword}
+                                onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                disabled={savingPassword}
+                            />
+                            <input 
+                                type="password" 
+                                className="profile-input" 
+                                placeholder={language === 'vi' ? 'Nhập lại mật khẩu mới' : 'Confirm new password'} 
+                                value={passwordData.confirmPassword}
+                                onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                disabled={savingPassword}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button 
+                                className="btn btn-glass" 
+                                style={{ flex: 1 }} 
+                                onClick={() => { setShowPasswordModal(false); setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' }); }}
+                                disabled={savingPassword}
+                            >
+                                {t('cancel')}
+                            </button>
+                            <button 
+                                className="btn btn-primary" 
+                                style={{ flex: 1, backgroundColor: 'var(--accent)' }} 
+                                onClick={handleChangePassword}
+                                disabled={savingPassword}
+                            >
+                                {savingPassword ? (language === 'vi' ? 'Đang lưu...' : 'Saving...') : t('confirm')}
                             </button>
                         </div>
                     </div>

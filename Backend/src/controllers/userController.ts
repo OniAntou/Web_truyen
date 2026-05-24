@@ -2,6 +2,7 @@ import {  User, ComicView, Comic, Rating, Comment, Favorite, Payment, ChapterUnl
 import { resolveR2Url } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
+import bcrypt from "bcryptjs";
 
 const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select('-password').lean() as any;
@@ -158,6 +159,31 @@ const updateMe = asyncHandler(async (req, res) => {
   res.json(safeUser);
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) throw new AppError("User không tồn tại", 404);
+
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new AppError("Vui lòng nhập mật khẩu cũ và mới", 400);
+  }
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) {
+    throw new AppError("Mật khẩu hiện tại không đúng", 400);
+  }
+
+  if (newPassword.length < 6) {
+    throw new AppError("Mật khẩu mới phải có ít nhất 6 ký tự", 400);
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword, salt);
+  await user.save();
+
+  res.json({ message: "Đổi mật khẩu thành công" });
+});
+
 const getTransactions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   
@@ -185,6 +211,7 @@ const getTransactions = asyncHandler(async (req, res) => {
 export { 
   getMe,
   updateMe,
+  changePassword,
   deleteMe,
   deleteUser,
   upgradeVip,
