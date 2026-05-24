@@ -117,7 +117,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
                 transition: 'opacity 0.2s',
                 position: 'relative'
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <div style={{ width: isReply ? '24px' : '32px', height: isReply ? '24px' : '32px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: isReply ? '0.75rem' : '0.9rem' }}>
                                 {c.user_id?.username ? c.user_id.username.charAt(0).toUpperCase() : 'U'}
@@ -196,7 +196,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
                                 />
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                                     <button type="button" onClick={() => { setReplyingTo(null); setNewComment(""); }} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>Huỷ</button>
-                                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
+                                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem', boxShadow: 'none' }}>
                                         {isSubmitting ? 'Đang gửi...' : 'Gửi'}
                                     </button>
                                 </div>
@@ -237,7 +237,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
                             } as React.CSSProperties}
                         />
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()}>
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()} style={{ boxShadow: 'none' }}>
                                 {isSubmitting ? 'Đang gửi...' : 'Gửi bình luận'}
                             </button>
                         </div>
