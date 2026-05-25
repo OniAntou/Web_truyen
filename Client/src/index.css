@@ -1486,11 +1486,15 @@ img {
 
 @media (max-width: 480px) {
   .reader-end-actions {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 0.5rem;
   }
 
   .reader-end-btn {
-    flex: none;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    gap: 0.2rem;
   }
 }
 
