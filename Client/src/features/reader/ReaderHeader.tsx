@@ -30,11 +30,9 @@ const ReaderHeader: React.FC<ReaderHeaderProps> = ({
                     </span>
                 )}
 
-                {chapterTitle && <div className="reader-info-spacer"></div>}
-
                 <button 
                     onClick={onOpenReport}
-                    className="flex items-center gap-2 text-zinc-500 hover:text-rose-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/10 text-xs font-medium"
+                    className="ml-auto flex items-center gap-2 text-zinc-500 hover:text-rose-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/10 text-xs font-medium"
                     title="Báo lỗi chương"
                 >
                     <Flag size={14} />

@@ -1346,10 +1346,7 @@ img {
   text-overflow: ellipsis;
 }
 
-.reader-info-spacer {
-  width: 30px;
-  flex-shrink: 0;
-}
+
 
 @media (min-width: 768px) {
   .reader-breadcrumb-title {
