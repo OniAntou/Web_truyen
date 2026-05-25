@@ -1363,6 +1363,10 @@ img {
     max-width: calc(50% - 50px);
   }
 
+  .reader-info-back-title {
+    display: none;
+  }
+
   .reader-info-center-chapter {
     font-size: 0.75rem;
     max-width: 90px;
