@@ -17,11 +17,12 @@ const authenticateToken = (req, res, next) => {
   if (!token) return res.status(401).json({ message: "Không tìm thấy token" });
   
   const secret = process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV !== 'production') {
-    console.warn('WARNING: JWT_SECRET is missing in environment variables. Using fallback_secret.');
+  if (!secret) {
+    console.error('CRITICAL: JWT_SECRET is missing in environment variables.');
+    return res.status(500).json({ message: "Lỗi cấu hình máy chủ: Thiếu JWT_SECRET" });
   }
 
-  jwt.verify(token, secret || 'fallback_secret', (err, user) => {
+  jwt.verify(token, secret, (err, user) => {
     if (err) {
       console.log(`[AUTH] Token verification failed: ${err.message}. Token: ${token?.substring(0, 10)}...`);
       return res.status(403).json({ message: "Token không hợp lệ hoặc đã hết hạn" });

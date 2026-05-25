@@ -380,9 +380,16 @@ const createComic = asyncHandler(async (req, res) => {
   const lastComic = await Comic.findOne().sort({ id: -1 });
   const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 
-  const payload = { ...req.body };
-  if (payload.genres) {
-    payload.genres = await processGenres(payload.genres);
+  const payload: any = {
+    title: req.body.title,
+    author: req.body.author,
+    artist: req.body.artist,
+    status: req.body.status,
+    description: req.body.description,
+  };
+  
+  if (req.body.genres) {
+    payload.genres = await processGenres(req.body.genres);
   }
 
   const comicData = {
@@ -419,14 +426,16 @@ const updateComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền chỉnh sửa truyện này.", 403);
   }
 
-  const payload = { ...req.body };
-  delete payload._id;
-  delete payload.id;
-  delete payload.__v;
-  delete payload.created_at;
-  delete payload.updated_at;
-  if (payload.genres) {
-    payload.genres = await processGenres(payload.genres);
+  const payload: any = {
+    title: req.body.title,
+    author: req.body.author,
+    artist: req.body.artist,
+    status: req.body.status,
+    description: req.body.description,
+  };
+  
+  if (req.body.genres) {
+    payload.genres = await processGenres(req.body.genres);
   }
 
   Object.assign(comic, payload);

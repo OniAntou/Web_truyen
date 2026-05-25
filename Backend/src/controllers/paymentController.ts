@@ -56,32 +56,37 @@ const vnpayReturn = asyncHandler(async (req, res) => {
   const responseCode = vnp_Params["vnp_ResponseCode"];
   const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
 
-  const payment = await Payment.findOne({ order_id: String(orderId) });
+  const payment = await Payment.findOneAndUpdate(
+    { order_id: String(orderId), status: "pending" },
+    {
+      $set: {
+        status: responseCode === "00" ? "success" : "failed",
+        vnp_transaction_no: vnp_TransactionNo,
+        vnp_response_code: responseCode,
+        updated_at: new Date()
+      }
+    },
+    { new: true }
+  );
+
   if (!payment) {
-    return res.status(200).json({ success: false, message: "Order not found" });
+    // If not found, it might have been processed already or order id is invalid
+    const existing = await Payment.findOne({ order_id: String(orderId) });
+    if (existing && existing.status !== "pending") {
+       return res.json({ success: true, message: "Giao dịch đã được xử lý trước đó" });
+    }
+    return res.status(200).json({ success: false, message: "Order not found or already processed" });
   }
 
   if (responseCode === "00") {
-    if (payment.status !== "success") {
-      // Update payment status
-      payment.status = "success";
-      payment.vnp_transaction_no = vnp_TransactionNo;
-      payment.vnp_response_code = responseCode;
-      payment.updated_at = new Date();
-      await payment.save();
-
-      // Update user coins (Conversion: 1,000 VND = 100 Coins)
-      const coinsToAdd = Math.floor(payment.amount / 1000) * 100;
-      await User.findByIdAndUpdate(payment.user_id, {
-        $inc: { coins: coinsToAdd },
-      });
-    }
+    // Update user coins (Conversion: 1,000 VND = 100 Coins)
+    const coinsToAdd = Math.floor(payment.amount / 1000) * 100;
+    await User.findByIdAndUpdate(payment.user_id, {
+      $inc: { coins: coinsToAdd },
+    });
+    
     return res.json({ success: true, message: "Thanh toán thành công" });
   } else {
-    payment.status = "failed";
-    payment.vnp_response_code = responseCode;
-    payment.updated_at = new Date();
-    await payment.save();
     return res.json({ success: false, message: "Thanh toán thất bại", code: responseCode });
   }
 });
@@ -101,24 +106,28 @@ const vnpayIpn = asyncHandler(async (req, res) => {
   const responseCode = vnp_Params["vnp_ResponseCode"];
   const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
 
-  const payment = await Payment.findOne({ order_id: String(orderId) });
+  const payment = await Payment.findOneAndUpdate(
+    { order_id: String(orderId), status: "pending" },
+    {
+      $set: {
+        status: responseCode === "00" ? "success" : "failed",
+        vnp_transaction_no: vnp_TransactionNo,
+        vnp_response_code: responseCode,
+        updated_at: new Date()
+      }
+    },
+    { new: true }
+  );
+
   if (!payment) {
+    const existing = await Payment.findOne({ order_id: String(orderId) });
+    if (existing && existing.status !== "pending") {
+      return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
+    }
     return res.status(200).json({ RspCode: "01", Message: "Order not found" });
   }
 
-  // Check if IPN already processed
-  if (payment.status !== "pending") {
-    return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
-  }
-
   if (responseCode === "00") {
-    // Success
-    payment.status = "success";
-    payment.vnp_transaction_no = vnp_TransactionNo;
-    payment.vnp_response_code = responseCode;
-    payment.updated_at = new Date();
-    await payment.save();
-
     // Add coins to user
     const coinsToAdd = Math.floor(payment.amount / 1000) * 100;
     await User.findByIdAndUpdate(payment.user_id, {
@@ -127,11 +136,6 @@ const vnpayIpn = asyncHandler(async (req, res) => {
 
     res.status(200).json({ RspCode: "00", Message: "Success" });
   } else {
-    // Failed
-    payment.status = "failed";
-    payment.vnp_response_code = responseCode;
-    payment.updated_at = new Date();
-    await payment.save();
     res.status(200).json({ RspCode: "00", Message: "Success" });
   }
 });

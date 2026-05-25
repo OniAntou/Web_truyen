@@ -35,11 +35,8 @@ const csrfProtection = (req, res, next) => {
   }
 
   // 3. Require a custom header (Standard technique for modern SPAs)
-  // Most CSRF attacks (form submissions) cannot set custom headers
-  // Allow requests without Origin/Referer (server-to-server, mobile apps, etc.)
-  if (!origin && !referer) {
-    return next();
-  }
+  // For all requests that change state (POST/PUT/DELETE), require a custom header
+  // that typical CSRF attacks (e.g. form submissions) cannot set.
 
   // For browser requests, require a custom header that CSRF attacks cannot set
   if (!req.headers['x-requested-with'] && !req.headers['x-csrf-token'] && !req.headers['content-type']?.includes('application/json')) {

@@ -13,6 +13,9 @@ const getR2Status = (req, res) => {
 };
 
 const getSignedUrl = asyncHandler(async (req, res) => {
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'creator')) {
+    throw new AppError("Bạn không có quyền lấy signed URL trực tiếp.", 403);
+  }
   const key = req.query.key;
   if (!key) throw new AppError("Thiếu query key", 400);
   const url = await getFileUrl(key, 3600);

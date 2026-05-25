@@ -107,13 +107,21 @@ const postComment = asyncHandler(async (req, res) => {
   
   if (!content || !content.trim()) throw new AppError("Nội dung không được để trống", 400);
 
+  // Basic XSS Sanitization: Encode HTML tags
+  const sanitizedContent = content.trim()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+
   const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
   const payload: any = {
     user_id: req.user.id,
     comic_id: comic._id,
-    content: content.trim()
+    content: sanitizedContent
   };
   
   if (chapterId) payload.chapter_id = chapterId;
