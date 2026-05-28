@@ -17,7 +17,11 @@ build/
 .env.test.local
 .env.production.local
 Backend/.env
+Backend/bot/.env
 Client/.env
+
+# Bot download files
+downloads/
 
 # Store files
 .DS_Store

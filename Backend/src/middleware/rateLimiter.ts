@@ -50,7 +50,7 @@ const writeLimiter = createLimiter(
 // ──────────────────────────────────────────────────────
 const uploadLimiter = createLimiter(
   60 * 60 * 1000,   // 1 hour
-  30,               // 30 uploads per hour
+  100,              // 100 uploads per hour
   'Bạn đã upload quá nhiều file. Vui lòng thử lại sau.'
 );
 
