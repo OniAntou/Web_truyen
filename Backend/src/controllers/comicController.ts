@@ -377,6 +377,12 @@ const createComic = asyncHandler(async (req, res) => {
   if (!req.user || (req.user.role !== 'creator' && req.user.role !== 'admin')) {
     throw new AppError("Bạn không có quyền đăng truyện.", 403);
   }
+
+  const existingComic = await Comic.findOne({ title: req.body.title });
+  if (existingComic) {
+    return res.status(200).json(existingComic);
+  }
+
   const lastComic = await Comic.findOne().sort({ id: -1 });
   const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 

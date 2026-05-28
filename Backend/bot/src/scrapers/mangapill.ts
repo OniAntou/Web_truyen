@@ -64,7 +64,8 @@ export class MangapillScraper implements Scraper {
           links.push({ chapterNumber, title: title || `Chapter ${chapterNumber}`, url: href });
         });
 
-        return links.reverse();
+        links.sort((a, b) => a.chapterNumber - b.chapterNumber);
+        return links;
       });
     } finally {
       await page.close();

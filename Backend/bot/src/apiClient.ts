@@ -52,6 +52,11 @@ export class ApiClient {
     console.log(`[API] Đã upload ảnh bìa cho comic ${comicId}`);
   }
 
+  async getComicById(comicId: number): Promise<any> {
+    const res = await this.http.get(`/comics/${comicId}`);
+    return res.data;
+  }
+
   async createChapter(data: {
     comic_id: string;
     chapter_number: number;

@@ -102,9 +102,29 @@ Ví dụ:
     }
   }
 
-  for (let i = 0; i < chapters.length; i++) {
-    const ch = chapters[i];
-    console.log(`\n[Bot] Chapter ${ch.chapterNumber}: "${ch.title}" (${i + 1}/${chapters.length})`);
+  // Lấy danh sách chapter hiện có trên web để bỏ qua
+  console.log(`[Bot] Đang kiểm tra các chapter đã tồn tại...`);
+  let existingChapters = new Set<number>();
+  try {
+    const comicData = await api.getComicById(newComic.id);
+    if (comicData && comicData.chapters) {
+      comicData.chapters.forEach((c: any) => existingChapters.add(c.chapter_number));
+    }
+  } catch (err: any) {
+    console.error(`[Bot] Lỗi lấy thông tin truyện từ web: ${err.message}`);
+  }
+
+  const chaptersToUpload = chapters.filter(ch => !existingChapters.has(ch.chapterNumber));
+  
+  if (chaptersToUpload.length === 0) {
+    console.log(`[Bot] Không có chapter mới nào cần cập nhật.`);
+  } else if (chaptersToUpload.length < chapters.length) {
+    console.log(`[Bot] Sẽ đăng ${chaptersToUpload.length} chapter mới (đã bỏ qua ${chapters.length - chaptersToUpload.length} chapter cũ).`);
+  }
+
+  for (let i = 0; i < chaptersToUpload.length; i++) {
+    const ch = chaptersToUpload[i];
+    console.log(`\n[Bot] Chapter ${ch.chapterNumber}: "${ch.title}" (${i + 1}/${chaptersToUpload.length})`);
 
     const newChapter = await api.createChapter({
       comic_id: newComic._id,
@@ -133,12 +153,12 @@ Ví dụ:
       }
     }
 
-    if (i < chapters.length - 1 && delayMs > 0) {
+    if (i < chaptersToUpload.length - 1 && delayMs > 0) {
       await sleep(delayMs);
     }
   }
 
-  console.log(`\n[Bot] Hoàn thành! Đã đăng ${chapters.length} chapter của "${comic.title}".`);
+  console.log(`\n[Bot] Hoàn thành! Đã đăng ${chaptersToUpload.length} chapter của "${comic.title}".`);
 }
 
 function getArg(args: string[], name: string): string | undefined {

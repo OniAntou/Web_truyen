@@ -68,26 +68,53 @@ export class PuppeteerScraper implements Scraper {
   async scrapeChapterList(url: string): Promise<ChapterMeta[]> {
     const page = await openPage();
     try {
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+      let currentPageUrl = url;
+      const allChapters: ChapterMeta[] = [];
+      const seenUrls = new Set<string>();
 
-      return await page.evaluate(() => {
-        const links: ChapterMeta[] = [];
-        document.querySelectorAll('ul.list-chapters a, .chapter-list a, table td:first-child a, .listing a')
-          .forEach((el) => {
-            const href = (el as HTMLAnchorElement).href;
-            const text = el.textContent?.trim() || '';
-            if (!href || href === '#') return;
+      while (currentPageUrl) {
+        await page.goto(currentPageUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+        await sleep(2000);
 
-            const numMatch = text.match(/chapter\s*(\d+)/i) || text.match(/chương\s*(\d+)/i) || text.match(/(\d+)/);
-            const chapterNumber = numMatch ? parseInt(numMatch[1], 10) : links.length + 1;
-            const title = text.replace(/chapter\s*\d+/i, '').replace(/chương\s*\d+/i, '').trim();
+        const { links, nextUrl } = await page.evaluate(() => {
+          const pageLinks: ChapterMeta[] = [];
+          document.querySelectorAll('ul.list-chapters a, .chapter-list a, table td:first-child a, .listing a')
+            .forEach((el) => {
+              const href = (el as HTMLAnchorElement).href;
+              const text = el.textContent?.trim() || '';
+              if (!href || href === '#') return;
 
-            if (!links.some(l => l.url === href)) {
-              links.push({ chapterNumber, title: title || `Chapter ${chapterNumber}`, url: href });
-            }
-          });
-        return links.reverse();
-      });
+              const numMatch = text.match(/chapter\s*(\d+)/i) || text.match(/chương\s*(\d+)/i) || text.match(/(\d+)/);
+              const chapterNumber = numMatch ? parseFloat(numMatch[1]) : pageLinks.length + 1;
+              const title = text.replace(/chapter\s*\d+/i, '').replace(/chương\s*\d+/i, '').trim();
+
+              pageLinks.push({ chapterNumber, title: title || `Chapter ${chapterNumber}`, url: href });
+            });
+
+          let nUrl = '';
+          const nextBtn = document.querySelector('.pagination .next a, .pagination a.next, a.next-page, a.next, li.next a, .nav-next a, a[rel="next"]') as HTMLAnchorElement;
+          if (nextBtn && nextBtn.href && nextBtn.href !== window.location.href && !nextBtn.href.includes('#')) {
+            nUrl = nextBtn.href;
+          }
+          return { links: pageLinks, nextUrl: nUrl };
+        });
+
+        for (const link of links) {
+          if (!seenUrls.has(link.url)) {
+            seenUrls.add(link.url);
+            allChapters.push(link);
+          }
+        }
+
+        if (nextUrl) {
+          currentPageUrl = nextUrl;
+        } else {
+          break;
+        }
+      }
+
+      allChapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
+      return allChapters;
     } finally {
       await page.close();
     }
