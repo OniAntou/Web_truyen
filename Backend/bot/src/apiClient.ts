@@ -67,7 +67,7 @@ export class ApiClient {
   }
 
   async uploadChapterPages(chapterId: string, imagePaths: string[]): Promise<void> {
-    const BATCH_SIZE = 15;
+    const BATCH_SIZE = 3;
     for (let i = 0; i < imagePaths.length; i += BATCH_SIZE) {
       const batch = imagePaths.slice(i, Math.min(i + BATCH_SIZE, imagePaths.length));
       const form = new FormData();

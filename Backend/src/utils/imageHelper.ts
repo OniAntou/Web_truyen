@@ -8,7 +8,7 @@ import sharp from "sharp";
  */
 async function convertToWebp(buffer, quality = 80) {
   try {
-    return await sharp(buffer)
+    return await sharp(buffer, { failOnError: false })
       .webp({ quality })
       .toBuffer();
   } catch (err) {

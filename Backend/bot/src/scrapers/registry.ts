@@ -5,10 +5,8 @@ import { TruyenTranhIOScraper } from './truyentranhio.js';
 import { PuppeteerScraper } from './puppeteer.js';
 
 const scrapers: Scraper[] = [
-  new MangapillScraper(),
   new BlogTruyenScraper(),
   new TruyenTranhIOScraper(),
-  new PuppeteerScraper(),
 ];
 
 export function findScraper(url: string): Scraper | null {

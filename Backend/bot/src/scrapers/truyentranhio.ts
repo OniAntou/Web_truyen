@@ -57,20 +57,12 @@ export class TruyenTranhIOScraper implements Scraper {
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       await sleep(2000);
 
-      const totalPages = await page.evaluate(() => {
-        const btns = document.querySelectorAll('.eTruyen-paging');
-        let max = 0;
-        btns.forEach(b => {
-          const n = parseInt(b.textContent?.trim() || '0', 10);
-          if (n > max) max = n;
-        });
-        return max;
-      });
-
       const base = url.replace(/\/?$/, '');
       const allChapters: ChapterMeta[] = [];
+      let p = 1;
+      let lastMax = 1;
 
-      for (let p = 1; p <= (totalPages || 1); p++) {
+      while (true) {
         if (p > 1) {
           await page.goto(`${base}/trang-${p}/`, { waitUntil: 'networkidle2', timeout: 30000 });
           await sleep(1500);
@@ -96,7 +88,24 @@ export class TruyenTranhIOScraper implements Scraper {
           return links;
         });
 
+        if (pageChapters.length === 0) break;
         allChapters.push(...pageChapters);
+
+        const maxOnPage = await page.evaluate(() => {
+          let m = 0;
+          document.querySelectorAll('.eTruyen-paging').forEach(b => {
+            const n = parseInt(b.textContent?.trim() || '0', 10);
+            if (n > m) m = n;
+          });
+          return m;
+        });
+
+        if (maxOnPage > lastMax) {
+          lastMax = maxOnPage;
+        }
+
+        if (p >= lastMax) break;
+        p++;
       }
 
       allChapters.sort((a, b) => a.chapterNumber - b.chapterNumber);

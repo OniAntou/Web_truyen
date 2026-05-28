@@ -5,6 +5,7 @@ import { ApiClient } from './apiClient.js';
 import { findScraper, scrapeMeta, scrapeChapterList, scrapeChapterImages } from './scrapers/registry.js';
 import { downloadChapterImages, cleanupDir } from './downloader.js';
 import { sleep } from './utils.js';
+import { closeBrowser } from './scrapers/browser.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -126,31 +127,35 @@ Ví dụ:
     const ch = chaptersToUpload[i];
     console.log(`\n[Bot] Chapter ${ch.chapterNumber}: "${ch.title}" (${i + 1}/${chaptersToUpload.length})`);
 
-    const newChapter = await api.createChapter({
-      comic_id: newComic._id,
-      chapter_number: ch.chapterNumber,
-      title: ch.title,
-    });
+    try {
+      const newChapter = await api.createChapter({
+        comic_id: newComic._id,
+        chapter_number: ch.chapterNumber,
+        title: ch.title,
+      });
 
-    if (scrapeImages) {
-      console.log(`[Bot]   Đang lấy danh sách ảnh...`);
-      const imageUrls = await scrapeChapterImages(ch.url);
-      console.log(`[Bot]   Tìm thấy ${imageUrls.length} ảnh`);
+      if (scrapeImages) {
+        console.log(`[Bot]   Đang lấy danh sách ảnh...`);
+        const imageUrls = await scrapeChapterImages(ch.url);
+        console.log(`[Bot]   Tìm thấy ${imageUrls.length} ảnh`);
 
-      if (imageUrls.length > 0) {
-        console.log(`[Bot]   Đang tải ảnh...`);
-        const chapterDir = path.join(config.bot.downloadDir, 'chapters', newComic._id, String(ch.chapterNumber));
+        if (imageUrls.length > 0) {
+          console.log(`[Bot]   Đang tải ảnh...`);
+          const chapterDir = path.join(config.bot.downloadDir, 'chapters', newComic._id, String(ch.chapterNumber));
 
-        const pagePaths = await downloadChapterImages(chapterDir, imageUrls, concurrency);
-        console.log(`\n[Bot]   Upload ${pagePaths.length} ảnh...`);
-        try {
-          await api.uploadChapterPages(newChapter._id, pagePaths);
-        } catch (err: any) {
-          console.error(`\n[Bot]   Lỗi upload ảnh: ${err.message}`);
+          const pagePaths = await downloadChapterImages(chapterDir, imageUrls, concurrency);
+          console.log(`\n[Bot]   Upload ${pagePaths.length} ảnh...`);
+          try {
+            await api.uploadChapterPages(newChapter._id, pagePaths);
+          } catch (err: any) {
+            console.error(`\n[Bot]   Lỗi upload ảnh: ${err.message}`);
+          }
+
+          await cleanupDir(chapterDir);
         }
-
-        await cleanupDir(chapterDir);
       }
+    } catch (err: any) {
+      console.error(`\n[Bot] LỖI khi xử lý chapter ${ch.chapterNumber}: ${err.message}`);
     }
 
     if (i < chaptersToUpload.length - 1 && delayMs > 0) {
@@ -159,6 +164,7 @@ Ví dụ:
   }
 
   console.log(`\n[Bot] Hoàn thành! Đã đăng ${chaptersToUpload.length} chapter của "${comic.title}".`);
+  await closeBrowser();
 }
 
 function getArg(args: string[], name: string): string | undefined {
@@ -169,7 +175,11 @@ function getArg(args: string[], name: string): string | undefined {
   return undefined;
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error('\n[Bot] LỖI:', err.message);
+  try {
+    const { closeBrowser } = await import('./scrapers/browser.js');
+    await closeBrowser();
+  } catch (e) {}
   process.exit(1);
 });
