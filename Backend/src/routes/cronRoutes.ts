@@ -1,23 +1,21 @@
 import express from "express";
+import { resetWeeklyViews } from "../cron/cronJobs";
+import { isCronAuthorized } from "../utils/accessControl";
+
 const router = express.Router();
-import {  resetWeeklyViews  } from "../cron/cronJobs";
 
-/**
- * Endpoint for Vercel Crons
- * Secured by CRON_SECRET environment variable
- */
-router.get('/reset-weekly-views', async (req, res) => {
-  const authHeader = req.headers.authorization;
+router.get("/reset-weekly-views", async (req, res) => {
   const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return res.status(503).json({ message: "CRON_SECRET is not configured" });
+  }
 
-  // Validate CRON_SECRET if it exists
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  if (!isCronAuthorized(cronSecret, req.headers.authorization)) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
-    const result = await resetWeeklyViews();
-    res.json(result);
+    res.json(await resetWeeklyViews());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

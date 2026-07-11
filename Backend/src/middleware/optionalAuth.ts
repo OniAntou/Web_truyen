@@ -1,22 +1,18 @@
-import jwt from "jsonwebtoken";
+import { getAuthToken, resolveCurrentPrincipal } from "./auth";
 
-const optionalAuth = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  let token = authHeader && authHeader.split(' ')[1];
+const optionalAuth = async (req, res, next) => {
+  const token = getAuthToken(req);
+  const secret = process.env.JWT_SECRET;
+  if (!token || !secret) return next();
 
-  // If token in header is invalid/placeholder, try cookies
-  if (!token || token === 'undefined' || token === 'null') {
-    token = req.cookies?.token || req.cookies?.adminToken;
+  try {
+    const principal = await resolveCurrentPrincipal(token, secret);
+    if (principal) req.user = principal;
+  } catch {
+    // Public endpoints remain readable when an optional token is invalid.
   }
 
-  if (!token) return next();
-  
-  jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, user) => {
-    if (!err) {
-      req.user = user;
-    }
-    next();
-  });
+  next();
 };
 
 export default optionalAuth;

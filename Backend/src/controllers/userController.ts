@@ -115,25 +115,31 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const upgradeVip = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) throw new AppError("User không tồn tại", 404);
-
   const VIP_PRICE = 50000;
-  if (user.coins < VIP_PRICE) {
+  const now = new Date();
+  const durationMs = 30 * 24 * 60 * 60 * 1000;
+  const user = await User.findOneAndUpdate(
+    { _id: req.user.id, coins: { $gte: VIP_PRICE } },
+    [{
+      $set: {
+        coins: { $subtract: ["$coins", VIP_PRICE] },
+        is_vip: true,
+        vip_expiry: {
+          $cond: [
+            { $gt: ["$vip_expiry", now] },
+            { $add: ["$vip_expiry", durationMs] },
+            { $add: [now, durationMs] },
+          ],
+        },
+      },
+    }],
+    { new: true },
+  );
+
+  if (!user) {
+    if (!await User.exists({ _id: req.user.id })) throw new AppError("User không tồn tại", 404);
     throw new AppError("Bạn không đủ Coins để nâng cấp VIP.", 400);
   }
-
-  user.coins -= VIP_PRICE;
-  user.is_vip = true;
-
-  const now = new Date();
-  if (user.vip_expiry && user.vip_expiry > now) {
-    user.vip_expiry = new Date(user.vip_expiry.getTime() + 30 * 24 * 60 * 60 * 1000);
-  } else {
-    user.vip_expiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-  }
-
-  await user.save();
 
   res.json({ message: "Nâng cấp VIP thành công!", user: { coins: user.coins, is_vip: user.is_vip, vip_expiry: user.vip_expiry } });
 });
