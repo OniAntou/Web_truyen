@@ -1,25 +1,25 @@
-import {  Payment, User  } from "../database";
+import { Payment } from "../database";
 import * as vnpay from "../utils/vnpay";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
+import { createPaymentOrderId, settlePayment } from "../services/paymentSettlement";
 
 /**
  * Handle VNPay Payments
  */
 const createPayment = asyncHandler(async (req, res) => {
   const { amount, bankCode, locale } = req.body;
-  const userId = req.user.id; // From auth middleware
+  const userId = req.user.id;
 
   if (!amount || amount < 5000) {
     throw new AppError("Số tiền tối thiểu là 5,000 VNĐ", 400);
   }
 
-  const orderId = `PAY_${Date.now()}`;
+  const orderId = createPaymentOrderId();
   const orderInfo = `Nap Linh thach cho user ${userId}`;
 
   console.log(`[Payment] Creating payment for user ${userId}, amount ${amount}`);
-  
-  // 1. Generate payment URL
+
   const paymentUrl = vnpay.createPaymentUrl({
     amount,
     orderId,
@@ -29,7 +29,6 @@ const createPayment = asyncHandler(async (req, res) => {
     ipAddr: req.ip || "127.0.0.1",
   });
 
-  // 2. Create pending transaction in DB
   await Payment.create({
     user_id: userId,
     amount,
@@ -45,103 +44,60 @@ const createPayment = asyncHandler(async (req, res) => {
  * Handle VNPay Return URL (Browser redirect)
  */
 const vnpayReturn = asyncHandler(async (req, res) => {
-  let vnp_Params = req.query;
-  const isValid = vnpay.verifyReturnUrl({ ...vnp_Params });
+  const vnpParams = req.query;
+  const isValid = vnpay.verifyReturnUrl({ ...vnpParams });
 
   if (!isValid) {
     return res.status(200).json({ success: false, message: "Checksum failed" });
   }
 
-  const orderId = vnp_Params["vnp_TxnRef"];
-  const responseCode = vnp_Params["vnp_ResponseCode"];
-  const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
+  const orderId = String(vnpParams["vnp_TxnRef"]);
+  const responseCode = String(vnpParams["vnp_ResponseCode"]);
+  const transactionNo = String(vnpParams["vnp_TransactionNo"] || "");
+  const settlement = await settlePayment(orderId, responseCode, transactionNo);
 
-  const payment = await Payment.findOneAndUpdate(
-    { order_id: String(orderId), status: "pending" },
-    {
-      $set: {
-        status: responseCode === "00" ? "success" : "failed",
-        vnp_transaction_no: vnp_TransactionNo,
-        vnp_response_code: responseCode,
-        updated_at: new Date()
-      }
-    },
-    { new: true }
-  );
-
-  if (!payment) {
-    // If not found, it might have been processed already or order id is invalid
-    const existing = await Payment.findOne({ order_id: String(orderId) });
-    if (existing && existing.status !== "pending") {
-       return res.json({ success: true, message: "Giao dịch đã được xử lý trước đó" });
-    }
+  if (settlement === "already-settled") {
+    return res.json({ success: true, message: "Giao dịch đã được xử lý trước đó" });
+  }
+  if (settlement === "not-found") {
     return res.status(200).json({ success: false, message: "Order not found or already processed" });
   }
 
   if (responseCode === "00") {
-    // Update user coins (Conversion: 1,000 VND = 100 Coins)
-    const coinsToAdd = Math.floor(payment.amount / 1000) * 100;
-    await User.findByIdAndUpdate(payment.user_id, {
-      $inc: { coins: coinsToAdd },
-    });
-    
     return res.json({ success: true, message: "Thanh toán thành công" });
-  } else {
-    return res.json({ success: false, message: "Thanh toán thất bại", code: responseCode });
   }
+
+  return res.json({ success: false, message: "Thanh toán thất bại", code: responseCode });
 });
 
 /**
- * Handle VNPay IPN (Background notification)
+ * Handle VNPay IPN (background notification)
  */
 const vnpayIpn = asyncHandler(async (req, res) => {
-  let vnp_Params = req.query;
-  const isValid = vnpay.verifyReturnUrl({ ...vnp_Params });
+  const vnpParams = req.query;
+  const isValid = vnpay.verifyReturnUrl({ ...vnpParams });
 
   if (!isValid) {
     return res.status(200).json({ RspCode: "97", Message: "Fail checksum" });
   }
 
-  const orderId = vnp_Params["vnp_TxnRef"];
-  const responseCode = vnp_Params["vnp_ResponseCode"];
-  const vnp_TransactionNo = vnp_Params["vnp_TransactionNo"];
+  const orderId = String(vnpParams["vnp_TxnRef"]);
+  const responseCode = String(vnpParams["vnp_ResponseCode"]);
+  const transactionNo = String(vnpParams["vnp_TransactionNo"] || "");
+  const settlement = await settlePayment(orderId, responseCode, transactionNo);
 
-  const payment = await Payment.findOneAndUpdate(
-    { order_id: String(orderId), status: "pending" },
-    {
-      $set: {
-        status: responseCode === "00" ? "success" : "failed",
-        vnp_transaction_no: vnp_TransactionNo,
-        vnp_response_code: responseCode,
-        updated_at: new Date()
-      }
-    },
-    { new: true }
-  );
-
-  if (!payment) {
-    const existing = await Payment.findOne({ order_id: String(orderId) });
-    if (existing && existing.status !== "pending") {
-      return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
-    }
+  if (settlement === "already-settled") {
+    return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
+  }
+  if (settlement === "not-found") {
     return res.status(200).json({ RspCode: "01", Message: "Order not found" });
   }
 
-  if (responseCode === "00") {
-    // Add coins to user
-    const coinsToAdd = Math.floor(payment.amount / 1000) * 100;
-    await User.findByIdAndUpdate(payment.user_id, {
-      $inc: { coins: coinsToAdd },
-    });
-
-    res.status(200).json({ RspCode: "00", Message: "Success" });
-  } else {
-    res.status(200).json({ RspCode: "00", Message: "Success" });
-  }
+  return res.status(200).json({ RspCode: "00", Message: "Success" });
 });
 
-export { 
+export {
   createPayment,
   vnpayReturn,
   vnpayIpn,
- };
+};
