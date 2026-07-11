@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../constants/api';
-import { clearAuthToken, getAuthToken, getAdminToken, clearAdminToken } from '../utils/authToken';
+import { clearAuthToken, clearAdminToken } from '../utils/authToken';
 
 interface ApiOptions extends Omit<RequestInit, 'body'> {
     body?: Record<string, any> | FormData;
@@ -16,12 +16,6 @@ const apiClient = async <T = unknown>(endpoint: string, options: ApiOptions = {}
     const isExplicitAdminEndpoint = endpoint.startsWith('/admin') || endpoint.startsWith('admin') || endpoint.startsWith('/studio') || endpoint.startsWith('studio');
     
     const isAdmin = isAdminContext || isExplicitAdminEndpoint;
-    const token = isAdmin ? (getAdminToken() || getAuthToken()) : getAuthToken();
-    
-    if (token && !headers.Authorization) {
-        headers.Authorization = `Bearer ${token}`;
-    }
-
     const config: RequestInit = {
         method: body ? 'POST' : 'GET',
         ...customConfig,

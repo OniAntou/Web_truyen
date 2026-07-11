@@ -3,7 +3,6 @@ import { User } from '../types/user';
 
 interface AuthResponse {
     message: string;
-    token?: string;
     user: User;
 }
 

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { authService } from "../../services/authService";
 import { useAuthStore } from "../../store/authStore";
-import { setAuthToken } from "../../utils/authToken";
+import { clearAuthToken } from "../../utils/authToken";
 import { useTranslation } from "../../hooks/useTranslation";
 
 const registerSchema = z.object({
@@ -52,7 +52,7 @@ const AuthPage: React.FC = () => {
         ? await authService.login(data.email, data.password)
         : await authService.register(data.username!, data.email, data.password);
         
-      setAuthToken(response.token);
+      clearAuthToken();
       storeLogin(response.user);
       navigate("/");
     } catch (err: any) {
