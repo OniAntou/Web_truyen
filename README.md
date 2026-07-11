@@ -31,7 +31,7 @@ ComicVerse is a high-performance, full-stack web application designed for a prem
 - **Fluid Reading Experience:** Intelligent prefetching via `@tanstack/react-query` and optimized image delivery from Cloudflare R2.
 - **Premium Aesthetics:** Sleek, modern design with custom CSS animations, dark mode, and responsive layouts.
 - **Interactive Community:** Robust comment sections with nested replies and real-time interaction.
-- **Monetization & VIP:** Automated MoMo Payment Gateway integration for coin top-ups and chapter unlocking.
+- **Monetization & VIP:** VNPay integration for coin top-ups and chapter unlocking.
 
 ### 🎨 For Creators
 - **Creator Studio:** A professional dashboard for publishing, managing chapters, and analyzing reader engagement.
@@ -88,6 +88,10 @@ cp .env.example .env
 # Configure your .env variables
 npm run dev
 ```
+
+## Production deployment
+
+See [the production runbook](docs/production-readiness.md) before deploying. The backend checks its required Production variables during startup, and CI validates both applications on every pull request and `main` push.
 
 **2. Setup Client**
 ```bash
