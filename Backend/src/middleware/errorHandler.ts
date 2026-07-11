@@ -48,13 +48,17 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (statusCode >= 500) {
-    console.error(`[Error] ${req.method} ${req.originalUrl} -> ${statusCode} ${message}`);
+    const requestId = res.locals.requestId || "unknown";
+    console.error(`[Error] ${requestId} ${req.method} ${req.originalUrl} -> ${statusCode} ${message}`);
     console.error(err.stack || err);
   } else if (process.env.NODE_ENV !== 'production') {
     console.error(`[Error] ${statusCode} - ${message}`);
   }
 
-  res.status(statusCode).json({ message });
+  res.status(statusCode).json({
+    message,
+    requestId: res.locals.requestId,
+  });
 };
 
 export default errorHandler;

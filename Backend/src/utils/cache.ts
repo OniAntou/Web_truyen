@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis';
 
 // Determine if we should use Redis or fallback to in-memory for local dev
 const useRedis = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+export const isRedisEnabled = useRedis;
 
 const redis = useRedis ? new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,

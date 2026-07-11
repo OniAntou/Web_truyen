@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
+import { assertProductionEnvironment, getAllowedOrigins } from "./config/environment";
+assertProductionEnvironment();
 
 import express from "express";
 import cors from "cors";
@@ -10,6 +12,10 @@ import {  resetWeeklyViews  } from "./cron/cronJobs";
 import ensureDbConnection from "./middleware/ensureDbConnection";
 import {  csrfProtection, mongoSanitize  } from "./middleware/security";
 import {  globalLimiter  } from "./middleware/rateLimiter";
+import { connectDB, mongoose } from "./database";
+import { R2_ENABLED } from "./config/r2";
+import { isRedisEnabled } from "./utils/cache";
+import requestId from "./middleware/requestId";
 
 // Route imports
 import authRoutes from "./routes/authRoutes";
@@ -40,6 +46,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
+app.use(requestId);
 app.use(mongoSanitize);
 // Custom CSRF protection middleware: validates Origin/Referer headers and requires custom security headers
 // for state-changing requests. This replaces the deprecated `csurf` package.
@@ -55,9 +62,7 @@ if (process.env.TRUST_PROXY) {
 }
 
 // CORS Configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:5173', 'http://localhost:4173'];
+const allowedOrigins = getAllowedOrigins();
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -104,6 +109,35 @@ app.get("/api/health", (req, res) => {
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
+});
+
+app.get("/api/ready", async (req, res) => {
+  try {
+    await connectDB();
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error("Database is not connected");
+    }
+
+    res.json({
+      status: "ready",
+      checks: {
+        database: "ok",
+        storage: R2_ENABLED ? "configured" : "unconfigured",
+        cache: isRedisEnabled ? "redis" : "memory",
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("[Readiness] request failed", {
+      requestId: res.locals.requestId || "unknown",
+      error,
+    });
+    res.status(503).json({
+      status: "not_ready",
+      message: "Service dependencies are unavailable",
+      requestId: res.locals.requestId,
+    });
+  }
 });
 
 app.use('/api', ensureDbConnection);

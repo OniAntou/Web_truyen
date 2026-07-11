@@ -7,6 +7,9 @@ import {
 
 const uriFromEnv = process.env.MONGO_URI;
 if (!uriFromEnv) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("MONGO_URI is required in production.");
+  }
   console.error("WARNING: MONGO_URI was not found in the environment. Falling back to localhost.");
 }
 
