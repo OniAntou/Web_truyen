@@ -17,8 +17,10 @@ build/
 .env.test.local
 .env.production.local
 Backend/.env
+Backend/.env*
 Backend/bot/.env
 Client/.env
+.vercel/
 
 # Bot download files
 downloads/
