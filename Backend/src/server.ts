@@ -128,7 +128,10 @@ app.get("/api/ready", async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error(`[Readiness] ${res.locals.requestId || "unknown"}`, error);
+    console.error("[Readiness] request failed", {
+      requestId: res.locals.requestId || "unknown",
+      error,
+    });
     res.status(503).json({
       status: "not_ready",
       message: "Service dependencies are unavailable",
