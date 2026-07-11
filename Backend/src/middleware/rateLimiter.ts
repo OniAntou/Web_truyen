@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 /**
  * Centralized Rate Limiting Configuration
@@ -15,16 +15,15 @@ import rateLimit from "express-rate-limit";
  * - GLOBAL:   Catch-all fallback for all /api routes
  */
 
+export const getRateLimitKey = (ip: string | undefined) => ipKeyGenerator(ip || "0.0.0.0");
+
 const createLimiter = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
   message: { message },
   standardHeaders: true,   // Return rate limit info in `RateLimit-*` headers
   legacyHeaders: false,     // Disable `X-RateLimit-*` headers
-  keyGenerator: (req) => {
-    // Use X-Forwarded-For on reverse proxy, fallback to req.ip
-    return req.ip;
-  },
+  keyGenerator: (req) => ipKeyGenerator(req.ip || "0.0.0.0"),
 });
 
 // ──────────────────────────────────────────────────────
