@@ -22,7 +22,7 @@ This repository is ready for a controlled production deployment after the extern
 ## Release procedure
 
 1. Protect `main`: require the two GitHub Actions checks in `.github/workflows/ci.yml` and at least one review.
-2. Add Production variables in Vercel. The backend intentionally refuses to start when a required production variable is blank.
+2. Add Production variables in Vercel. The backend continues to serve liveness traffic, while `/api/ready` returns `503` and lists only the missing variable names when production configuration is incomplete.
 3. Deploy Backend first. Confirm `GET /api/health` returns `200` and `GET /api/ready` returns `200` with `database: ok`.
 4. Deploy Client, then verify sign-in, protected creator actions, one upload, reading a chapter, and the VNPay return path.
 5. Check Vercel runtime logs for a request ID after an intentional invalid request. Support requests should include the `X-Request-Id` response header.

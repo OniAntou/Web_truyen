@@ -91,7 +91,7 @@ npm run dev
 
 ## Production deployment
 
-See [the production runbook](docs/production-readiness.md) before deploying. The backend checks its required Production variables during startup, and CI validates both applications on every pull request and `main` push.
+See [the production runbook](docs/production-readiness.md) before deploying. The backend reports missing required Production variables through `/api/ready`, and CI validates both applications on every pull request and `main` push.
 
 **2. Setup Client**
 ```bash

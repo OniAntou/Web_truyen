@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { assertProductionEnvironment, getAllowedOrigins } from "./config/environment";
-assertProductionEnvironment();
+import { getAllowedOrigins, getProductionEnvironmentIssues } from "./config/environment";
 
 import express from "express";
 import cors from "cors";
@@ -116,6 +115,20 @@ app.get("/api/ready", async (req, res) => {
     await connectDB();
     if (mongoose.connection.readyState !== 1) {
       throw new Error("Database is not connected");
+    }
+
+    const configurationIssues = getProductionEnvironmentIssues();
+    if (configurationIssues.length > 0) {
+      res.status(503).json({
+        status: "not_ready",
+        checks: {
+          database: "ok",
+          configuration: "incomplete",
+        },
+        missingConfiguration: configurationIssues,
+        requestId: res.locals.requestId,
+      });
+      return;
     }
 
     res.json({
