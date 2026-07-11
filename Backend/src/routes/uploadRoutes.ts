@@ -15,8 +15,7 @@ const setUploadTimeout = (req, res, next) => {
 router.get('/r2/status', readLimiter, uploadController.getR2Status);
 router.get('/media/signed-url', readLimiter, auth, uploadController.getSignedUrl);
 router.post('/cover/:comicId', uploadLimiter, auth, uploadMiddleware.single('cover'), uploadController.uploadCover);
-router.post('/chapter/:chapterId', uploadLimiter, auth, setUploadTimeout, uploadMiddleware.array('pages', 200), uploadController.uploadChapterPages);
+router.post('/chapter/:chapterId', uploadLimiter, auth, setUploadTimeout, uploadMiddleware.array('pages', 5), uploadController.uploadChapterPages);
 router.post('/avatar', uploadLimiter, auth, uploadMiddleware.single('avatar'), uploadController.uploadAvatar);
 
 export default router;
-
