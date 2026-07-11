@@ -3,6 +3,7 @@ import test from "node:test";
 import { z } from "zod";
 import { getZodErrorMessage } from "../src/middleware/validateRequest";
 import { canManageComic, isAdmin, isCronAuthorized } from "../src/utils/accessControl";
+import { getPagination } from "../src/utils/pagination";
 
 test("only an admin or owning creator can manage a comic", () => {
   assert.equal(canManageComic({ id: "owner", role: "creator" }, "owner"), true);
@@ -31,4 +32,11 @@ test("Zod v4 validation errors return their first issue message", () => {
   } catch (error) {
     assert.equal(getZodErrorMessage(error), "Invalid email address");
   }
+});
+
+test("pagination clamps invalid and oversized client values", () => {
+  assert.deepEqual(getPagination("-3", "10000", 20, 100), { page: 1, limit: 100, skip: 0 });
+  assert.deepEqual(getPagination("not-a-number", undefined, 20, 100), { page: 1, limit: 20, skip: 0 });
+  assert.deepEqual(getPagination("3", "15", 20, 100), { page: 3, limit: 15, skip: 30 });
+  assert.deepEqual(getPagination("999999", "1", 20, 100), { page: 10000, limit: 1, skip: 9999 });
 });

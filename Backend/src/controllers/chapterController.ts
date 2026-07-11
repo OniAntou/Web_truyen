@@ -1,4 +1,4 @@
-import {  Chapter, Pages, Upload, User, ChapterUnlock, Comic  } from "../database";
+import {  Chapter, Pages, Upload, User, ChapterUnlock, Comic, mongoose  } from "../database";
 import {  resolveR2Url, resolveR2Urls, deleteFromR2  } from "../config/r2";
 import {  syncLatestChapter, isChapterRequiresLock  } from "../utils/helpers";
 import asyncHandler from "../middleware/asyncHandler";
@@ -44,36 +44,54 @@ const getChapterPages = asyncHandler(async (req, res) => {
 const unlockChapter = asyncHandler(async (req, res) => {
   const chapter = await Chapter.findById(req.params.chapterId);
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
-
   if (!chapter.price || chapter.price <= 0 || (chapter.early_access_end_date && new Date(chapter.early_access_end_date) <= new Date())) {
     return res.json({ message: "Chương này không yêu cầu mở khóa." });
   }
 
-  const user = await User.findById(req.user.id);
+  const session = await mongoose.startSession();
+  try {
+    let response: { message: string; coins?: number } | undefined;
+    await session.withTransaction(async () => {
+      const transactionalChapter = await Chapter.findById(chapter._id).session(session);
+      const user = await User.findById(req.user.id).session(session);
+      if (!transactionalChapter) throw new AppError("Chapter không tồn tại", 404);
+      if (!user) throw new AppError("User không tồn tại", 404);
 
-  if (user.is_vip && user.vip_expiry && new Date(user.vip_expiry) > new Date()) {
-    return res.json({ message: "Bạn là VIP nên có thể đọc miễn phí chương này." });
+      if (user.is_vip && user.vip_expiry && new Date(user.vip_expiry) > new Date()) {
+        response = { message: "Bạn là VIP nên có thể đọc miễn phí chương này." };
+        return;
+      }
+
+      const existingUnlock = await ChapterUnlock.findOne({
+        user_id: user._id,
+        chapter_id: transactionalChapter._id,
+      }).session(session);
+      if (existingUnlock) {
+        response = { message: "Bạn đã mở khóa chương này rồi.", coins: user.coins };
+        return;
+      }
+
+      if (user.coins < transactionalChapter.price) {
+        throw new AppError("Bạn không đủ Coins để mở khóa. Vui lòng nạp thêm.", 403);
+      }
+
+      user.coins -= transactionalChapter.price;
+      await user.save({ session });
+      await ChapterUnlock.create([{
+        user_id: user._id,
+        chapter_id: transactionalChapter._id,
+        price: transactionalChapter.price,
+      }], { session });
+      response = { message: "Mở khóa chương thành công!", coins: user.coins };
+    });
+
+    res.json(response);
+  } catch (error: any) {
+    if (error?.code === 11000) return res.json({ message: "Bạn đã mở khóa chương này rồi." });
+    throw error;
+  } finally {
+    await session.endSession();
   }
-  
-  const existingUnlock = await ChapterUnlock.findOne({ user_id: user._id, chapter_id: chapter._id });
-  if (existingUnlock) {
-    return res.json({ message: "Bạn đã mở khóa chương này rồi." });
-  }
-
-  if (user.coins < chapter.price) {
-    throw new AppError("Bạn không đủ Coins để mở khóa. Vui lòng nạp thêm.", 403);
-  }
-
-  user.coins -= chapter.price;
-  await user.save();
-
-  await ChapterUnlock.create({
-    user_id: user._id,
-    chapter_id: chapter._id,
-    price: chapter.price
-  });
-
-  res.json({ message: "Mở khóa chương thành công!", coins: user.coins });
 });
 
 const reorderPages = asyncHandler(async (req, res) => {
