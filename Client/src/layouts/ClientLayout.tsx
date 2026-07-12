@@ -16,8 +16,9 @@ const ClientLayout: React.FC = () => {
 
     return (
         <div className="app-layout">
+            <a className="skip-link" href="#main-content">Bỏ qua điều hướng</a>
             {!isReader && <Navbar />}
-            <main className={`app-main ${!isReader ? 'has-navbar' : ''}`}>
+            <main id="main-content" tabIndex={-1} className={`app-main ${!isReader ? 'has-navbar' : ''}`}>
                 <Outlet />
             </main>
             {!isReader && <Footer />}

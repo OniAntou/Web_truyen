@@ -10,6 +10,8 @@ interface HeroSectionProps {
     featuredComics: Comic[];
 }
 
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -31,7 +33,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
     const frameRef = useRef<HTMLDivElement>(null);
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (!frameRef.current) return;
+        if (!frameRef.current || prefersReducedMotion()) return;
         const rect = frameRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -46,13 +48,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
     };
 
     const handleMouseLeave = () => {
-        if (!frameRef.current) return;
+        if (!frameRef.current || prefersReducedMotion()) return;
         frameRef.current.style.transform = `perspective(1200px) scale(1) translateY(0) rotateX(0deg) rotateY(0deg)`;
-        frameRef.current.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        frameRef.current.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
     };
 
     const handleMouseEnter = () => {
-        if (!frameRef.current) return;
+        if (!frameRef.current || prefersReducedMotion()) return;
         frameRef.current.style.transition = 'transform 0.1s ease-out'; // Fast track when entering
     };
 

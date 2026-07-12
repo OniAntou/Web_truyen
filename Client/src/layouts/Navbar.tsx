@@ -62,7 +62,13 @@ const Navbar: React.FC = () => {
                         
                         <NavSearch />
 
-                        <button className="theme-toggle-btn" onClick={toggleTheme} title={theme === 'dark' ? t('theme_light') : t('theme_dark')}>
+                        <button
+                            className="theme-toggle-btn"
+                            onClick={toggleTheme}
+                            title={theme === 'dark' ? t('theme_light') : t('theme_dark')}
+                            aria-label={theme === 'dark' ? t('theme_light') : t('theme_dark')}
+                            aria-pressed={theme === 'dark'}
+                        >
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
 
@@ -77,7 +83,9 @@ const Navbar: React.FC = () => {
                         <button
                             className="mobile-nav-btn"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            aria-label="Menu"
+                            aria-label={isMobileMenuOpen ? "Đóng menu" : "Mở menu"}
+                            aria-expanded={isMobileMenuOpen}
+                            aria-controls="mobile-navigation"
                         >
                             {isMobileMenuOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
                         </button>

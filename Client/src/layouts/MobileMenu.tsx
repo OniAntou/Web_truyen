@@ -46,12 +46,20 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
     ];
 
     return (
-        <div className={`mobile-drawer-overlay ${isOpen ? 'open' : ''}`}>
+        <div
+            id="mobile-navigation"
+            className={`mobile-drawer-overlay ${isOpen ? 'open' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Điều hướng trên thiết bị di động"
+            aria-hidden={!isOpen}
+            inert={!isOpen}
+        >
             <div className="mobile-drawer-backdrop" onClick={onClose} />
             <div className={`mobile-drawer ${isOpen ? 'open' : ''}`}>
                 <div className="drawer-header">
                     <span className="nav-logo drawer-logo">Comic<span>Verse</span></span>
-                    <button onClick={onClose} className="drawer-close-btn">
+                    <button onClick={onClose} className="drawer-close-btn" aria-label="Đóng menu">
                         <X size={20} />
                     </button>
                 </div>

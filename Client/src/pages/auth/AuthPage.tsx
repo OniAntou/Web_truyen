@@ -95,21 +95,26 @@ const AuthPage: React.FC = () => {
             <p className="text-zinc-400 text-sm">{t('forgot_password_subtitle')}</p>
           </div>
           
-          {apiError && <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">{apiError}</div>}
-          {forgotMessage && <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm">{forgotMessage}</div>}
+          {apiError && <div role="alert" className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">{apiError}</div>}
+          {forgotMessage && <div role="status" aria-live="polite" className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm">{forgotMessage}</div>}
           
           <form className="flex flex-col gap-4" onSubmit={handleForgotPassword}>
+            <label className="sr-only" htmlFor="forgot-email">{t('email_placeholder')}</label>
             <input
+              id="forgot-email"
               type="email"
+              name="email"
+              autoComplete="email"
+              spellCheck={false}
               placeholder={t('email_placeholder')}
-              className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none focus:border-rose-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
               required
             />
             <button 
                 type="submit" 
-                className="w-full py-3.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold transition-all disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold transition-colors disabled:opacity-50"
                 disabled={forgotLoading}
             >
               {forgotLoading ? t('sending') : t('send_request')}
@@ -134,38 +139,55 @@ const AuthPage: React.FC = () => {
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          {apiError && <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">{apiError}</div>}
+          {apiError && <div role="alert" className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">{apiError}</div>}
           
           {!isLogin && (
             <div className="flex flex-col gap-1">
+              <label className="sr-only" htmlFor="auth-username">{t('display_name_placeholder')}</label>
               <input 
+                id="auth-username"
                 type="text" 
+                autoComplete="username"
+                spellCheck={false}
                 placeholder={t('display_name_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none focus:border-rose-500 transition-colors" 
+                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                aria-invalid={Boolean(errors.username)}
+                aria-describedby={errors.username ? 'auth-username-error' : undefined}
                 {...register("username")} 
               />
-              {errors.username && <span className="text-red-500 text-xs px-1">{errors.username.message}</span>}
+              {errors.username && <span id="auth-username-error" className="text-red-500 text-xs px-1">{errors.username.message}</span>}
             </div>
           )}
           
           <div className="flex flex-col gap-1">
+            <label className="sr-only" htmlFor="auth-email">{t('email_placeholder')}</label>
             <input 
+                id="auth-email"
                 type="email" 
+                autoComplete="email"
+                spellCheck={false}
                 placeholder={t('email_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none focus:border-rose-500 transition-colors" 
+                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'auth-email-error' : undefined}
                 {...register("email")} 
             />
-            {errors.email && <span className="text-red-500 text-xs px-1">{errors.email.message}</span>}
+            {errors.email && <span id="auth-email-error" className="text-red-500 text-xs px-1">{errors.email.message}</span>}
           </div>
 
           <div className="flex flex-col gap-1">
+            <label className="sr-only" htmlFor="auth-password">{t('password_placeholder')}</label>
             <input 
+                id="auth-password"
                 type="password" 
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
                 placeholder={t('password_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none focus:border-rose-500 transition-colors" 
+                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'auth-password-error' : undefined}
                 {...register("password")} 
             />
-            {errors.password && <span className="text-red-500 text-xs px-1">{errors.password.message}</span>}
+            {errors.password && <span id="auth-password-error" className="text-red-500 text-xs px-1">{errors.password.message}</span>}
           </div>
 
           {isLogin && (
@@ -182,7 +204,7 @@ const AuthPage: React.FC = () => {
 
           <button 
             type="submit" 
-            className="w-full py-4 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-lg shadow-lg shadow-rose-500/20 transition-all disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-lg shadow-lg shadow-rose-500/20 transition-colors disabled:opacity-50"
             disabled={loading}
           >
             {loading ? t('processing') : (isLogin ? t('login_btn') : t('register_btn'))}

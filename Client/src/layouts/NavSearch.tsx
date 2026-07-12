@@ -70,6 +70,10 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                 <Search size={18} className="nav-search-icon" />
                 <input 
                     type="text" 
+                    name="search"
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-label={t('search_placeholder')}
                     placeholder={t('search_placeholder')} 
                     value={searchQuery}
                     className="nav-search-input"
@@ -84,8 +88,10 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                 />
                 {searchQuery && (
                     <button
+                        type="button"
                         className="nav-search-clear"
                         onClick={() => { setSearchQuery(''); setSearchResults([]); setShowDropdown(false); }}
+                        aria-label="Xoá nội dung tìm kiếm"
                     >
                         <X size={14} />
                     </button>
@@ -135,6 +141,7 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                                 </Link>
                             ))}
                             <button
+                                type="button"
                                 className="search-dropdown-viewall"
                                 onClick={handleSearchSubmit}
                             >
