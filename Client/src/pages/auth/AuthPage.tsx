@@ -39,6 +39,8 @@ const AuthPage: React.FC = () => {
   const [forgotMessage, setForgotMessage] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
 
+  const inputClassName = "w-full px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-secondary)]";
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm<AuthForm>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     mode: "onBlur"
@@ -91,8 +93,8 @@ const AuthPage: React.FC = () => {
       return (
         <div className="flex flex-col gap-6">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-white mb-2">{t('forgot_password_title')}</h2>
-            <p className="text-zinc-400 text-sm">{t('forgot_password_subtitle')}</p>
+            <h2 className="text-3xl font-extrabold text-[var(--text-primary)] mb-2">{t('forgot_password_title')}</h2>
+            <p className="text-[var(--text-secondary)] text-sm">{t('forgot_password_subtitle')}</p>
           </div>
           
           {apiError && <div role="alert" className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">{apiError}</div>}
@@ -107,7 +109,7 @@ const AuthPage: React.FC = () => {
               autoComplete="email"
               spellCheck={false}
               placeholder={t('email_placeholder')}
-              className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className={inputClassName}
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
               required
@@ -134,8 +136,8 @@ const AuthPage: React.FC = () => {
     return (
       <div className="flex flex-col gap-6">
         <div className="text-center">
-          <h2 className="text-4xl font-black text-white mb-2">{isLogin ? t('login_title') : t('register_title')}</h2>
-          <p className="text-zinc-400 text-sm">{isLogin ? t('login_subtitle') : t('register_subtitle')}</p>
+          <h2 className="text-4xl font-black text-[var(--text-primary)] mb-2">{isLogin ? t('login_title') : t('register_title')}</h2>
+          <p className="text-[var(--text-secondary)] text-sm">{isLogin ? t('login_subtitle') : t('register_subtitle')}</p>
         </div>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -150,7 +152,7 @@ const AuthPage: React.FC = () => {
                 autoComplete="username"
                 spellCheck={false}
                 placeholder={t('display_name_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className={inputClassName}
                 aria-invalid={Boolean(errors.username)}
                 aria-describedby={errors.username ? 'auth-username-error' : undefined}
                 {...register("username")} 
@@ -167,7 +169,7 @@ const AuthPage: React.FC = () => {
                 autoComplete="email"
                 spellCheck={false}
                 placeholder={t('email_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className={inputClassName}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? 'auth-email-error' : undefined}
                 {...register("email")} 
@@ -182,7 +184,7 @@ const AuthPage: React.FC = () => {
                 type="password" 
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
                 placeholder={t('password_placeholder')} 
-                className="w-full px-4 py-3 rounded-xl bg-black border border-zinc-800 text-white outline-none transition-colors focus:border-rose-500 focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className={inputClassName}
                 aria-invalid={Boolean(errors.password)}
                 aria-describedby={errors.password ? 'auth-password-error' : undefined}
                 {...register("password")} 
@@ -195,7 +197,7 @@ const AuthPage: React.FC = () => {
               <button 
                 type="button" 
                 onClick={() => setIsForgotPassword(true)} 
-                className="text-xs text-zinc-500 hover:text-rose-500 transition-colors"
+                className="text-xs text-[var(--text-secondary)] hover:text-rose-500 transition-colors"
               >
                 {t('forgot_password_link')}
               </button>
@@ -212,7 +214,7 @@ const AuthPage: React.FC = () => {
         </form>
 
         <div className="text-center pt-2">
-          <span className="text-zinc-500 text-sm">{isLogin ? t('new_to_verse') : t('already_have_account')}</span>
+          <span className="text-[var(--text-secondary)] text-sm">{isLogin ? t('new_to_verse') : t('already_have_account')}</span>
           <button
             onClick={toggleLogin}
             className="ml-2 text-rose-500 font-bold hover:underline"
@@ -225,8 +227,8 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col justify-center items-center p-6">
-      <div className="w-full max-w-[440px] p-8 md:p-10 rounded-[2rem] bg-zinc-900 border border-zinc-800 shadow-2xl">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col justify-center items-center p-6">
+      <div className="w-full max-w-[440px] p-8 md:p-10 rounded-[2rem] bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
         {renderForm()}
       </div>
     </div>
