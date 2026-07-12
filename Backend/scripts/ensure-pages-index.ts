@@ -1,6 +1,6 @@
 import { connectDB, mongoose, Pages } from "../src/database";
 
-async function main() {
+export async function ensurePagesIndex() {
   await connectDB();
 
   try {
@@ -38,7 +38,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error("Failed to ensure the unique pages index:", error);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  ensurePagesIndex().catch((error) => {
+    console.error("Failed to ensure the unique pages index:", error);
+    process.exitCode = 1;
+  });
+}

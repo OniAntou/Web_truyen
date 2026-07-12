@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript, Express, Mongoose/MongoDB Atlas transactions, Cloudflare R2, React/Vite, GitHub Actions, Vercel.
 
-**Implementation status (2026-07-12):** Tasks 1-5 are implemented and locally verified. Before the unique page-number constraint is enforced in Atlas, an operator with the production `MONGO_URI` must run `npm run db:ensure-pages-index` from `Backend`; the script reports existing duplicate pairs and exits without changing data if any are found.
+**Implementation status (2026-07-12):** Tasks 1-5 are implemented and locally verified. Before the unique page-number constraint is enforced in Atlas, an operator with the production `MONGO_URI` must run `npm run db:ensure-pages-index` from `Backend`; the script reports existing duplicate pairs and exits without changing data if any are found. When Vercel policy prevents the CLI from reading `MONGO_URI` locally, a one-time production deployment can set `RUN_PAGES_INDEX_MIGRATION=1` as a build environment variable. The build wrapper refuses to run outside Vercel production or without `MONGO_URI`, and normal builds do not run the migration.
 
 ---
 
@@ -20,6 +20,7 @@
 - `Backend/src/controllers/uploadController.ts` — page reservation, database transaction, and R2 rollback.
 - `Backend/src/models/Pages.ts` — unique compound page-number index.
 - `Backend/scripts/ensure-pages-index.ts` — safe production index preflight and creation.
+- `Backend/scripts/maybe-ensure-pages-index.ts` — one-time Vercel-build gate for the page index migration.
 - `Client/src/pages/auth/AuthPage.tsx`, `Client/src/pages/admin/AdminLogin.tsx`, and `Client/src/services/apiClient.ts` — stop persisting or sending browser JWTs; keep HTTP-only cookies.
 - `Backend/tests/*.test.ts` — regression coverage for pure helpers and production configuration.
 - `.github/workflows/ci.yml` — add bot install/build/audit checks.

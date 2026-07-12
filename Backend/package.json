@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "dev": "tsx watch src/server.ts",
-    "build": "rimraf dist && tsc",
+    "build": "tsx scripts/maybe-ensure-pages-index.ts && rimraf dist && tsc",
     "test": "tsx --test tests/*.test.ts",
     "db:ensure-pages-index": "tsx scripts/ensure-pages-index.ts"
   },
