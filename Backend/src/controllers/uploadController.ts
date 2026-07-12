@@ -1,5 +1,6 @@
-import { Comic, Chapter, Upload, Pages, User } from "../database";
-import { R2_ENABLED, getFileUrl, uploadToR2, resolveR2Url } from "../config/r2";
+import { randomUUID } from "crypto";
+import { Comic, Chapter, Upload, Pages, User, mongoose } from "../database";
+import { R2_ENABLED, deleteFromR2, getFileUrl, uploadToR2, resolveR2Url } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import { convertToWebp } from "../utils/imageHelper";
@@ -51,7 +52,7 @@ const uploadCover = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Cần gửi file ảnh (field: cover)", 400);
 
   const webpBuffer = await convertToWebp(req.file.buffer);
-  const key = `covers/${comicId}/${Date.now()}.webp`;
+  const key = `covers/${comicId}/${randomUUID()}.webp`;
   const { key: r2Key } = await uploadToR2(key, webpBuffer, "image/webp");
   await Upload.create({ key: r2Key, type: "cover", comic_id: comic._id });
   comic.cover_url = r2Key;
@@ -70,30 +71,56 @@ const uploadChapterPages = asyncHandler(async (req, res) => {
   requireComicManager(req, comic);
   if (!req.files?.length) throw new AppError("Cần gửi ít nhất một ảnh (field: pages)", 400);
 
-  const existingPages = await Pages.find({ chapter_id: chapter._id }).sort("-page_number");
-  const maxPageNumber = existingPages.length > 0 ? existingPages[0].page_number : 0;
-
-  const uploadedData = await Promise.all(req.files.map(async (file, index) => {
-    const pageNum = maxPageNumber + index + 1;
+  const uploadResults = await Promise.allSettled(req.files.map(async (file, index) => {
     const webpBuffer = await convertToWebp(file.buffer);
-    const key = `chapters/${chapterId}/${pageNum}-${Date.now()}.webp`;
+    const key = `chapters/${chapterId}/${randomUUID()}.webp`;
     const { key: r2Key } = await uploadToR2(key, webpBuffer, "image/webp");
-    return { r2Key, pageNum };
+    return { index, r2Key };
   }));
 
-  const created = await Promise.all(uploadedData.map(({ r2Key, pageNum }) =>
-    Pages.create({ chapter_id: chapter._id, page_number: pageNum, image_url: r2Key }).then((page) =>
-      Upload.create({
-        key: r2Key,
+  const uploadedData = uploadResults
+    .filter((result): result is PromiseFulfilledResult<{ index: number; r2Key: string }> => result.status === "fulfilled")
+    .map((result) => result.value)
+    .sort((a, b) => a.index - b.index);
+  const uploadFailure = uploadResults.find((result) => result.status === "rejected");
+
+  if (uploadFailure) {
+    await Promise.allSettled(uploadedData.map(({ r2Key }) => deleteFromR2(r2Key)));
+    throw uploadFailure.reason;
+  }
+
+  const session = await mongoose.startSession();
+  try {
+    let createdPages: any[] = [];
+
+    await session.withTransaction(async () => {
+      const lastPage = await Pages.findOne({ chapter_id: chapter._id })
+        .sort({ page_number: -1 })
+        .session(session);
+      const firstPageNumber = (lastPage?.page_number || 0) + 1;
+      const pageDocuments = uploadedData.map(({ r2Key }, index) => ({
+        chapter_id: chapter._id,
+        page_number: firstPageNumber + index,
+        image_url: r2Key,
+      }));
+
+      createdPages = await Pages.insertMany(pageDocuments, { session });
+      await Upload.insertMany(createdPages.map((page) => ({
+        key: page.image_url,
         type: "page",
         comic_id: chapter.comic_id,
         chapter_id: chapter._id,
-        page_number: pageNum,
-      }).then(() => page)
-    )
-  ));
+        page_number: page.page_number,
+      })), { session });
+    });
 
-  res.status(201).json({ chapter: chapterId, pages: created });
+    res.status(201).json({ chapter: chapterId, pages: createdPages });
+  } catch (error) {
+    await Promise.allSettled(uploadedData.map(({ r2Key }) => deleteFromR2(r2Key)));
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 });
 
 const uploadAvatar = asyncHandler(async (req, res) => {
@@ -103,7 +130,7 @@ const uploadAvatar = asyncHandler(async (req, res) => {
   if (!req.file) throw new AppError("Cần gửi file ảnh (field: avatar)", 400);
 
   const webpBuffer = await convertToWebp(req.file.buffer);
-  const key = `avatars/${user._id}/${Date.now()}.webp`;
+  const key = `avatars/${user._id}/${randomUUID()}.webp`;
   const { key: r2Key } = await uploadToR2(key, webpBuffer, "image/webp");
   user.avatar_url = r2Key;
   await user.save();
