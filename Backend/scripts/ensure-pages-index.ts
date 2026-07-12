@@ -9,6 +9,8 @@ export async function ensurePagesIndex() {
         $group: {
           _id: { chapter_id: "$chapter_id", page_number: "$page_number" },
           count: { $sum: 1 },
+          page_ids: { $push: "$_id" },
+          image_urls: { $addToSet: "$image_url" },
         },
       },
       { $match: { count: { $gt: 1 } } },
