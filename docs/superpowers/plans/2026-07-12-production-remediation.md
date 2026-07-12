@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript, Express, Mongoose/MongoDB Atlas transactions, Cloudflare R2, React/Vite, GitHub Actions, Vercel.
 
-**Implementation status (2026-07-12):** Tasks 1-5 are implemented and locally verified. Before the unique page-number constraint is enforced in Atlas, an operator with the production `MONGO_URI` must run `npm run db:ensure-pages-index` from `Backend`; the script reports existing duplicate pairs and exits without changing data if any are found. When Vercel policy prevents the CLI from reading `MONGO_URI` locally, a one-time production deployment can set `RUN_PAGES_INDEX_MIGRATION=1` as a build environment variable. The build wrapper refuses to run outside Vercel production or without `MONGO_URI`, and normal builds do not run the migration.
+**Implementation status (2026-07-12):** Tasks 1-5 are implemented and locally verified. Before the unique page-number constraint is enforced in Atlas, an operator with the production `MONGO_URI` must run `npm run db:ensure-pages-index` from `Backend`; the script reports existing duplicate pairs and exits without changing data if any are found. When Vercel policy prevents the CLI from reading `MONGO_URI` locally, a one-time production deployment can set `RUN_PAGES_INDEX_MIGRATION=1` as a build environment variable. The build wrapper refuses to run outside Vercel production or without `MONGO_URI`, and normal builds do not run the migration. If preflight proves all copies in a duplicate group use the same R2 key, set `REPAIR_DUPLICATE_PAGE_MEDIA=1` for that same one-time build to keep the oldest Page and Upload metadata before creating the index; it never deletes the shared R2 object and refuses groups with different media.
 
 ---
 
