@@ -1,9 +1,14 @@
 import multer from "multer";
 
-// Multer: lưu file trong memory để gửi lên R2
+// Keep each batch below the serverless memory and execution envelope.
+export const uploadLimits = {
+  fileSize: 8 * 1024 * 1024,
+  files: 3,
+} as const;
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024, files: 5 }, // 10MB per image, 5 files per request
+  limits: uploadLimits,
   fileFilter: (req, file, cb) => {
     const allowed = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.mimetype);
     if (allowed) cb(null, true);

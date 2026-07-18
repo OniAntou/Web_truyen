@@ -1,11 +1,5 @@
 import { Link } from 'react-router-dom';
-import { 
-    Facebook, 
-    Twitter, 
-    Instagram, 
-    Github,
-    Languages
-} from 'lucide-react';
+import { Languages } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
 const Footer: React.FC = () => {
@@ -39,13 +33,6 @@ const Footer: React.FC = () => {
         }
     ];
 
-    const socialLinks = [
-        { icon: <Facebook size={18} />, href: "#", color: "#1877F2" },
-        { icon: <Twitter size={18} />, href: "#", color: "#1DA1F2" },
-        { icon: <Instagram size={18} />, href: "#", color: "#E4405F" },
-        { icon: <Github size={18} />, href: "#", color: "#333" },
-    ];
-
     return (
         <>
             {/* ── DESKTOP FOOTER ── */}
@@ -63,18 +50,6 @@ const Footer: React.FC = () => {
                             <p className="text-[0.9rem] leading-relaxed opacity-80" style={{ color: 'var(--text-secondary)' }}>
                                 Nền tảng đọc truyện tranh trực tuyến hiện đại. Cung cấp trải nghiệm đọc mượt mà và nội dung chọn lọc hàng đầu.
                             </p>
-                            <div className="flex gap-5 mt-2">
-                                {socialLinks.map((social, idx) => (
-                                    <a 
-                                        key={idx} 
-                                        href={social.href} 
-                                        className="opacity-60 hover:opacity-100 transition-opacity"
-                                        style={{ color: 'var(--text-primary)' }}
-                                    >
-                                        {social.icon}
-                                    </a>
-                                ))}
-                            </div>
                         </div>
 
                         {/* Links Grid */}
@@ -164,18 +139,6 @@ const Footer: React.FC = () => {
                         {/* Social & Language */}
                         <div className="flex flex-col gap-6 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
                             <div className="flex items-center justify-between">
-                                <div className="flex gap-4">
-                                    {socialLinks.map((social, idx) => (
-                                        <a 
-                                            key={idx} 
-                                            href={social.href} 
-                                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90"
-                                            style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
-                                        >
-                                            {social.icon}
-                                        </a>
-                                    ))}
-                                </div>
                                 <button 
                                     onClick={toggleLanguage} 
                                     className="flex items-center gap-2 px-4 py-2 rounded-xl text-[0.7rem] font-bold uppercase tracking-widest transition-all active:scale-95"

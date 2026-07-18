@@ -5,6 +5,7 @@ import {  AdminLogin, User  } from "../database";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
 import {  sendPasswordResetEmail  } from "../utils/email";
+import { buildAdminAuthResponse, buildUserAuthResponse } from "../utils/authResponse";
 
 const adminLogin = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
@@ -34,7 +35,7 @@ const adminLogin = asyncHandler(async (req, res) => {
     path: '/'
   });
 
-  res.json({ message: "Đăng nhập thành công", token, admin: { username: admin.username } });
+  res.json(buildAdminAuthResponse("Đăng nhập thành công", admin.username));
 });
 
 const register = asyncHandler(async (req, res) => {
@@ -71,7 +72,12 @@ const register = asyncHandler(async (req, res) => {
     path: '/'
   });
 
-  res.status(201).json({ message: "Đăng ký thành công", token, user: { id: newUser._id, username: newUser.username, email: newUser.email, role: newUser.role } });
+  res.status(201).json(buildUserAuthResponse("Đăng ký thành công", {
+    id: String(newUser._id),
+    username: newUser.username,
+    email: newUser.email,
+    role: newUser.role,
+  }));
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -103,7 +109,12 @@ const login = asyncHandler(async (req, res) => {
     path: '/'
   });
 
-  res.json({ message: "Đăng nhập thành công", token, user: { id: user._id, username: user.username, email: user.email, role: user.role } });
+  res.json(buildUserAuthResponse("Đăng nhập thành công", {
+    id: String(user._id),
+    username: user.username,
+    email: user.email,
+    role: user.role,
+  }));
 });
 
 const logout = asyncHandler(async (req, res) => {

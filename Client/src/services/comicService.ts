@@ -64,6 +64,5 @@ export const comicService = {
         return apiClient<any>(`/comics/${id}/reader/${chapterId}`); // Typed correctly in ReadPage
     },
     getUserReadingHistory: () => apiClient<any[]>('/users/reading-progress'),
-    testConnection: () => apiClient<{ status: string }>('/test'),
     warmup: () => apiClient<{ status: string }>('/health').catch(() => {}) // Lightweight ping to wake up server
 };

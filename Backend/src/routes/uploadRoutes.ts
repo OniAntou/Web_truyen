@@ -5,10 +5,12 @@ import uploadMiddleware from "../middleware/upload";
 import auth from "../middleware/auth";
 import {  uploadLimiter, readLimiter  } from "../middleware/rateLimiter";
 
-// Middleware to set request timeout for chapter uploads (5 minutes for large batches)
+const UPLOAD_TIMEOUT_MS = 5 * 60 * 1000;
+
+// Match the Vercel Function budget configured in vercel.json.
 const setUploadTimeout = (req, res, next) => {
-  req.setTimeout(5 * 60 * 1000); // 5 minutes
-  res.setTimeout(5 * 60 * 1000);
+  req.setTimeout(UPLOAD_TIMEOUT_MS);
+  res.setTimeout(UPLOAD_TIMEOUT_MS);
   next();
 };
 
@@ -19,3 +21,4 @@ router.post('/chapter/:chapterId', uploadLimiter, auth, setUploadTimeout, upload
 router.post('/avatar', uploadLimiter, auth, uploadMiddleware.single('avatar'), uploadController.uploadAvatar);
 
 export default router;
+export { UPLOAD_TIMEOUT_MS };

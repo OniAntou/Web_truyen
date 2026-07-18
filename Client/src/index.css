@@ -4458,6 +4458,12 @@ body * {
   outline-offset: 3px;
 }
 
+.reset-password-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-slide-up-fade {
     animation: none;

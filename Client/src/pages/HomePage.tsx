@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import HeroSection from '../features/home/HeroSection';
@@ -24,14 +24,6 @@ const HomePage: React.FC = () => {
     const popularComics = data?.popular || [];
     const newComics = data?.latest || [];
     const trending = data?.trending || [];
-
-
-    useEffect(() => {
-        // Test connection (Console only)
-        comicService.testConnection()
-            .then(data => console.log('Backend connected:', data))
-            .catch(err => console.error('Failed to connect to server:', err));
-    }, []);
 
     const featuredComics = trending.length > 0 ? trending.slice(0, 5) : popularComics.slice(0, 5);
 

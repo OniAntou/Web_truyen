@@ -42,7 +42,7 @@ import ProtectedCreatorRoute from './features/auth/ProtectedCreatorRoute';
 
 // Loading Component
 const Loading = () => (
-    <div className="flex items-center justify-center min-h-screen bg-[#0f0f0f]">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--bg-primary)]" role="status" aria-live="polite" aria-label="Đang tải trang">
         <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
 );

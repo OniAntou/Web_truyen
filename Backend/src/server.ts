@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { getAllowedOrigins, getProductionEnvironmentIssues } from "./config/environment";
+import { contentSecurityPolicy } from "./config/securityHeaders";
 
 import express from "express";
 import cors from "cors";
@@ -78,16 +79,7 @@ app.use(compression()); // Gzip compress all responses
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin image/resource loading (R2, S3)
   crossOriginEmbedderPolicy: false, // Don't block cross-origin embeds
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "blob:", "https:", "http:"], // Allow images from R2/S3
-      connectSrc: ["'self'", "https:", "http:"],
-    },
-  },
+  contentSecurityPolicy,
 })); // Secure HTTP headers
 // Global Rate Limiter for all routes (prevent basic DDoS)
 // Configuration defined in middleware/rateLimiter.js
@@ -96,10 +88,6 @@ app.use('/api', globalLimiter);
 // Routes
 app.get("/", (req, res) => {
   res.send("API is running...");
-});
-
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Connection successful! Hello from Express!" });
 });
 
 app.get("/api/health", (req, res) => {

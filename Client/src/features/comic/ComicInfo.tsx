@@ -5,6 +5,7 @@ import { formatViews, translateStatus, slugify } from '../../utils/format';
 import LazyImage from '../../components/ui/LazyImage';
 import { comicService } from '../../services/comicService';
 import { useQueryClient } from '@tanstack/react-query';
+import { shareComic } from '../../utils/shareComic';
 
 import { Comic } from '../../types/comic';
 import { User } from '../../types/user';
@@ -23,6 +24,7 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
     const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
     const [readingProgress, setReadingProgress] = useState<ReadingProgress | null>(null);
     const [loadingProgress, setLoadingProgress] = useState(true);
+    const [shareMessage, setShareMessage] = useState("");
     const storedUser = localStorage.getItem('user');
     const user: User | null = storedUser ? JSON.parse(storedUser) : null;
     const queryClient = useQueryClient();
@@ -126,6 +128,25 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
         }
     };
 
+    const handleShare = async () => {
+        try {
+            const result = await shareComic({
+                title: comic.title,
+                text: `Đọc ${comic.title} trên Web Truyện`,
+                url: window.location.href,
+            });
+            if (result === "shared") {
+                setShareMessage("Đã mở bảng chia sẻ.");
+                return;
+            }
+            setShareMessage(result === "copied" ? "Đã sao chép liên kết truyện." : "Trình duyệt không hỗ trợ chia sẻ trực tiếp.");
+        } catch (error) {
+            if ((error as DOMException)?.name !== "AbortError") {
+                setShareMessage("Không thể chia sẻ liên kết. Vui lòng thử lại.");
+            }
+        }
+    };
+
     const comicId = comic.id || comic._id;
 
     return (
@@ -155,21 +176,32 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                         <span className="flex items-center gap-4">
                             <UserIcon size={16} /> {comic.author}
                         </span>
-                        <span className="flex items-center gap-1" style={{ cursor: user ? 'pointer' : 'default' }} title={user ? "Đánh giá truyện này" : "Đăng nhập để đánh giá"}>
+                        <div className="flex items-center gap-1" role="group" aria-label={user ? "Đánh giá truyện này" : "Đăng nhập để đánh giá"}>
                             {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                    key={star} 
-                                    size={18} 
-                                    fill={(hoverRating || userRating) >= star ? "#eab308" : "transparent"} 
-                                    color={(hoverRating || userRating) >= star ? "#eab308" : "var(--text-secondary)"}
+                                <button
+                                    key={star}
+                                    type="button"
+                                    aria-label={`Đánh giá ${star} sao`}
                                     onMouseEnter={() => user && setHoverRating(star)}
                                     onMouseLeave={() => user && setHoverRating(0)}
+                                    onFocus={() => user && setHoverRating(star)}
+                                    onBlur={() => setHoverRating(0)}
                                     onClick={() => handleRate(star)}
-                                    style={{ transition: 'all 0.2s', transform: hoverRating === star ? 'scale(1.2)' : 'none' }}
-                                />
+                                    disabled={!user || isSubmitting}
+                                    className="rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
+                                    style={{ background: 'transparent', border: 'none', padding: 0, lineHeight: 0 }}
+                                >
+                                    <Star
+                                        aria-hidden="true"
+                                        size={18}
+                                        fill={(hoverRating || userRating) >= star ? "#eab308" : "transparent"}
+                                        color={(hoverRating || userRating) >= star ? "#eab308" : "var(--text-secondary)"}
+                                        style={{ transition: 'transform 0.2s', transform: hoverRating === star ? 'scale(1.2)' : 'none' }}
+                                    />
+                                </button>
                             ))}
                             <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>{Number(avgRating).toFixed(1)}</span>
-                        </span>
+                        </div>
                         <span className="flex items-center gap-4" style={{ color: '#22c55e' }}>
                             {translateStatus(comic.status || '')}
                         </span>
@@ -226,9 +258,11 @@ const ComicInfo: React.FC<ComicInfoProps> = ({ comic }) => {
                             <Heart size={20} fill={isFavorited ? "#ef4444" : "none"} color={isFavorited ? "#ef4444" : "currentColor"} />
                             {isFavorited ? "Đã thích" : "Yêu thích"}
                         </button>
-                        <button className="btn btn-glass">
-                            <Share2 size={20} />
+                        <button className="btn btn-glass" type="button" onClick={handleShare} aria-label={`Chia sẻ ${comic.title}`}>
+                            <Share2 size={20} aria-hidden="true" />
+                            Chia sẻ
                         </button>
+                        <p className="sr-only" role="status" aria-live="polite">{shareMessage}</p>
                     </div>
                 </div>
             </div>

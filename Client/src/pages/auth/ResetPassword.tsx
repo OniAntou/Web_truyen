@@ -30,8 +30,10 @@ const ResetPassword: React.FC = () => {
       const res = await authService.resetPassword(token || "", password);
       setMessage(res.message);
       setTimeout(() => navigate("/auth"), 3000);
-    } catch (err: any) {
-      setError(err || "Có lỗi xảy ra, vui lòng thử lại sau.");
+    } catch (err: unknown) {
+      setError(typeof err === "object" && err && "message" in err
+        ? String(err.message)
+        : "Có lỗi xảy ra, vui lòng thử lại sau.");
     } finally {
       setLoading(false);
     }
@@ -45,22 +47,32 @@ const ResetPassword: React.FC = () => {
           <h2 style={titleStyle}>Đặt lại mật khẩu</h2>
           <p style={subTitleStyle}>Nhập mật khẩu mới cho tài khoản của bạn.</p>
           
-          {error && <div style={{ color: "#ef4444", fontSize: "0.9rem", textAlign: "left", marginBottom: "1rem" }}>{error}</div>}
-          {message && <div style={{ color: "#22c55e", fontSize: "0.9rem", textAlign: "left", marginBottom: "1rem" }}>{message}</div>}
+          {error && <div role="alert" style={{ color: "#ef4444", fontSize: "0.9rem", textAlign: "left", marginBottom: "1rem" }}>{error}</div>}
+          {message && <div role="status" aria-live="polite" style={{ color: "#22c55e", fontSize: "0.9rem", textAlign: "left", marginBottom: "1rem" }}>{message}</div>}
 
           {!message && (
             <form style={formStyle} onSubmit={handleSubmit}>
+              <label className="sr-only" htmlFor="reset-password">Mật khẩu mới</label>
               <input
+                id="reset-password"
                 type="password"
+                name="password"
+                autoComplete="new-password"
                 placeholder="Mật khẩu mới"
+                className="reset-password-input"
                 style={inputStyle}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <label className="sr-only" htmlFor="reset-password-confirmation">Xác nhận mật khẩu mới</label>
               <input
+                id="reset-password-confirmation"
                 type="password"
+                name="confirmPassword"
+                autoComplete="new-password"
                 placeholder="Xác nhận mật khẩu"
+                className="reset-password-input"
                 style={inputStyle}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -98,7 +110,7 @@ const cardStyle: React.CSSProperties = {
 const titleStyle: React.CSSProperties = { color: "var(--text-primary)", fontSize: "2rem", fontWeight: "800", marginBottom: "0.5rem" };
 const subTitleStyle: React.CSSProperties = { color: "var(--text-secondary)", marginBottom: "2rem", fontSize: "0.9rem" };
 const formStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: "1rem" };
-const inputStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box", padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "var(--text-primary)", outline: "none" };
+const inputStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box", padding: "0.9rem 1.2rem", borderRadius: "0.8rem", background: "var(--bg-primary)", border: "1px solid var(--border)", color: "var(--text-primary)" };
 const buttonStyle: React.CSSProperties = { padding: "1rem", borderRadius: "0.8rem", background: "var(--accent)", color: "white", border: "none", fontWeight: "700", cursor: "pointer", marginTop: "0.5rem", width: "100%" };
 
 export default ResetPassword;
