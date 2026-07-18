@@ -33,5 +33,6 @@ This repository is ready for a controlled production deployment after the extern
 - `/api/health` is a liveness endpoint and does not require MongoDB. `/api/ready` validates the database connection and reports storage/cache configuration.
 - Wallet chapter unlocks use MongoDB transactions; a standalone MongoDB deployment is not supported for production.
 - The Vercel API Function is configured for a 300-second maximum duration. Client-side chapter uploads must still batch files within the API's three-file, 8-MB-per-file limit.
+- Backend strict null-safety is enabled. `noImplicitAny` remains an explicit legacy compatibility exception; new or changed backend code should add concrete parameter and data-model types instead of extending that exception.
 - The in-memory cache is safe only as a development fallback. Configure Upstash Redis for consistent cache behavior across serverless instances.
 - Keep Vercel, Atlas, R2, VNPay and SMTP credentials in their respective secret managers; rotate them on staff changes or suspected exposure.

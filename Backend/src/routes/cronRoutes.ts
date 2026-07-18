@@ -17,7 +17,8 @@ router.get("/reset-weekly-views", async (req, res) => {
   try {
     res.json(await resetWeeklyViews());
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    const message = err instanceof Error ? err.message : "Internal server error";
+    res.status(500).json({ error: message });
   }
 });
 

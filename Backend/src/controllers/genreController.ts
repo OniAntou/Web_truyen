@@ -14,7 +14,7 @@ const getGenres = asyncHandler(async (req, res) => {
     return { _id: g._id, name: g.name, slug: g.slug, description: g.description, count };
   }));
 
-  let comics = [];
+  let comics: Array<Record<string, unknown>> = [];
   if (genre) {
     const genreStr = String(genre);
     const escapedGenre = genreStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

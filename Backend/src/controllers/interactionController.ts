@@ -285,7 +285,7 @@ const getAllReadingProgress = asyncHandler(async (req, res) => {
     .limit(20)
     .lean();
 
-  const results = [];
+  const results: Array<Record<string, unknown>> = [];
   for (const progress of progresses) {
     if (!progress.comic_id || !progress.chapter_id) continue;
 

@@ -11,7 +11,7 @@ const accessKeyId = process.env.R2_ACCESS_KEY_ID;
 const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
 const bucket = process.env.R2_BUCKET || 'web-truyen-uploads';
 const publicUrlBase = process.env.R2_PUBLIC_URL || '';
-const urlCache = new Map(); // Cache for signed URLs
+const urlCache = new Map<string, { url: string; expires: number }>(); // Cache for signed URLs
 
 const endpoint = accountId
   ? `https://${accountId}.r2.cloudflarestorage.com`
@@ -44,6 +44,9 @@ async function uploadToR2(key, body, contentType = 'image/jpeg') {
   if (!R2_ENABLED) {
     throw new Error('R2 chưa được cấu hình. Kiểm tra R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET trong .env');
   }
+  if (!s3Client) {
+    throw new Error('R2 client is unavailable despite a configured storage environment.');
+  }
   await s3Client.send(new PutObjectCommand({
     Bucket: bucket,
     Key: key,
@@ -66,7 +69,7 @@ async function getFileUrl(keyOrR2Key, expiresIn = 3600) {
     ? keyOrR2Key.slice(3)
     : keyOrR2Key;
   if (!key) return null;
-  if (!R2_ENABLED) return null;
+  if (!R2_ENABLED || !s3Client) return null;
   
   if (publicUrlBase) {
     return publicUrlBase.replace(/\/$/, '') + '/' + key;
@@ -119,7 +122,7 @@ async function resolveR2Urls(items, fieldName = 'image_url') {
  * @param {string} keyOrR2Key - key thuần (covers/...) hoặc "r2:covers/..."
  */
 async function deleteFromR2(keyOrR2Key) {
-  if (!R2_ENABLED) return;
+  if (!R2_ENABLED || !s3Client) return;
   const key = typeof keyOrR2Key === 'string' && keyOrR2Key.startsWith('r2:')
     ? keyOrR2Key.slice(3)
     : keyOrR2Key;

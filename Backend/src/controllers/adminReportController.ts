@@ -24,7 +24,7 @@ const getAllReports = asyncHandler(async (req, res) => {
 
     // Populate target data manually because target_id is dynamic
     const populatedReports = await Promise.all(reports.map(async (report) => {
-        let targetData = null;
+        let targetData: unknown = null;
         if (report.target_type === 'chapter') {
             targetData = await Chapter.findById(report.target_id)
                 .populate('comic_id', 'title cover_url')

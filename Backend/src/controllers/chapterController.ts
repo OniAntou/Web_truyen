@@ -107,7 +107,7 @@ const reorderPages = asyncHandler(async (req, res) => {
   if (!chapter) throw new AppError("Chapter không tồn tại", 404);
 
   const comic = await Comic.findById(chapter.comic_id);
-  if (req.user.role === 'creator' && comic && comic.uploader_id.toString() !== req.user.id) {
+  if (req.user.role === 'creator' && (!comic?.uploader_id || comic.uploader_id.toString() !== req.user.id)) {
     throw new AppError("Bạn không có quyền chỉnh sửa chương của truyện này.", 403);
   }
 
@@ -130,7 +130,7 @@ const createChapter = asyncHandler(async (req, res) => {
   const comic = await Comic.findById(String(comic_id));
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
-  if (req.user.role === 'creator' && comic.uploader_id.toString() !== req.user.id) {
+  if (req.user.role === 'creator' && (!comic.uploader_id || comic.uploader_id.toString() !== req.user.id)) {
     throw new AppError("Bạn không có quyền tạo chương cho truyện này.", 403);
   }
 
@@ -158,7 +158,7 @@ const deleteChapter = asyncHandler(async (req, res) => {
   if (!chapter) throw new AppError("Chapter not found", 404);
 
   const comic = await Comic.findById(chapter.comic_id);
-  if (req.user.role === 'creator' && comic && comic.uploader_id.toString() !== req.user.id) {
+  if (req.user.role === 'creator' && (!comic?.uploader_id || comic.uploader_id.toString() !== req.user.id)) {
     throw new AppError("Bạn không có quyền xóa chương của truyện này.", 403);
   }
 
@@ -196,10 +196,13 @@ const bulkDeleteChapters = asyncHandler(async (req, res) => {
 
   const chapters = await Chapter.find({ _id: { $in: chapterIds } });
   if (req.user.role === 'creator') {
-    const comicIds = [...new Set(chapters.map(ch => ch.comic_id.toString()))];
+    if (chapters.some(ch => !ch.comic_id)) {
+      throw new AppError('Chapter is missing its associated comic.', 409);
+    }
+    const comicIds = [...new Set(chapters.map(ch => ch.comic_id!.toString()))];
     const comics = await Comic.find({ _id: { $in: comicIds } });
     for (const comic of comics) {
-      if (comic.uploader_id.toString() !== req.user.id) {
+      if (!comic.uploader_id || comic.uploader_id.toString() !== req.user.id) {
         throw new AppError("Bạn không có quyền xóa chương của truyện này.", 403);
       }
     }
@@ -242,7 +245,7 @@ const deletePage = asyncHandler(async (req, res) => {
   if (!chapter) throw new AppError("Chapter not found", 404);
 
   const comic = await Comic.findById(chapter.comic_id);
-  if (req.user.role === 'creator' && comic && comic.uploader_id.toString() !== req.user.id) {
+  if (req.user.role === 'creator' && (!comic?.uploader_id || comic.uploader_id.toString() !== req.user.id)) {
     throw new AppError("Bạn không có quyền xóa trang của truyện này.", 403);
   }
 

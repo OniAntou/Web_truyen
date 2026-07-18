@@ -6,23 +6,24 @@ import qs from "qs";
  * Key difference: uses qs.stringify with { encode: false } and a specific sortObject.
  */
 
-function sortObject(obj) {
-  let sorted: any = {};
-  let str = [];
-  let key;
-  for (key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      str.push(encodeURIComponent(key));
-    }
-  }
-  str.sort();
-  for (key = 0; key < str.length; key++) {
-    sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+function sortObject(obj: Record<string, string | number>) {
+  const sorted: Record<string, string> = {};
+  for (const key of Object.keys(obj).sort()) {
+    sorted[encodeURIComponent(key)] = encodeURIComponent(String(obj[key])).replace(/%20/g, "+");
   }
   return sorted;
 }
 
-function createPaymentUrl(params) {
+interface PaymentUrlParams {
+  amount: number;
+  orderId: string;
+  orderInfo: string;
+  ipAddr: string;
+  locale?: string;
+  bankCode?: string;
+}
+
+function createPaymentUrl(params: PaymentUrlParams) {
   const tmnCode = process.env.VNP_TMN_CODE?.trim();
   const secretKey = process.env.VNP_HASH_SECRET?.trim();
   const vnpUrl = process.env.VNP_URL?.trim();
@@ -30,7 +31,7 @@ function createPaymentUrl(params) {
 
   // Validate environment variables
   if (!tmnCode || !secretKey || !vnpUrl || !returnUrl) {
-    const missing = [];
+    const missing: string[] = [];
     if (!tmnCode) missing.push("VNP_TMN_CODE");
     if (!secretKey) missing.push("VNP_HASH_SECRET");
     if (!vnpUrl) missing.push("VNP_URL");
@@ -43,7 +44,7 @@ function createPaymentUrl(params) {
   const date = new Date();
   const createDate = formatDate(date);
 
-  let vnp_Params: any = {};
+  let vnp_Params: Record<string, string | number> = {};
   vnp_Params["vnp_Version"] = "2.1.0";
   vnp_Params["vnp_Command"] = "pay";
   vnp_Params["vnp_TmnCode"] = tmnCode;
@@ -78,8 +79,10 @@ function createPaymentUrl(params) {
   return finalUrl;
 }
 
-function verifyReturnUrl(vnp_Params) {
+function verifyReturnUrl(vnp_Params: Record<string, string | number>) {
   const secretKey = process.env.VNP_HASH_SECRET?.trim();
+
+  if (!secretKey) return false;
 
   let secureHash = vnp_Params["vnp_SecureHash"];
 
@@ -95,8 +98,8 @@ function verifyReturnUrl(vnp_Params) {
   return secureHash === signed;
 }
 
-function formatDate(date) {
-  const pad = (n) => (n < 10 ? "0" + n : n);
+function formatDate(date: Date) {
+  const pad = (n: number) => (n < 10 ? "0" + n : n);
   return (
     date.getFullYear().toString() +
     pad(date.getMonth() + 1) +

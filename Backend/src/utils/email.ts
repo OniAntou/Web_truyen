@@ -12,20 +12,20 @@ import nodemailer from "nodemailer";
  *   SMTP_FROM=SkyComic <noreply@skycomic.com>
  */
 
-const isSmtpConfigured = () => {
-  return !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
-};
-
 const createTransporter = () => {
-  if (!isSmtpConfigured()) return null;
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) return null;
 
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
+    host,
+    port: Number.parseInt(process.env.SMTP_PORT ?? '587', 10) || 587,
     secure: false,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user,
+      pass,
     },
   });
 };

@@ -267,7 +267,7 @@ const getComicById = asyncHandler(async (req, res) => {
 
   const chapters = await Chapter.find({ comic_id: comic._id }).sort({ chapter_number: 1 }).lean();
   
-  let userDoc = null;
+  let userDoc: { is_vip: boolean; vip_expiry?: Date | null; role: string } | null = null;
   let unlockedChapters = new Set<string>();
   if (req.user) {
     userDoc = await User.findById(req.user.id).select('is_vip vip_expiry role').lean();
@@ -336,7 +336,7 @@ const getReaderData = asyncHandler(async (req, res) => {
     .lean();
 
   // Check locking logic
-  let userDoc = null;
+  let userDoc: { is_vip: boolean; vip_expiry?: Date | null; role: string } | null = null;
   let unlockedChapters = new Set<string>();
   if (req.user) {
     userDoc = await User.findById(req.user.id).select('is_vip vip_expiry role').lean();

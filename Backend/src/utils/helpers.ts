@@ -1,4 +1,4 @@
-import {  Comic, Favorite, ReadingProgress, Genre, Chapter  } from "../database";
+import {  Comic, Favorite, ReadingProgress, Genre, Chapter, mongoose  } from "../database";
 
 // Helper for chapter counts to prevent N+1 queries
 async function getChapterCounts(comicIds) {
@@ -15,7 +15,7 @@ async function getChapterCounts(comicIds) {
 // Helper to process genres array
 async function processGenres(genresInput) {
   if (!genresInput || !Array.isArray(genresInput)) return [];
-  const genreIds = [];
+  const genreIds: Array<string | mongoose.Types.ObjectId> = [];
   for (const g of genresInput) {
     if (typeof g === 'string') {
       if (g.match(/^[0-9a-fA-F]{24}$/)) {

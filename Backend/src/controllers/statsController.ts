@@ -51,7 +51,7 @@ const getStats = asyncHandler(async (req, res) => {
     revenueTrend = 100; // 100% up if previous was 0
   }
 
-  const revenueHistory = [];
+  const revenueHistory: Array<{ date: string; amount: number }> = [];
   for (let i = 6; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
@@ -125,7 +125,7 @@ const getStats = asyncHandler(async (req, res) => {
     revenueTrend: (revenueTrend >= 0 ? "+" : "") + revenueTrend + "%",
     revenueHistory,
     previousRevenueHistory: (() => {
-      const history = [];
+      const history: Array<{ date: string; amount: number }> = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now);
         date.setDate(date.getDate() - (i + 7));
@@ -166,5 +166,4 @@ export {
   getStats,
   clearCache
  };
-
 

@@ -12,7 +12,7 @@
 
 ## Execution status
 
-Completed on 2026-07-18: Tasks 1 through 4 and the test, CI, generated-artifact, and documentation portions of Task 5. The backend strict-mode migration was measured separately: enabling strict null-safety while preserving legacy implicit-any settings exposes 31 existing diagnostics across unrelated controllers and utility modules. It is intentionally left for a dedicated, staged refactor rather than being suppressed or mixed into this production release.
+Completed on 2026-07-18: Tasks 1 through 4 and all scoped portions of Task 5. Backend strict null-safety is now enabled and the 31 diagnostics across controllers and utility modules were resolved with guards and explicit collection/response types. The separately explicit `noImplicitAny: false` setting remains a legacy compatibility exception; it was not broadened or used to suppress the null-safety migration.
 
 ### Task 1: Keep JWTs in HttpOnly cookies only
 
