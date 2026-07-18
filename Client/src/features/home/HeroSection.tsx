@@ -74,7 +74,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                 
                 <div className="mobile-hero-content" key={currentComic._id || currentComic.id}>
                     {/* Mobile Cover */}
-                    <Link to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`} className="mobile-hero-cover">
+                    <Link
+                        to={`/p/${slugify(currentComic.title)}-${currentComic.id || currentComic._id}`}
+                        className="mobile-hero-cover"
+                        aria-label={`Xem thông tin truyện ${currentComic.title}`}
+                    >
                         <LazyImage 
                             src={currentComic.cover_url || currentComic.cover || ''} 
                             fill={true}
