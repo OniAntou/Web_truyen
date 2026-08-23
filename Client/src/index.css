@@ -24,6 +24,7 @@
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --mobile-radius: 1.25rem;
   --mobile-spacing: 1rem;
+  --focus-ring: 0 0 0 3px var(--bg-primary), 0 0 0 5px var(--accent);
 }
 
 [data-theme="light"] {
@@ -79,6 +80,29 @@ ul {
 img {
   max-width: 100%;
   display: block;
+}
+
+.comic-rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.comic-rail::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* Scrollbar */

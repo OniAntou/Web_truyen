@@ -17,6 +17,7 @@ const ComicCard: React.FC<ComicCardProps> = ({
     comic, 
     showTime = false, 
     showChapter = true, 
+    showHoverStats = false,
 }) => {
     const timeAgo = (date: string | undefined): string => {
         if (!date) return '';
@@ -35,14 +36,21 @@ const ComicCard: React.FC<ComicCardProps> = ({
     const displayViews = formatViews(comic.views);
 
     return (
-        <Link to={`/p/${slugify(comic.title)}-${comic.id || comic._id}`} className="group flex flex-col gap-3 w-full">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)] bg-[var(--bg-secondary)]">
+        <Link to={`/p/${slugify(comic.title)}-${comic.id || comic._id}`} className="group flex w-full flex-col gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--bg-primary)]">
+            <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-[var(--bg-secondary)] shadow-sm ring-1 ring-[var(--border)] transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:shadow-[var(--shadow-card)]">
                 <LazyImage
                     src={comic.cover_url || comic.cover || ''}
                     alt={comic.title}
                     fill={true}
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                {showHoverStats && (
+                    <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between text-xs font-semibold text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                        <span>{chapterCount > 0 ? `Chapter ${chapterCount}` : 'Đang cập nhật'}</span>
+                        <span className="flex items-center gap-1"><Eye size={12} /> {displayViews}</span>
+                    </div>
+                )}
             </div>
 
             <div className="px-1 flex flex-col gap-1">

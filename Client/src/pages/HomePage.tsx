@@ -45,8 +45,10 @@ const HomePage: React.FC = () => {
             <h1 className="sr-only" style={{ display: 'none' }}>Web Truyện - Đọc truyện tranh online, truyện tranh bản quyền, cập nhật nhanh nhất</h1>
             {featuredComics.length > 0 && <HeroSection featuredComics={featuredComics} />}
 
-            <ComicGrid title="Truyện Thịnh Hành" comics={popularComics} linkTo="/popular" />
-            <ComicGrid title="Truyện Mới" comics={newComics} linkTo="/latest" />
+            <main className="home-content">
+                <ComicGrid title="Truyện Thịnh Hành" comics={popularComics} linkTo="/popular" showHoverStats />
+                <ComicGrid title="Truyện Mới" comics={newComics} linkTo="/latest" showHoverStats />
+            </main>
         </div>
     );
 };

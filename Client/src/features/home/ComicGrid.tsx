@@ -21,29 +21,32 @@ const ComicGrid: React.FC<ComicGridProps> = ({
     const displayComics = comics.slice(0, 30);
     
     return (
-        <section className="container mx-auto px-6 py-12 md:py-16 max-w-7xl">
+        <section className="container mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-16">
             {!hideTitle && (
-                <div className="flex items-end justify-between mb-8 md:mb-10">
-                    <h2 className="text-3xl md:text-4xl font-light tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                        {title}
-                    </h2>
-                    <Link to={linkTo} className="text-xs font-bold tracking-widest uppercase transition-colors hover:opacity-80 pb-1 border-b-2" style={{ color: 'var(--accent)', borderColor: 'var(--accent)' }}>
-                        Xem Tất Cả
+                <div className="mb-7 flex items-end justify-between gap-4 md:mb-9">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[0.65rem] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--accent)' }}>Khám phá mỗi ngày</span>
+                        <h2 className="text-2xl font-bold tracking-tight md:text-4xl" style={{ color: 'var(--text-primary)' }}>
+                            {title}
+                        </h2>
+                    </div>
+                    <Link to={linkTo} className="shrink-0 rounded-full border border-[var(--border)] px-4 py-2 text-[0.65rem] font-bold uppercase tracking-widest transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]" style={{ color: 'var(--text-secondary)' }}>
+                        Xem tất cả
                     </Link>
                 </div>
             )}
 
-            <div className="flex md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-x-6 md:gap-y-10 overflow-x-auto pb-6 md:pb-0 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                {/* Custom styling to hide scrollbar while keeping functionality */}
-                <style>{`
-                    .overflow-x-auto::-webkit-scrollbar { display: none; }
-                `}</style>
-                {displayComics.map(comic => (
-                    <div key={comic.id || comic._id} className="w-[140px] flex-shrink-0 md:w-auto md:flex-shrink snap-start">
-                        <ComicCard comic={comic} showHoverStats={showHoverStats} />
-                    </div>
-                ))}
-            </div>
+            {displayComics.length > 0 ? (
+                <div className="comic-rail -mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-4 md:mx-0 md:grid md:grid-cols-4 md:gap-x-5 md:gap-y-10 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-5 xl:grid-cols-6">
+                    {displayComics.map(comic => (
+                        <div key={comic.id || comic._id} className="w-[142px] shrink-0 snap-start md:w-auto">
+                            <ComicCard comic={comic} showHoverStats={showHoverStats} />
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="rounded-2xl border border-dashed border-[var(--border)] px-5 py-10 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>Chưa có truyện trong mục này.</p>
+            )}
         </section>
     );
 };
