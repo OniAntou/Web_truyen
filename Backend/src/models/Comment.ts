@@ -16,5 +16,6 @@ CommentSchema.index({ comic_id: 1 });
 CommentSchema.index({ chapter_id: 1 });
 CommentSchema.index({ parent_id: 1 });
 CommentSchema.index({ created_at: -1 });
+CommentSchema.index({ comic_id: 1, chapter_id: 1, created_at: -1 });
 
 export const Comment = mongoose.model("Comment", CommentSchema);

@@ -3,6 +3,7 @@ import {  getChapterCounts  } from "../utils/helpers";
 import {  resolveR2Url  } from "../config/r2";
 import asyncHandler from "../middleware/asyncHandler";
 import AppError from "../utils/AppError";
+import apiCache from "../utils/cache";
 
 const getGenres = asyncHandler(async (req, res) => {
   const { genre, sort = 'views' } = req.query;
@@ -84,6 +85,7 @@ const createGenre = asyncHandler(async (req, res) => {
     throw new AppError('Genre đã tồn tại (trùng name hoặc slug)', 409);
   }
   const genre = await Genre.create({ name, slug, description });
+  await apiCache.flush('homepage');
   res.status(201).json(genre);
 });
 
@@ -99,12 +101,22 @@ const updateGenre = asyncHandler(async (req, res) => {
 
   const genre = await Genre.findByIdAndUpdate(String(req.params.id), updateData, { new: true, runValidators: true });
   if (!genre) throw new AppError('Genre không tồn tại', 404);
+  await apiCache.flush('homepage');
   res.json(genre);
 });
 
 const deleteGenre = asyncHandler(async (req, res) => {
   const genre = await Genre.findByIdAndDelete(String(req.params.id));
   if (!genre) throw new AppError('Genre không tồn tại', 404);
+  
+  // Pull genre from all associated comics
+  await Comic.updateMany({ genres: genre._id }, { $pull: { genres: genre._id } });
+  
+  await apiCache.flush('homepage');
+  await apiCache.flush('latest');
+  await apiCache.flush('popular');
+  await apiCache.flush('trending');
+  
   res.json({ message: 'Đã xoá genre thành công' });
 });
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { commentService } from '../../services/commentService';
 import ReportModal from '../../components/common/ReportModal';
 import { Flag } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 interface Comment {
     _id: string;
@@ -28,8 +29,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
     const [replyingTo, setReplyingTo] = useState<string | null>(null); // id of root comment
     const [reportModal, setReportModal] = useState<{ isOpen: boolean; targetId: string | null }>({ isOpen: false, targetId: null });
     
-    const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
+    const user = useAuthStore(state => state.user);
 
     const fetchComments = () => {
         commentService.getByComic(comicId, chapterId || null)

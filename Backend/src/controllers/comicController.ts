@@ -271,7 +271,7 @@ const getComicById = asyncHandler(async (req, res) => {
   let unlockedChapters = new Set<string>();
   if (req.user) {
     userDoc = await User.findById(req.user.id).select('is_vip vip_expiry role').lean();
-    if (!userDoc || !userDoc.is_vip || !userDoc.vip_expiry || new Date(userDoc.vip_expiry) <= new Date()) {
+    if (!userDoc || !userDoc.is_vip || (userDoc.vip_expiry && new Date(userDoc.vip_expiry) <= new Date())) {
       const unlocks = await ChapterUnlock.find({ user_id: req.user.id }).select('chapter_id').lean();
       unlocks.forEach(u => unlockedChapters.add(u.chapter_id.toString()));
     }
@@ -340,7 +340,7 @@ const getReaderData = asyncHandler(async (req, res) => {
   let unlockedChapters = new Set<string>();
   if (req.user) {
     userDoc = await User.findById(req.user.id).select('is_vip vip_expiry role').lean();
-    if (!userDoc || !userDoc.is_vip || !userDoc.vip_expiry || new Date(userDoc.vip_expiry) <= new Date()) {
+    if (!userDoc || !userDoc.is_vip || (userDoc.vip_expiry && new Date(userDoc.vip_expiry) <= new Date())) {
       const unlocks = await ChapterUnlock.find({ user_id: req.user.id }).select('chapter_id').lean();
       unlocks.forEach(u => unlockedChapters.add(u.chapter_id.toString()));
     }
@@ -457,7 +457,13 @@ const updateComic = asyncHandler(async (req, res) => {
   await apiCache.flush('latest');
   await apiCache.flush('popular');
   await apiCache.flush('trending');
-  await apiCache.flush(`detail_${id}`);
+  await apiCache.flush('homepage');
+  await apiCache.flush(`detail_public_${id}`);
+  await apiCache.flush(`detail_public_${comic._id}`);
+  if (comic.id) await apiCache.flush(`detail_public_${comic.id}`);
+  await apiCache.flush(`reader_public_${id}_`);
+  await apiCache.flush(`reader_public_${comic._id}_`);
+  if (comic.id) await apiCache.flush(`reader_public_${comic.id}_`);
   
   await logAudit(req, "UPDATE_COMIC", "Comic", comic._id, { title: comic.title });
 
@@ -503,7 +509,12 @@ const deleteComic = asyncHandler(async (req, res) => {
   await apiCache.flush('popular');
   await apiCache.flush('trending');
   await apiCache.flush('homepage');
-  await apiCache.flush(`detail_${id}`);
+  await apiCache.flush(`detail_public_${id}`);
+  await apiCache.flush(`detail_public_${comic._id}`);
+  if (comic.id) await apiCache.flush(`detail_public_${comic.id}`);
+  await apiCache.flush(`reader_public_${id}_`);
+  await apiCache.flush(`reader_public_${comic._id}_`);
+  if (comic.id) await apiCache.flush(`reader_public_${comic.id}_`);
   
   await logAudit(req, "DELETE_COMIC", "Comic", comic._id, { title: comic.title });
 

@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import * as interactionController from "../controllers/interactionController";
 import authenticateToken from "../middleware/auth";
+import optionalAuth from "../middleware/optionalAuth";
 import {  interactionLimiter, readLimiter  } from "../middleware/rateLimiter";
 
 // Ratings
@@ -9,7 +10,7 @@ router.get('/:id/user-rating', readLimiter, authenticateToken, interactionContro
 router.post('/:id/rate', interactionLimiter, authenticateToken, interactionController.submitRating);
 
 // Views
-router.post('/:id/view', interactionLimiter, authenticateToken, interactionController.recordView);
+router.post('/:id/view', interactionLimiter, optionalAuth, interactionController.recordView);
 
 // Comments
 router.get('/:id/comments', readLimiter, interactionController.getComments);

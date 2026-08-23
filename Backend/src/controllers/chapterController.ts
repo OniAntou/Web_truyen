@@ -17,7 +17,7 @@ const getChapterPages = asyncHandler(async (req, res) => {
         hasAccess = true;
       } else {
         const fullUser = await User.findById(req.user.id).select('is_vip vip_expiry').lean();
-        if (fullUser && fullUser.is_vip && fullUser.vip_expiry && new Date(fullUser.vip_expiry) > new Date()) {
+        if (fullUser && fullUser.is_vip && (!fullUser.vip_expiry || new Date(fullUser.vip_expiry) > new Date())) {
           hasAccess = true;
         } else {
           const unlocked = await ChapterUnlock.findOne({ user_id: req.user.id, chapter_id: chapter._id }).lean();
@@ -57,7 +57,7 @@ const unlockChapter = asyncHandler(async (req, res) => {
       if (!transactionalChapter) throw new AppError("Chapter không tồn tại", 404);
       if (!user) throw new AppError("User không tồn tại", 404);
 
-      if (user.is_vip && user.vip_expiry && new Date(user.vip_expiry) > new Date()) {
+      if (user.is_vip && (!user.vip_expiry || new Date(user.vip_expiry) > new Date())) {
         response = { message: "Bạn là VIP nên có thể đọc miễn phí chương này." };
         return;
       }

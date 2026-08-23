@@ -129,14 +129,18 @@ const getStats = asyncHandler(async (req, res) => {
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now);
         date.setDate(date.getDate() - (i + 7));
-        const dateString = date.toLocaleDateString();
+        const dateString = date.toISOString().split('T')[0];
         
         const dayTotal = previousPeriodPayments
-          .filter(p => new Date(p.created_at).toLocaleDateString() === dateString)
-          .reduce((acc, curr) => acc + curr.amount, 0);
+          .filter(p => {
+            const pDate = new Date(p.created_at);
+            const pDateString = new Date(pDate.getTime() - pDate.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+            return pDateString === dateString;
+          })
+          .reduce((acc, curr) => acc + (curr.amount || 0), 0);
         
         history.push({
-          date: date.toISOString().split('T')[0],
+          date: dateString,
           amount: dayTotal
         });
       }

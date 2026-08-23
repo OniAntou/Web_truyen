@@ -66,16 +66,28 @@ const recordView = asyncHandler(async (req, res) => {
   const comic = await findComicById(req.params.id, '', false);
   if (!comic) throw new AppError("Comic không tồn tại", 404);
 
-  const existingView = await ComicView.findOne({ user_id: req.user.id, comic_id: comic._id });
-  if (!existingView) {
-    await ComicView.create({ user_id: req.user.id, comic_id: comic._id });
+  let viewRecorded = false;
+
+  if (req.user) {
+    const existingView = await ComicView.findOne({ user_id: req.user.id, comic_id: comic._id });
+    if (!existingView) {
+      await ComicView.create({ user_id: req.user.id, comic_id: comic._id });
+      viewRecorded = true;
+    }
+  } else {
+    // Guest view
+    viewRecorded = true;
+  }
+
+  if (viewRecorded) {
     await Comic.updateOne({ _id: comic._id }, { $inc: { views: 1, weekly_views: 1 } });
     comic.views = (comic.views || 0) + 1;
     comic.weekly_views = (comic.weekly_views || 0) + 1;
 
-    // Flush cache occasionally or for homepage
+    // Flush cache
     await apiCache.flush('homepage');
     await apiCache.flush('trending');
+    await apiCache.flush('popular');
   }
   
   res.json({ message: "Lượt xem đã được ghi nhận", views: comic.views, weekly_views: comic.weekly_views });

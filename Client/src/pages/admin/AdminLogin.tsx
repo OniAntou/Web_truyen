@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, BookOpen } from 'lucide-react';
-import { API_BASE_URL } from '../../constants/api';
+import apiClient from '../../services/apiClient';
 import { clearAdminToken } from '../../utils/authToken';
 
 const AdminLogin = () => {
@@ -33,25 +33,17 @@ const AdminLogin = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-                credentials: 'include',
+            const data = await apiClient<{ admin: any }>('/admin/login', {
+                body: { username, password },
+                skipAuthLogout: true,
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                clearAdminToken();
-                localStorage.setItem('admin', JSON.stringify(data.admin));
-                navigate('/admin', { replace: true });
-            } else {
-                setError(data.message || 'Sai tên đăng nhập hoặc mật khẩu');
-            }
-        } catch (err) {
+            clearAdminToken();
+            localStorage.setItem('admin', JSON.stringify(data.admin));
+            navigate('/admin', { replace: true });
+        } catch (err: any) {
             console.error(err);
-            setError('Không kết nối được tới server. Hãy kiểm tra backend.');
+            setError(err?.message || 'Sai tên đăng nhập hoặc mật khẩu');
         } finally {
             setLoading(false);
         }

@@ -150,21 +150,24 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
   const ratingComicIds = userRatings.map(r => r.comic_id);
   
   if (ratingComicIds.length > 0) {
-    for (const comicId of ratingComicIds) {
-      const comic = await Comic.findById(comicId);
-      if (comic) {
-        const result = await Rating.aggregate([
-          { $match: { comic_id: comic._id, user_id: { $ne: user._id } } },
-          { $group: { _id: null, avgRating: { $avg: "$rating" } } }
-        ]);
-        const avg = result.length > 0 ? result[0].avgRating : 0;
-        const newAvg = Number(avg.toFixed(1));
-        const newCount = Math.max(0, (comic.rating_count || 1) - 1);
-        await Comic.updateOne(
-          { _id: comic._id },
-          { $set: { rating: newAvg, rating_count: newCount } }
-        );
-      }
+    const aggResults = await Rating.aggregate([
+      { $match: { comic_id: { $in: ratingComicIds }, user_id: { $ne: user._id } } },
+      { $group: { _id: "$comic_id", avgRating: { $avg: "$rating" }, count: { $sum: 1 } } }
+    ]);
+    const aggMap = new Map(aggResults.map(r => [r._id.toString(), { avg: Number(r.avgRating.toFixed(1)), count: r.count }]));
+    
+    const bulkOps = ratingComicIds.map(comicId => {
+      const stats = aggMap.get(comicId.toString()) || { avg: 0, count: 0 };
+      return {
+        updateOne: {
+          filter: { _id: comicId },
+          update: { $set: { rating: stats.avg, rating_count: stats.count } }
+        }
+      };
+    });
+
+    if (bulkOps.length > 0) {
+      await Comic.bulkWrite(bulkOps);
     }
   }
   await Rating.deleteMany({ user_id: user._id });

@@ -7,10 +7,11 @@ import ChapterList from '../../features/comic/ChapterList';
 import CommentSection from '../../features/comic/CommentSection';
 import { comicService } from '../../services/comicService';
 import ComicInfoSkeleton from '../../features/comic/ComicInfoSkeleton';
+import { extractComicId } from '../../utils/format';
 
 const ComicInfoPage = () => {
     const { slugAndId } = useParams();
-    const id = slugAndId?.includes('-') ? slugAndId.split('-').pop() : slugAndId;
+    const id = extractComicId(slugAndId);
     
     const { data: comic, isLoading: loading } = useQuery({
         queryKey: ['comic', id],

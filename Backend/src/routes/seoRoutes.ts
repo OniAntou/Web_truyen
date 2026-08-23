@@ -9,9 +9,9 @@ router.get('/sitemap.xml', async (req, res) => {
         let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
         xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-        const baseUrl = process.env.FRONTEND_URL || 'https://domain.com';
+        const baseUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
         
-        const staticRoutes = ['/', '/popular', '/latest', '/explore'];
+        const staticRoutes = ['/', '/popular', '/latest', '/genres', '/ranking'];
         staticRoutes.forEach(route => {
             xml += `  <url>\n`;
             xml += `    <loc>${baseUrl}${route}</loc>\n`;

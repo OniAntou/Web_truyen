@@ -24,6 +24,7 @@ import { saveReadingHistory } from '../../utils/readingHistory';
 
 import { useThemeStore } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
+import { extractComicId } from '../../utils/format';
 
 import { Comic, Chapter } from '../../types/comic';
 
@@ -51,7 +52,7 @@ interface LockedError {
 
 const ReadPage: React.FC = () => {
     const { slugAndId, chapterId } = useParams<{ slugAndId: string; chapterId: string }>();
-    const comicId = slugAndId?.includes('-') ? slugAndId.split('-').pop() : slugAndId;
+    const comicId = extractComicId(slugAndId);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     

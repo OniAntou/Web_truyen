@@ -27,3 +27,14 @@ export const slugify = (text: string): string => {
     .replace(/[^\w-]+/g, '')           // remove all non-word chars
     .replace(/--+/g, '-');             // replace multiple - with single -
 };
+
+export const extractComicId = (slugAndId?: string): string => {
+  if (!slugAndId) return '';
+  const hexMatch = slugAndId.match(/[0-9a-fA-F]{24}$/);
+  if (hexMatch) return hexMatch[0];
+  const lastHyphenIndex = slugAndId.lastIndexOf('-');
+  if (lastHyphenIndex !== -1) {
+    return slugAndId.substring(lastHyphenIndex + 1);
+  }
+  return slugAndId;
+};

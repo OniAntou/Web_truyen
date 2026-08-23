@@ -101,7 +101,7 @@ const isChapterLocked = (chapter: any, user: any, userDoc: any, unlockedChapters
   
   if (user && userDoc) {
     if (userDoc.role === 'admin' || userDoc.role === 'creator') return false;
-    if (userDoc.is_vip && userDoc.vip_expiry && new Date(userDoc.vip_expiry) > new Date()) return false;
+    if (userDoc.is_vip && (!userDoc.vip_expiry || new Date(userDoc.vip_expiry) > new Date())) return false;
     if (unlockedChapters.has(chapter._id.toString())) return false;
   }
   
