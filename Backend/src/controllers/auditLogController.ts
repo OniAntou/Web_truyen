@@ -6,16 +6,16 @@ export const getAuditLogs = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit as string) || 20;
   const skip = (page - 1) * limit;
 
-  // Optional filters
-  const filter: any = {};
-  if (req.query.action) {
-    filter.action = req.query.action;
+  // Optional filters with strict type checks and $eq to prevent NoSQL injection
+  const filter: Record<string, any> = {};
+  if (typeof req.query.action === 'string' && req.query.action.trim()) {
+    filter.action = { $eq: req.query.action.trim() };
   }
-  if (req.query.targetType) {
-    filter.target_type = req.query.targetType;
+  if (typeof req.query.targetType === 'string' && req.query.targetType.trim()) {
+    filter.target_type = { $eq: req.query.targetType.trim() };
   }
-  if (req.query.userId) {
-    filter.user_id = req.query.userId;
+  if (typeof req.query.userId === 'string' && req.query.userId.trim()) {
+    filter.user_id = { $eq: req.query.userId.trim() };
   }
 
   const logs = await AuditLog.find(filter)

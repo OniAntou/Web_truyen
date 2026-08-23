@@ -382,7 +382,12 @@ const createComic = asyncHandler(async (req, res) => {
     throw new AppError("Bạn không có quyền đăng truyện.", 403);
   }
 
-  const existingComic = await Comic.findOne({ title: req.body.title });
+  const titleStr = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+  if (!titleStr) {
+    throw new AppError("Tiêu đề truyện không được để trống.", 400);
+  }
+
+  const existingComic = await Comic.findOne({ title: { $eq: titleStr } });
   if (existingComic) {
     return res.status(200).json(existingComic);
   }
@@ -391,11 +396,11 @@ const createComic = asyncHandler(async (req, res) => {
   const newId = lastComic && lastComic.id ? lastComic.id + 1 : 1;
 
   const payload: any = {
-    title: req.body.title,
-    author: req.body.author,
-    artist: req.body.artist,
-    status: req.body.status,
-    description: req.body.description,
+    title: titleStr,
+    author: typeof req.body.author === 'string' ? req.body.author.trim() : '',
+    artist: typeof req.body.artist === 'string' ? req.body.artist.trim() : '',
+    status: typeof req.body.status === 'string' ? req.body.status : 'Ongoing',
+    description: typeof req.body.description === 'string' ? req.body.description : '',
   };
   
   if (req.body.genres) {

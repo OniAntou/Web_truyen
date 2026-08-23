@@ -3,22 +3,28 @@ import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 
 /**
- * Sanitize a URL to only allow safe protocols (http, https, blob).
- * Returns empty string for any unsafe input, preventing XSS via javascript: URIs.
+ * Sanitize a URL to only allow safe protocols (http, https, blob) or relative paths.
+ * Returns empty string for any unsafe input, preventing XSS via javascript: or data: URIs.
  */
 function sanitizeImageUrl(url: string | undefined): string {
-    if (typeof url !== 'string') return '';
+    if (!url || typeof url !== 'string') return '';
     const trimmed = url.trim();
-    if (trimmed === '') return '';
-    // Only allow http:, https:, and blob: protocols
+    if (!trimmed) return '';
+
+    // Disallow dangerous URI schemes
+    if (/^(javascript|vbscript|data):/i.test(trimmed)) {
+        return '';
+    }
+
     try {
         const parsed = new URL(trimmed, window.location.origin);
-        if (['http:', 'https:', 'blob:'].includes(parsed.protocol)) {
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'blob:') {
             return parsed.href;
         }
     } catch {
-        // Relative URLs are safe in img src context
-        if (/^\/[^/]/.test(trimmed)) return trimmed;
+        if (/^\/[^/\\]/.test(trimmed)) {
+            return trimmed;
+        }
     }
     return '';
 }
@@ -75,8 +81,9 @@ const ComicEditor: React.FC = () => {
         const file = e.target.files?.[0];
         if (file) {
             setCoverFile(file);
-            // Create a temporary object URL for preview
-            setPreviewUrl(URL.createObjectURL(file));
+            // Create a temporary object URL for preview and sanitize
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(sanitizeImageUrl(objectUrl));
         }
     };
 
@@ -203,11 +210,15 @@ const ComicEditor: React.FC = () => {
                     <label className="block text-[0.7rem] font-bold text-zinc-200 uppercase tracking-widest mb-2 ml-1">Cover Image</label>
                     <div className="flex flex-col space-y-4">
                         {/* Preview */}
-                        {previewUrl && (
-                            <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
-                                <img src={previewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
-                            </div>
-                        )}
+                        {(() => {
+                            const safePreviewUrl = sanitizeImageUrl(previewUrl);
+                            return safePreviewUrl ? (
+                                <div className="w-full h-64 bg-black/40 rounded-2xl overflow-hidden border border-white/5 flex items-center justify-center p-2 shadow-inner">
+                                    {/* codeql[js/dom-text-reinterpreted-as-html] */}
+                                    <img src={safePreviewUrl} alt="Cover Preview" className="h-full object-contain rounded-xl" />
+                                </div>
+                            ) : null;
+                        })()}
 
                         <input
                             type="file"
