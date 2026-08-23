@@ -54,12 +54,9 @@
 }
 
 body {
-  font-family:
-    "Outfit",
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
