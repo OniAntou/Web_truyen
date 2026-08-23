@@ -35,43 +35,52 @@ const ComicCard: React.FC<ComicCardProps> = ({
     const displayViews = formatViews(comic.views);
 
     return (
-        <Link to={`/p/${slugify(comic.title)}-${comic.id || comic._id}`} className="group flex flex-col gap-3 w-full">
-            <div className="relative aspect-[2/3] w-full rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-[var(--shadow-card)] ring-1 ring-[var(--border)] bg-[var(--bg-secondary)]">
-                <LazyImage
-                    src={comic.cover_url || comic.cover || ''}
-                    alt={comic.title}
-                    fill={true}
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                />
+        <Link to={`/p/${slugify(comic.title)}-${comic.id || comic._id}`} className="group flex flex-col gap-2.5 w-full select-none">
+            {/* Double-Bezel Card Frame */}
+            <div className="relative aspect-[2/3] w-full p-1 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] group-hover:border-[var(--accent)]/50 shadow-sm group-hover:shadow-xl group-hover:shadow-[var(--accent)]/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1.5">
+                <div className="relative w-full h-full rounded-[calc(1rem-2px)] overflow-hidden bg-[var(--bg-card)]">
+                    <LazyImage
+                        src={comic.cover_url || comic.cover || ''}
+                        alt={comic.title}
+                        fill={true}
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                    {/* Subtle inner gradient shadow */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+
+                    {/* Chapter count overlay badge */}
+                    {showChapter && chapterCount > 0 && (
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-black text-white uppercase tracking-wider">
+                            Ch. {chapterCount}
+                        </div>
+                    )}
+                </div>
             </div>
 
-            <div className="px-1 flex flex-col gap-1">
-                <h3 className="font-bold text-[0.95rem] leading-tight line-clamp-1 transition-colors duration-300 ease-out group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>
+            {/* Info details */}
+            <div className="px-0.5 flex flex-col gap-1">
+                <h3 className="font-bold text-xs sm:text-sm leading-snug line-clamp-1 text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors duration-300">
                     {comic.title}
                 </h3>
                 
-                <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 text-[0.7rem] font-bold" style={{ color: '#fbbf24' }}>
-                            <Star size={10} fill="currentColor" />
-                            <span>{displayRating}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-[0.7rem] font-semibold opacity-70" style={{ color: 'var(--text-secondary)' }}>
-                            <Eye size={10} strokeWidth={2.5} />
-                            <span>{displayViews}</span>
-                        </div>
-                        {showTime && comic.created_at && (
-                            <div className="flex items-center gap-1 text-[0.7rem] font-semibold ml-auto opacity-60" style={{ color: 'var(--text-secondary)' }}>
-                                <Clock size={10} strokeWidth={2.5} />
-                                <span>{timeAgo(comic.created_at)}</span>
-                            </div>
-                        )}
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[var(--text-secondary)]">
+                    <div className="flex items-center gap-2">
+                        <span className="flex items-center gap-0.5 text-amber-400 font-bold">
+                            <Star size={11} fill="currentColor" />
+                            {displayRating}
+                        </span>
+                        <span className="text-[var(--text-muted)]">•</span>
+                        <span className="flex items-center gap-1 opacity-80">
+                            <Eye size={11} strokeWidth={2} />
+                            {displayViews}
+                        </span>
                     </div>
-                    
-                    {showChapter && chapterCount > 0 && (
-                        <p className="text-[0.65rem] uppercase font-bold tracking-widest line-clamp-1" style={{ color: 'var(--text-primary)' }}>
-                            Chapter {chapterCount}
-                        </p>
+
+                    {showTime && comic.created_at && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-[var(--text-muted)]">
+                            <Clock size={10} />
+                            {timeAgo(comic.created_at)}
+                        </span>
                     )}
                 </div>
             </div>

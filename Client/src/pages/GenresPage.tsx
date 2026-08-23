@@ -37,10 +37,10 @@ const GenreCard: React.FC<GenreCardProps> = ({ genre, isSelected, onClick }) => 
 
 const SkeletonCard: React.FC = () => (
     <div className="flex flex-col gap-3">
-        <div className="aspect-[2/3] w-full rounded-2xl animate-pulse bg-gray-200 dark:bg-gray-800"></div>
+        <div className="aspect-[2/3] w-full rounded-2xl animate-pulse bg-[var(--bg-secondary)] border border-[var(--border)]"></div>
         <div className="px-1 space-y-2">
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-3/4"></div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-1/2"></div>
+            <div className="h-4 bg-[var(--bg-secondary)] rounded animate-pulse w-3/4"></div>
+            <div className="h-3 bg-[var(--bg-secondary)] rounded animate-pulse w-1/2"></div>
         </div>
     </div>
 );

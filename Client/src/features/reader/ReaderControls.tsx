@@ -65,58 +65,61 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
 
   return (
     <>
-      <div className="reader-controls-fixed">
-        <div className="reader-controls-bar glass-panel shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 transition-all duration-300">
+        <div className="flex items-center gap-2 p-1.5 rounded-full bg-[var(--glass-bg)] backdrop-blur-2xl border border-[var(--glass-border)] shadow-2xl shadow-black/20">
           <button
             onClick={onPrev}
-            className="control-btn hover:text-[var(--accent)] transition-colors"
-            title="Previous Chapter"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all"
+            title="Chương trước"
+            aria-label="Chương trước"
           >
-            <ArrowLeft size={22} strokeWidth={2.5} />
+            <ArrowLeft size={18} strokeWidth={2.5} />
           </button>
 
           <button
             onClick={() => setShowChapters(true)}
-            className="px-6 py-2 rounded-full text-white font-bold text-sm tracking-wide bg-white/5 hover:bg-white/10 transition-all border border-white/5 whitespace-nowrap"
-            title="Chapter List"
+            className="px-5 py-2 rounded-full text-[var(--text-primary)] font-extrabold text-xs tracking-wider uppercase bg-[var(--bg-secondary)] hover:bg-[var(--bg-elevated)] border border-[var(--border)] transition-all whitespace-nowrap shadow-inner"
+            title="Danh sách chương"
           >
-            {currentChapter ? `Chapter ${currentChapter.chapter_number}` : 'Danh sách chapter'}
+            {currentChapter ? `Chương ${currentChapter.chapter_number}` : 'Danh sách chương'}
           </button>
 
           <button 
             onClick={onNext} 
-            className="control-btn hover:text-[var(--accent)] transition-colors" 
-            title="Next Chapter"
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all"
+            title="Chương sau"
+            aria-label="Chương sau"
           >
-            <ArrowRight size={22} strokeWidth={2.5} />
+            <ArrowRight size={18} strokeWidth={2.5} />
           </button>
         </div>
       </div>
 
       {showChapters && (
         <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm animate-in fade-in duration-300"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-md animate-fade-in"
           onClick={() => setShowChapters(false)}
         >
           <div
-            className="bg-[var(--bg-secondary)] border border-white/10 rounded-[2rem] w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-300"
+            className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-3xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl relative animate-slide-up-fade"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 border-b border-white/5 flex justify-between items-center bg-white/5 backdrop-blur-md sticky top-0 z-10">
-              <h3 className="text-white font-bold text-xl tracking-tight">Danh sách chapter</h3>
+            <div className="px-6 py-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--bg-secondary)]">
+              <h3 className="text-[var(--text-primary)] font-extrabold text-base tracking-tight">Danh Sách Chương</h3>
               <button
                 onClick={() => setShowChapters(false)}
-                className="text-gray-400 hover:text-white transition-colors bg-white/5 p-2 rounded-full hover:bg-white/10"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--bg-primary)] p-1.5 rounded-full border border-[var(--border)] transition-colors"
+                aria-label="Đóng"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
             <div className="overflow-y-auto p-4 flex-1 custom-scrollbar">
               {loadingStatus ? (
-                <div className="py-20 text-center text-[var(--text-secondary)] italic font-medium animate-pulse">Đang tải trạng thái...</div>
+                <div className="py-16 text-center text-xs font-semibold text-[var(--text-secondary)] animate-pulse">Đang tải trạng thái...</div>
               ) : displayChapters && displayChapters.length > 0 ? (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                   {[...displayChapters].reverse().map((ch) => {
                     const isActive = ch._id === currentChapterId || ch.id === currentChapterId;
                     return (
@@ -125,26 +128,22 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
                         to={`/read/${slugify(comicTitle)}-${comicId}/${ch._id || ch.id}`}
                         onClick={() => setShowChapters(false)}
                         ref={isActive ? activeChapterRef : null}
-                        className={`px-5 py-4 rounded-2xl transition-all duration-300 flex justify-between items-center border ${
+                        className={`px-4 py-3 rounded-2xl transition-all duration-200 flex justify-between items-center text-xs font-bold border ${
                           isActive
-                            ? 'bg-[var(--accent)] text-white border-transparent shadow-lg shadow-[var(--accent)]/30 font-bold scale-[1.02]'
+                            ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-md shadow-[var(--accent)]/30'
                             : ch.isRead
-                            ? 'text-[var(--text-secondary)] bg-white/5 hover:bg-white/10 border-transparent'
-                            : 'text-[var(--text-primary)] hover:bg-white/10 border-white/5'
+                            ? 'text-[var(--text-muted)] bg-[var(--bg-secondary)]/50 border-transparent hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                            : 'text-[var(--text-primary)] bg-[var(--bg-secondary)] border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--bg-elevated)]'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="truncate max-w-[200px]">{ch.title || `Chapter ${ch.chapter_number}`}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {ch.isRead && !isActive && <span className="w-2 h-2 rounded-full bg-green-500 opacity-50"></span>}
-                        </div>
+                        <span className="truncate">{ch.title || `Chương ${ch.chapter_number}`}</span>
+                        {ch.isRead && !isActive && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>}
                       </Link>
                     );
                   })}
                 </div>
               ) : (
-                <div className="py-20 text-center text-[var(--text-secondary)] italic">Chưa có chapter nào</div>
+                <div className="py-16 text-center text-xs text-[var(--text-secondary)] italic">Chưa có chương nào</div>
               )}
             </div>
           </div>

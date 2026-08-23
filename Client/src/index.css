@@ -3,47 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #18181b;
-  --bg-secondary: #202024;
-  --bg-card: #2a2a2e;
+  --bg-primary: #09090b;
+  --bg-secondary: #121216;
+  --bg-card: #18181d;
+  --bg-elevated: #22222a;
   --accent: #f43f5e;
-  /* Rose 500 */
-  --accent-hover: #e11d48;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --border: #3f3f46;
+  --accent-hover: #fb7185;
+  --accent-glow: rgba(244, 63, 94, 0.25);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
 
-  --glass-bg: rgba(32, 32, 36, 0.85);
+  --glass-bg: rgba(18, 18, 22, 0.8);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --blur: 16px;
+  --blur: 20px;
 
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
-  --search-bg: #2a2a2e;
-  --search-border: #3f3f46;
-  --search-text: #a1a1aa;
+  --shadow-subtle: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --search-bg: #18181d;
+  --search-border: rgba(255, 255, 255, 0.1);
+  --search-text: #f8fafc;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   --mobile-radius: 1.25rem;
   --mobile-spacing: 1rem;
 }
 
 [data-theme="light"] {
-  --bg-primary: #f5f5f7;
-  --bg-secondary: #e8e8ec;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
   --bg-card: #ffffff;
+  --bg-elevated: #ffffff;
   --accent: #e11d48;
   --accent-hover: #be123c;
-  --text-primary: #18181b;
-  --text-secondary: #71717a;
-  --border: #d4d4d8;
+  --accent-glow: rgba(225, 29, 72, 0.15);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-hover: rgba(15, 23, 42, 0.16);
 
   --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --blur: 16px;
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --blur: 20px;
 
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.05);
   --search-bg: #ffffff;
-  --search-border: #d4d4d8;
-  --search-text: #71717a;
+  --search-border: rgba(15, 23, 42, 0.12);
+  --search-text: #0f172a;
 }
 
 * {
