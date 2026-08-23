@@ -104,36 +104,38 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
         const isBeingReplied = replyingTo === c._id;
         
         return (
-            <div 
-                key={c._id} 
-                className={`flex flex-col gap-3 transition-opacity duration-200 ${
-                    isReply 
-                        ? 'p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-primary)]/60 border-l-2 border-[var(--accent)] ml-4 sm:ml-8 mt-2' 
-                        : 'p-4 sm:p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-sm'
-                } ${deletingId === c._id ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
-            >
-                <div className="flex items-center justify-between border-b border-[var(--border)] pb-2.5 flex-wrap gap-2">
-                    <div className="flex items-center gap-2.5">
-                        <div className={`rounded-full bg-gradient-to-tr from-[var(--accent)] to-rose-400 flex items-center justify-center text-white font-extrabold shadow-sm ${
-                            isReply ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs'
-                        }`}>
-                            {c.user_id?.username ? c.user_id.username.charAt(0).toUpperCase() : 'U'}
+            <div key={c._id} style={{ 
+                display: 'flex', flexDirection: 'column', gap: '0.75rem',
+                padding: isReply ? '1rem' : '1.5rem', 
+                background: isReply ? 'rgba(255, 255, 255, 0.03)' : 'var(--bg-secondary)', 
+                borderRadius: '0.75rem', 
+                border: isReply ? 'none' : '1px solid var(--border)',
+                borderLeft: isReply ? '3px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--border)',
+                marginLeft: isReply ? '1.5rem' : '0',
+                marginTop: isReply ? '0.5rem' : '0',
+                opacity: deletingId === c._id ? 0.5 : 1,
+                transition: 'opacity 0.2s',
+                position: 'relative'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ width: isReply ? '24px' : '32px', height: isReply ? '24px' : '32px', borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: isReply ? '0.75rem' : '0.9rem' }}>
+                                {c.user_id?.username ? c.user_id.username.charAt(0).toUpperCase() : 'U'}
                         </div>
-                        <strong className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
-                            {c.user_id?.username || 'Người dùng ẩn danh'}
-                        </strong>
+                        <strong style={{ color: '#eab308', fontSize: isReply ? '0.95rem' : '1.1rem' }}>{c.user_id?.username || 'Người dùng ẩn danh'}</strong>
                     </div>
-
-                    <div className="flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
-                        <span>{new Date(c.created_at).toLocaleString('vi-VN')}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            {new Date(c.created_at).toLocaleString('vi-VN')}
+                        </span>
                         {canDelete(c) && (
                             <button
                                 onClick={() => handleDelete(c._id)}
                                 disabled={deletingId === c._id}
                                 title="Xoá bình luận"
-                                className="p-1 rounded-lg hover:bg-rose-500/10 hover:text-rose-500 text-[var(--text-muted)] transition-colors"
+                                className="comment-action-btn hover-danger"
                             >
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                 </svg>
@@ -141,13 +143,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
                         )}
                     </div>
                 </div>
-
-                <p className="text-xs sm:text-sm text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap">
-                    {c.content}
-                </p>
+                <p style={{ margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: '1.5', fontSize: '0.95rem' }}>{c.content}</p>
                 
                 {/* Actions Row */}
-                <div className="flex items-center gap-4 pt-1">
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem' }}>
                     <button 
                         onClick={() => {
                             if (isBeingReplied) {
@@ -159,64 +158,58 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
                                 setNewComment(username ? `@${username} ` : "");
                             }
                         }}
-                        className={`inline-flex items-center gap-1.5 text-xs font-semibold hover:text-[var(--accent)] transition-colors ${
-                            isBeingReplied ? 'text-[var(--accent)] font-bold' : 'text-[var(--text-secondary)]'
-                        }`}
+                        className="comment-action-btn hover-accent"
+                        style={{ color: isBeingReplied ? 'var(--accent)' : 'var(--text-secondary)' }}
                     >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                         </svg>
-                        <span>{isBeingReplied ? 'Huỷ' : 'Trả lời'}</span>
+                        {isBeingReplied ? 'Huỷ trả lời' : 'Trả lời'}
                     </button>
 
                     <button 
                         onClick={() => setReportModal({ isOpen: true, targetId: c._id })}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-rose-500 transition-colors"
+                        className="comment-action-btn hover-rose"
                     >
-                        <Flag size={12} />
-                        <span>Báo cáo</span>
+                        <Flag size={14} />
+                        Báo cáo
                     </button>
                 </div>
 
                 {/* Reply Form */}
                 {isBeingReplied && (
-                    <div className="mt-2 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
+                    <div style={{ marginTop: '0.5rem', padding: '1rem', borderRadius: '0.5rem', background: 'var(--bg-primary)', border: '1px solid var(--border)' }}>
                         {user ? (
-                            <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
+                            <form onSubmit={handleSubmit}>
                                 <textarea 
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder={`Phản hồi ${c.user_id?.username || 'người dùng'}...`}
                                     autoFocus
                                     onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
-                                    className="w-full min-h-[60px] p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] resize-y transition-colors"
+                                    style={{ 
+                                        width: '100%', minHeight: '60px', padding: '0.75rem', 
+                                        borderRadius: '0.5rem', background: 'transparent', 
+                                        border: '1px solid var(--border)', color: 'var(--text-primary)',
+                                        marginBottom: '0.75rem', resize: 'vertical', outline: 'none'
+                                    } as React.CSSProperties}
                                 />
-                                <div className="flex justify-end gap-2">
-                                    <button 
-                                        type="button" 
-                                        onClick={() => { setReplyingTo(null); setNewComment(""); }} 
-                                        className="px-3 py-1.5 rounded-full text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] border border-transparent transition-colors"
-                                    >
-                                        Huỷ
-                                    </button>
-                                    <button 
-                                        type="submit" 
-                                        disabled={isSubmitting || !newComment.trim()} 
-                                        className="px-4 py-1.5 rounded-full text-xs font-bold text-white bg-[var(--accent)] hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all shadow-sm"
-                                    >
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                    <button type="button" onClick={() => { setReplyingTo(null); setNewComment(""); }} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>Huỷ</button>
+                                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()} style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem', boxShadow: 'none' }}>
                                         {isSubmitting ? 'Đang gửi...' : 'Gửi'}
                                     </button>
                                 </div>
                             </form>
                         ) : (
-                            <p className="text-xs text-[var(--text-secondary)]">Vui lòng <Link to="/auth" className="text-[var(--accent)] font-bold">đăng nhập</Link> để trả lời.</p>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>Vui lòng <Link to="/auth" style={{ color: '#eab308' }}>đăng nhập</Link> để trả lời.</p>
                         )}
                     </div>
                 )}
 
                 {/* Render Replies */}
                 {replies.length > 0 && (
-                    <div className="flex flex-col gap-1 mt-1">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0', marginTop: '0.5rem' }}>
                         {replies.map(reply => renderComment(reply, true))}
                     </div>
                 )}
@@ -225,60 +218,82 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comicId, chapterId }) =
     };
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 max-w-7xl mt-12 mb-16">
-            <div className="flex items-center gap-2.5 mb-5 pb-3 border-b border-[var(--border)]">
-                <div className="w-1.5 h-5 rounded-full bg-[var(--accent)]" />
-                <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                    Bình Luận ({comments.length})
-                </h3>
-            </div>
-
-            <div className="rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] p-4 sm:p-6 shadow-sm">
+        <div className="container" style={{ marginTop: '1rem', paddingBottom: '3rem' }}>
+            <h3 className="section-title" style={{ marginBottom: '1.5rem' }}>Bình luận</h3>
+            <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '1rem' }}>
                 {user && !replyingTo ? (
-                    <form onSubmit={handleSubmit} className="mb-6">
+                    <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
                         <textarea 
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Chia sẻ cảm nghĩ của bạn về tác phẩm này..."
-                            className="w-full min-h-[90px] p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-xs sm:text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] resize-y mb-3 transition-colors shadow-inner"
+                            placeholder="Nhập bình luận của bạn..."
+                            style={{ 
+                                width: '100%', minHeight: '80px', padding: '1rem', 
+                                borderRadius: '0.5rem', background: 'var(--bg-primary)', 
+                                border: '1px solid var(--border)', color: 'var(--text-primary)',
+                                marginBottom: '1rem',
+                                resize: 'vertical',
+                                outline: 'none'
+                            } as React.CSSProperties}
                         />
-                        <div className="flex justify-end">
-                            <button 
-                                type="submit" 
-                                disabled={isSubmitting || !newComment.trim()} 
-                                className="px-6 py-2.5 rounded-full text-xs uppercase tracking-wider font-extrabold text-white bg-[var(--accent)] shadow-md shadow-[var(--accent)]/20 hover:opacity-90 active:scale-95 disabled:opacity-50 transition-all"
-                            >
-                                {isSubmitting ? 'Đang gửi...' : 'Gửi Bình Luận'}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newComment.trim()} style={{ boxShadow: 'none' }}>
+                                {isSubmitting ? 'Đang gửi...' : 'Gửi bình luận'}
                             </button>
                         </div>
                     </form>
-                ) : !user ? (
-                    <div className="p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-center mb-6">
-                        <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-                            Vui lòng <Link to="/auth" className="text-[var(--accent)] font-bold hover:underline">đăng nhập</Link> để tham gia bình luận cùng cộng đồng.
-                        </p>
+                ) : (!user && !replyingTo && (
+                    <div style={{ padding: '1rem', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: '0.5rem', marginBottom: '2rem', border: '1px solid var(--border)' }}>
+                        <p style={{ color: 'var(--text-secondary)' }}>Vui lòng <Link to="/auth" style={{ color: '#eab308', textDecoration: 'none' }}>đăng nhập</Link> để tham gia bình luận.</p>
                     </div>
-                ) : null}
+                ))}
 
-                <div className="flex flex-col gap-3">
-                    {rootComments.length > 0 ? (
-                        rootComments.map(c => renderComment(c))
-                    ) : (
-                        <div className="py-12 text-center text-xs text-[var(--text-muted)] italic">
-                            Chưa có bình luận nào. Hãy là người đầu tiên để lại ý kiến!
-                        </div>
+                <div className="comments-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {rootComments.length > 0 ? rootComments.map(c => renderComment(c, false)) : (
+                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem 0' }}>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
                     )}
                 </div>
             </div>
 
-            {reportModal.isOpen && (
-                <ReportModal
-                    isOpen={reportModal.isOpen}
-                    onClose={() => setReportModal({ isOpen: false, targetId: null })}
-                    targetType="comment"
-                    targetId={reportModal.targetId!}
-                />
-            )}
+            <ReportModal 
+                isOpen={reportModal.isOpen}
+                onClose={() => setReportModal({ ...reportModal, isOpen: false })}
+                targetType="comment"
+                targetId={reportModal.targetId || ''}
+            />
+
+            <style>{`
+                .comment-action-btn {
+                    background: none;
+                    border: 1px solid transparent;
+                    border-radius: 0.375rem;
+                    padding: 0.25rem 0.5rem;
+                    cursor: pointer;
+                    color: var(--text-secondary);
+                    font-size: 0.8rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    transition: all 0.2s;
+                    font-family: inherit;
+                }
+                .comment-action-btn.hover-danger:hover {
+                    color: #ef4444 !important;
+                    background: rgba(239,68,68,0.1);
+                }
+                .comment-action-btn.hover-accent:hover {
+                    color: var(--accent) !important;
+                    background: rgba(255, 255, 255, 0.05);
+                }
+                .comment-action-btn.hover-rose:hover {
+                    color: #f43f5e !important;
+                    background: rgba(244, 63, 94, 0.1);
+                }
+                .comment-action-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            `}</style>
         </div>
     );
 };

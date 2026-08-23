@@ -21,28 +21,25 @@ const ComicGrid: React.FC<ComicGridProps> = ({
     const displayComics = comics.slice(0, 30);
     
     return (
-        <section className="container mx-auto px-4 sm:px-6 py-10 sm:py-14 max-w-7xl">
+        <section className="container mx-auto px-6 py-12 md:py-16 max-w-7xl">
             {!hideTitle && (
-                <div className="flex items-end justify-between mb-6 sm:mb-8 pb-3 border-b border-[var(--border)]">
-                    <div className="flex items-center gap-2.5">
-                        <div className="w-1.5 h-6 rounded-full bg-[var(--accent)]" />
-                        <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                            {title}
-                        </h2>
-                    </div>
-                    <Link 
-                        to={linkTo} 
-                        className="group inline-flex items-center gap-1 text-xs font-bold tracking-wider uppercase text-[var(--accent)] hover:opacity-80 transition-all"
-                    >
-                        <span>Xem tất cả</span>
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <div className="flex items-end justify-between mb-8 md:mb-10">
+                    <h2 className="text-3xl md:text-4xl font-light tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                        {title}
+                    </h2>
+                    <Link to={linkTo} className="text-xs font-bold tracking-widest uppercase transition-colors hover:opacity-80 pb-1 border-b-2" style={{ color: 'var(--accent)', borderColor: 'var(--accent)' }}>
+                        Xem Tất Cả
                     </Link>
                 </div>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5 md:gap-6">
+            <div className="flex md:grid md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-x-6 md:gap-y-10 overflow-x-auto pb-6 md:pb-0 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {/* Custom styling to hide scrollbar while keeping functionality */}
+                <style>{`
+                    .overflow-x-auto::-webkit-scrollbar { display: none; }
+                `}</style>
                 {displayComics.map(comic => (
-                    <div key={comic.id || comic._id} className="w-full">
+                    <div key={comic.id || comic._id} className="w-[140px] flex-shrink-0 md:w-auto md:flex-shrink snap-start">
                         <ComicCard comic={comic} showHoverStats={showHoverStats} />
                     </div>
                 ))}

@@ -36,36 +36,34 @@ const PopularPage: React.FC = () => {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-            <div className="flex-1 container mx-auto px-4 sm:px-6 pt-24 pb-20 md:pt-32 md:pb-28 max-w-7xl">
-                {/* Header */}
-                <div className="mb-10 sm:mb-12">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-[0.2em] uppercase bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 mb-3">
-                        <Flame size={12} /> Bảng Khám Phá
-                    </span>
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--text-primary)] mb-3">
-                        Truyện <span className="text-[var(--accent)]">Thịnh Hành</span>
+            <div className="flex-1 container mx-auto px-6 pt-24 pb-24 md:pt-32 md:pb-32 max-w-7xl">
+                {/* Clean Typography Header */}
+                <div className="mb-12 md:mb-16">
+                    <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4" style={{ color: 'var(--text-primary)' }}>
+                        Truyện <span className="font-bold">Thịnh Hành</span>
                     </h1>
-                    <p className="text-sm sm:text-base max-w-2xl leading-relaxed text-[var(--text-secondary)]">
-                        Những tác phẩm truyện tranh nhận được nhiều lượt đọc và lượt đánh giá cao nhất từ cộng đồng ComicVerse.
+                    <p className="text-sm md:text-base max-w-2xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                        Khám phá bảng xếp hạng. Những tác phẩm được đọc nhiều nhất và yêu thích nhất bởi cộng đồng chúng tôi.
                     </p>
                 </div>
 
-                {/* Filter Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-10 relative z-20">
+                {/* Sleek Filter Bar */}
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 relative z-20">
                     
                     {/* Minimalist Tabs */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto flex-nowrap custom-scrollbar">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-4 md:pb-0 w-full md:w-auto flex-nowrap hide-scrollbar">
                         {sortOptions.map(opt => {
                             const isActive = sortBy === opt.value;
                             return (
                                 <button
                                     key={opt.value}
                                     onClick={() => setSortBy(opt.value)}
-                                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-xs uppercase tracking-wider font-bold transition-all duration-300 whitespace-nowrap border focus:outline-none ${
-                                        isActive 
-                                            ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-md shadow-[var(--accent)]/25 scale-100' 
-                                            : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--text-secondary)]'
-                                    }`}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap shadow-sm border focus:outline-none ${isActive ? 'scale-100' : 'hover:-translate-y-0.5'}`}
+                                    style={{
+                                        background: isActive ? 'var(--accent)' : 'var(--bg-secondary)',
+                                        color: isActive ? '#fff' : 'var(--text-secondary)',
+                                        borderColor: isActive ? 'var(--accent)' : 'var(--border)'
+                                    }}
                                 >
                                     {opt.icon}
                                     <span>{opt.label}</span>
@@ -75,24 +73,24 @@ const PopularPage: React.FC = () => {
                     </div>
 
                     {/* Genre Dropdown */}
-                    <div className="relative w-full sm:w-auto" ref={dropdownRef}>
+                    <div className="relative w-full md:w-auto" ref={dropdownRef}>
                         <button
                             onClick={() => setShowGenreDropdown(!showGenreDropdown)}
-                            className="flex items-center justify-between gap-3 px-5 py-2.5 rounded-full text-xs uppercase tracking-wider font-bold transition-all w-full sm:w-56 bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border)] hover:border-[var(--text-secondary)] shadow-sm focus:outline-none"
+                            className="flex items-center justify-between gap-3 px-6 py-3 rounded-2xl text-xs uppercase tracking-widest font-bold transition-all w-full md:w-56 shadow-sm border focus:outline-none"
+                            style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
                         >
                             <span className="flex items-center gap-2">
-                                <Filter size={13} className="text-[var(--accent)]" /> 
+                                <Filter size={14} style={{ color: 'var(--accent)' }} /> 
                                 <span className="truncate max-w-[120px] text-left">{selectedGenre || 'Tất cả Thể loại'}</span>
                             </span>
-                            <ChevronDown size={15} className={`transition-transform duration-300 ${showGenreDropdown ? 'rotate-180' : ''}`} />
+                            <ChevronDown size={16} className={`transition-transform duration-300 ${showGenreDropdown ? 'rotate-180' : ''}`} />
                         </button>
                         
                         {showGenreDropdown && (
-                            <div className="absolute top-full right-0 mt-2 w-full sm:w-64 rounded-3xl overflow-hidden border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-2xl shadow-2xl py-2 max-h-80 overflow-y-auto custom-scrollbar z-50 animate-slide-up-fade">
+                            <div className="absolute top-full right-0 mt-3 w-full md:w-64 rounded-2xl overflow-hidden border shadow-2xl py-2 max-h-80 overflow-y-auto custom-scrollbar" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', zIndex: 50 }}>
                                 <button
-                                    className={`w-full text-left px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[var(--bg-secondary)] ${
-                                        !selectedGenre ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'
-                                    }`}
+                                    className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[var(--bg-primary)]"
+                                    style={{ color: !selectedGenre ? 'var(--accent)' : 'var(--text-secondary)' }}
                                     onClick={() => { setSelectedGenre(''); setShowGenreDropdown(false); }}
                                 >
                                     Tất cả Thể loại
@@ -104,9 +102,8 @@ const PopularPage: React.FC = () => {
                                     return (
                                         <button
                                             key={gKey}
-                                            className={`w-full text-left px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-[var(--bg-secondary)] ${
-                                                isSelected ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'
-                                            }`}
+                                            className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[var(--bg-primary)]"
+                                            style={{ color: isSelected ? 'var(--accent)' : 'var(--text-secondary)' }}
                                             onClick={() => { setSelectedGenre(gName); setShowGenreDropdown(false); }}
                                         >
                                             {gName}
@@ -119,14 +116,14 @@ const PopularPage: React.FC = () => {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-x-6 md:gap-y-10">
                     {loading ? (
                         Array.from({ length: 12 }).map((_, i) => (
-                            <div key={i} className="flex flex-col gap-3">
-                                <div className="aspect-[2/3] w-full rounded-2xl animate-pulse bg-[var(--bg-secondary)] border border-[var(--border)]"></div>
+                            <div key={i} className="flex flex-col gap-4">
+                                <div className="aspect-[2/3] w-full rounded-2xl animate-pulse ring-1 ring-[var(--border)]" style={{ background: 'var(--bg-secondary)' }}></div>
                                 <div className="px-1 space-y-2">
-                                    <div className="h-4 w-3/4 rounded bg-[var(--bg-secondary)] animate-pulse"></div>
-                                    <div className="h-3 w-1/2 rounded bg-[var(--bg-secondary)] animate-pulse"></div>
+                                    <div className="h-4 w-3/4 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }}></div>
+                                    <div className="h-3 w-1/2 rounded animate-pulse" style={{ background: 'var(--bg-secondary)' }}></div>
                                 </div>
                             </div>
                         ))
@@ -135,10 +132,10 @@ const PopularPage: React.FC = () => {
                             <ComicCard key={comic._id || comic.id} comic={comic} />
                         ))
                     ) : (
-                        <div className="col-span-full py-20 flex flex-col items-center justify-center text-center p-8 rounded-3xl border border-dashed border-[var(--border)] bg-[var(--bg-secondary)]">
-                            <Flame size={48} className="mb-4 text-[var(--text-muted)] opacity-40" />
-                            <h3 className="text-xl font-bold mb-2 text-[var(--text-primary)]">Không tìm thấy truyện</h3>
-                            <p className="text-xs text-[var(--text-secondary)]">Vui lòng thay đổi bộ lọc hoặc chuyên mục để xem các bộ truyện khác.</p>
+                        <div className="col-span-full py-24 flex flex-col items-center justify-center text-center">
+                            <Flame size={56} className="mb-6 opacity-30" style={{ color: 'var(--text-secondary)' }} />
+                            <h3 className="text-2xl font-light mb-3" style={{ color: 'var(--text-primary)' }}>Không tìm thấy truyện</h3>
+                            <p style={{ color: 'var(--text-secondary)' }}>Vui lòng thay đổi bộ lọc hoặc chuyên mục để xem các bộ truyện khác.</p>
                         </div>
                     )}
                 </div>

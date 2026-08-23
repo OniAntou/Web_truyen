@@ -65,9 +65,9 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
     };
 
     return (
-        <div className="relative flex-shrink-0" ref={searchRef}>
-            <div className="relative flex items-center w-40 lg:w-56 focus-within:w-72 h-9 px-3 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] focus-within:border-[var(--accent)] transition-all duration-300 shadow-inner">
-                <Search size={15} className="text-[var(--text-muted)] shrink-0 mr-2" />
+        <div className="nav-search-container flex-shrink-0" ref={searchRef}>
+            <div className="nav-search-box">
+                <Search size={18} className="nav-search-icon" />
                 <input 
                     type="text" 
                     name="search"
@@ -76,7 +76,7 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                     aria-label={t('search_placeholder')}
                     placeholder={t('search_placeholder')} 
                     value={searchQuery}
-                    className="w-full bg-transparent text-xs font-semibold text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
+                    className="nav-search-input"
                     onChange={(e) => handleSearchInput(e.target.value)}
                     onFocus={() => {
                         if (searchResults.length > 0) setShowDropdown(true);
@@ -89,51 +89,48 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                 {searchQuery && (
                     <button
                         type="button"
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-white/5 hover:bg-white/10 shrink-0 ml-1 transition-colors"
+                        className="nav-search-clear"
                         onClick={() => { setSearchQuery(''); setSearchResults([]); setShowDropdown(false); }}
                         aria-label="Xoá nội dung tìm kiếm"
                     >
-                        <X size={12} />
+                        <X size={14} />
                     </button>
                 )}
             </div>
 
             {showDropdown && (
-                <div className="absolute right-0 top-12 w-80 max-h-96 overflow-y-auto rounded-2xl bg-[var(--glass-bg)] backdrop-blur-2xl border border-[var(--glass-border)] shadow-2xl p-2 z-50 animate-slide-up-fade">
+                <div className="search-dropdown">
                     {searching ? (
-                        <div className="py-6 flex items-center justify-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
-                            <div className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
+                        <div className="search-dropdown-loading">
+                            <div className="search-spinner"></div>
                             <span>{t('searching')}</span>
                         </div>
                     ) : searchResults.length > 0 ? (
-                        <div className="flex flex-col gap-1">
+                        <>
                             {searchResults.map(comic => (
                                 <Link
                                     key={comic._id || comic.id}
                                     to={`/p/${slugify(comic.title)}-${comic._id || comic.id}`}
-                                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--bg-secondary)] transition-colors group"
+                                    className="search-dropdown-item"
                                     onClick={() => { setShowDropdown(false); setSearchQuery(''); if (onSearchComplete) onSearchComplete(); }}
                                 >
-                                    <div className="w-10 h-14 rounded-lg overflow-hidden shrink-0 ring-1 ring-[var(--border)] bg-[var(--bg-card)]">
-                                        <LazyImage
-                                            src={comic.cover_url || comic.cover || ''}
-                                            alt={comic.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="block text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] truncate transition-colors">
-                                            {comic.title}
-                                        </span>
-                                        <div className="flex items-center gap-2 mt-1">
+                                    <LazyImage
+                                        src={comic.cover_url || comic.cover || ''}
+                                        alt={comic.title}
+                                        className="search-dropdown-img"
+                                        style={{ width: '40px', height: '56px', flexShrink: 0 }}
+                                    />
+                                    <div className="search-dropdown-info">
+                                        <span className="search-dropdown-title">{comic.title}</span>
+                                        <div className="search-dropdown-meta">
                                             {(comic.rating && Number(comic.rating) > 0) ? (
-                                                <span className="flex items-center gap-1 text-[10px] font-bold text-amber-400">
-                                                    <Star size={10} fill="currentColor" />
+                                                <span className="search-dropdown-rating">
+                                                    <Star size={10} fill="#eab308" color="#eab308" />
                                                     {comic.rating}
                                                 </span>
                                             ) : null}
                                             {comic.genres && comic.genres.length > 0 && (
-                                                <span className="text-[10px] font-medium text-[var(--text-muted)] truncate">
+                                                <span className="search-dropdown-genre">
                                                     {typeof comic.genres[0] === 'object' 
                                                         ? (comic.genres[0] as Genre).name 
                                                         : comic.genres[0]}
@@ -143,18 +140,16 @@ const NavSearch: React.FC<NavSearchProps> = ({ onSearchComplete }) => {
                                     </div>
                                 </Link>
                             ))}
-                            <div className="mt-1 pt-1 border-t border-[var(--border)]">
-                                <button
-                                    type="button"
-                                    className="w-full py-2 text-center text-xs font-bold text-[var(--accent)] hover:opacity-80 transition-opacity"
-                                    onClick={handleSearchSubmit}
-                                >
-                                    {t('view_all')} "{searchQuery}" →
-                                </button>
-                            </div>
-                        </div>
+                            <button
+                                type="button"
+                                className="search-dropdown-viewall"
+                                onClick={handleSearchSubmit}
+                            >
+                                {t('view_all')} "{searchQuery}"
+                            </button>
+                        </>
                     ) : (
-                        <div className="py-6 text-center text-xs font-semibold text-[var(--text-muted)]">
+                        <div className="search-dropdown-empty">
                             {t('no_results')} "{searchQuery}"
                         </div>
                     )}

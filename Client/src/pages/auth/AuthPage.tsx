@@ -227,20 +227,9 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
-      {/* Dynamic ambient background glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[var(--accent)]/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Double-Bezel Card Frame */}
-      <div className="w-full max-w-[440px] p-2 rounded-[2.5rem] bg-gradient-to-b from-white/15 to-white/5 border border-[var(--border)] shadow-2xl backdrop-blur-md relative z-10">
-        <div className="p-7 sm:p-9 rounded-[calc(2.5rem-0.5rem)] bg-[var(--bg-card)] shadow-inner">
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[var(--accent)] to-rose-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[var(--accent)]/30">
-              C
-            </div>
-          </div>
-          {renderForm()}
-        </div>
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col justify-center items-center p-6">
+      <div className="w-full max-w-[440px] p-8 md:p-10 rounded-[2rem] bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl">
+        {renderForm()}
       </div>
     </div>
   );
