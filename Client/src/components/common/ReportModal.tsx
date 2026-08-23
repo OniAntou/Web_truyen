@@ -137,7 +137,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, targetType, 
                                 className={`w-full font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 ${
                                     !selectedReason || isSubmitting
                                     ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
-                                    : 'bg-rose-500 hover:bg-rose-400 text-white shadow-[0_0_20px_rgba(244,63,94,0.3)]'
+                                    : 'bg-rose-500 hover:bg-rose-400 text-white shadow-sm'
                                 }`}
                             >
                                 {isSubmitting ? (

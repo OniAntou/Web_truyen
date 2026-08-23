@@ -416,7 +416,7 @@ const Dashboard: React.FC = () => {
                         <span className="text-xs font-bold uppercase tracking-widest">{clearingCache ? "Clearing..." : "Clear Cache"}</span>
                     </button>
                     <div className="flex items-center gap-2 px-4 py-2 bg-black border border-white/5 rounded-xl shadow-inner">
-                        <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${systemStatus === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                         <span className={`text-xs font-bold uppercase tracking-widest ${systemStatus === 'Active' ? 'text-zinc-200' : 'text-amber-500'}`}>
                             {systemStatus === 'Active' ? 'System Online' : 'Session Expired'}
                         </span>
@@ -518,7 +518,7 @@ const Dashboard: React.FC = () => {
                             </span>
                             <div className="flex items-center gap-1.5">
                                 <span className="text-emerald-500 text-[9px] font-black uppercase tracking-widest">Active</span>
-                                <div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" />
+                                <div className="w-1 h-1 rounded-full bg-emerald-500" />
                             </div>
                         </div>
                     </div>

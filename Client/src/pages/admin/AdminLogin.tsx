@@ -50,14 +50,11 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 font-sans selection:bg-white/20 relative overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-zinc-600/10 blur-[120px] rounded-full pointer-events-none"></div>
-            
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 font-sans selection:bg-white/20 relative">
             <div className="w-full max-w-[380px] relative z-10">
                 {/* Header */}
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_25px_rgba(255,255,255,0.3)]">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
                         <BookOpen strokeWidth={1.5} size={22} className="text-black" />
                     </div>
                     <h1 className="text-2xl font-medium text-white tracking-tight">SkyComic</h1>
@@ -65,8 +62,7 @@ const AdminLogin = () => {
                 </div>
 
                 {/* Form Wrapper */}
-                <div className="bg-zinc-800/40 rounded-[2rem] p-8 border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.4)] backdrop-blur-3xl relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-[2rem] pointer-events-none"></div>
+                <div className="bg-zinc-900 rounded-3xl p-8 border border-zinc-800 shadow-xl relative">
                     <form onSubmit={handleSubmit} className="space-y-6 relative">
                         {/* Username */}
                         <div>
@@ -81,7 +77,7 @@ const AdminLogin = () => {
                                 disabled={loading}
                                 placeholder="Enter admin username"
                                 autoComplete="username"
-                                className="w-full bg-zinc-900/60 border border-white/10 text-white placeholder-zinc-400 rounded-xl px-4 py-3.5 text-sm outline-none focus:bg-zinc-800/80 focus:border-white/30 focus:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 disabled:opacity-50"
+                                className="w-full bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 text-sm outline-none focus:border-zinc-500 transition-colors disabled:opacity-50"
                             />
                         </div>
 
@@ -99,7 +95,7 @@ const AdminLogin = () => {
                                     disabled={loading}
                                     placeholder="Enter your password"
                                     autoComplete="current-password"
-                                    className="w-full bg-zinc-900/60 border border-white/10 text-white placeholder-zinc-400 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:bg-zinc-800/80 focus:border-white/30 focus:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 disabled:opacity-50"
+                                    className="w-full bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 pr-11 text-sm outline-none focus:border-zinc-500 transition-colors disabled:opacity-50"
                                 />
                                 <button
                                     type="button"
@@ -124,7 +120,7 @@ const AdminLogin = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 disabled:bg-zinc-400 disabled:opacity-60 text-black font-semibold py-3.5 rounded-xl transition-all duration-300 mt-2 cursor-pointer disabled:cursor-not-allowed shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)]"
+                            className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 disabled:bg-zinc-400 disabled:opacity-60 text-black font-semibold py-3.5 rounded-xl transition-colors mt-2 cursor-pointer disabled:cursor-not-allowed shadow-sm"
                         >
                             {loading ? (
                                 <>

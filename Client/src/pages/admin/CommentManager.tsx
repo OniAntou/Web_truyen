@@ -62,7 +62,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({ count, onConfir
                 </button>
                 <button
                     onClick={onConfirm}
-                    className="px-6 py-3 rounded-xl text-white bg-red-500 hover:bg-red-600 transition-all text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                    className="px-6 py-3 rounded-xl text-white bg-red-500 hover:bg-red-600 transition-colors text-xs font-bold uppercase tracking-wider"
                 >
                     Xoá {count} bình luận
                 </button>

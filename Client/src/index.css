@@ -183,7 +183,6 @@ img {
 .btn-primary {
   background-color: var(--accent);
   color: white;
-  box-shadow: 0 4px 14px 0 rgba(244, 63, 94, 0.39);
 }
 
 .btn-primary:hover {
@@ -677,7 +676,6 @@ img {
   justify-content: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
 }
 
 .drawer-login-btn:active {
@@ -915,10 +913,8 @@ img {
   aspect-ratio: 2/3;
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 40px rgba(244, 63, 94, 0.1);
-  border: 2px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
   transition:
     transform 0.4s ease,
     box-shadow 0.4s ease;
@@ -1446,13 +1442,11 @@ img {
 .reader-end-btn-primary {
   background: var(--accent);
   color: white;
-  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.3);
 }
 
 .reader-end-btn-primary:hover {
   background: var(--accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
 }
 
 .reader-end-btn-secondary {
@@ -1518,20 +1512,16 @@ img {
 .reader-controls-bar {
   max-width: 480px;
   margin: 0 auto;
-  background: rgba(10, 10, 10, 0.7);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: var(--bg-secondary);
   padding: 10px 10px;
   border-radius: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   pointer-events: auto;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s ease;
 }
 
 .reader-controls-bar:hover {
@@ -1572,7 +1562,6 @@ img {
   justify-content: center;
   border-radius: 50%;
   margin-top: -30px;
-  box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);
   transition: transform 0.2s;
 }
 
@@ -2790,10 +2779,9 @@ body * {
 }
 
 .latest-page-btn.active {
-  background: linear-gradient(135deg, var(--accent), #c026d3);
+  background: var(--accent);
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
 }
 
 .latest-page-btn:disabled {
@@ -2881,10 +2869,9 @@ body * {
   width: 64px;
   height: 64px;
   border-radius: 1rem;
-  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  background: var(--accent);
   color: white;
   margin-bottom: 1.25rem;
-  box-shadow: 0 8px 24px rgba(244, 63, 94, 0.3);
 }
 
 .popular-header-title {
@@ -3051,10 +3038,9 @@ body * {
 }
 
 .popular-sort-btn.active {
-  background: linear-gradient(135deg, var(--accent), #c026d3);
+  background: var(--accent);
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
 }
 
 /* Comic Card (Popular variant) */
@@ -3547,11 +3533,10 @@ body * {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: #fff;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   padding: 0.35rem 1rem;
   border-radius: 999px;
   margin-bottom: 0.25rem;
-  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
 }
 
 
@@ -3608,7 +3593,7 @@ body * {
   max-width: 280px;
   padding: 1rem;
   border-radius: 1rem;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  background: var(--accent);
   color: white;
   font-size: 0.95rem;
   font-weight: 800;
@@ -3617,12 +3602,10 @@ body * {
   text-decoration: none;
   transition: all 0.2s;
   margin-top: 1rem;
-  box-shadow: 0 10px 25px rgba(244, 63, 94, 0.5);
 }
 
 .mobile-hero-cta:active {
   transform: scale(0.96);
-  box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);
 }
 
 .mobile-hero-dots {

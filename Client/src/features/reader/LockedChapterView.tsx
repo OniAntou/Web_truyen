@@ -65,7 +65,7 @@ const LockedChapterView: React.FC<LockedChapterViewProps> = ({
                     </button>
                     <button 
                         onClick={onUpgradeVip}
-                        className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:brightness-110 font-bold py-3 px-6 rounded-2xl transition-all shadow-[0_0_20px_rgba(234,179,8,0.15)] text-sm"
+                        className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-6 rounded-2xl transition-colors shadow-sm text-sm"
                     >
                         Đăng ký VIP (50.000 Xu / Tháng)
                     </button>

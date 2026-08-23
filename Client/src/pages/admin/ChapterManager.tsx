@@ -702,7 +702,7 @@ const ChapterManager: React.FC = () => {
                             className={`px-8 py-2.5 rounded-xl font-bold text-sm transition-all tracking-wide uppercase shadow-lg ${
                                 existingChapterFiles.length === 0 || uploading
                                     ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                                    : 'bg-white hover:bg-zinc-200 text-black shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+                                    : 'bg-white hover:bg-zinc-200 text-black shadow-sm'
                             }`}
                         >
                             {uploading ? 'Đang upload...' : `Upload ${existingChapterFiles.length} ảnh`}
@@ -734,7 +734,7 @@ const ChapterManager: React.FC = () => {
                             className={`px-8 py-2.5 rounded-xl font-bold text-sm transition-all tracking-wide uppercase shadow-lg ${
                                 reorderPages.length === 0 || savingOrder
                                     ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                                    : 'bg-white hover:bg-zinc-200 text-black shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+                                    : 'bg-white hover:bg-zinc-200 text-black shadow-sm'
                             }`}
                         >
                             {savingOrder ? 'Đang lưu...' : `Lưu thứ tự (${reorderPages.length} trang)`}
@@ -860,7 +860,7 @@ const ChapterManager: React.FC = () => {
                             disabled={uploading}
                             className={`w-full flex items-center justify-center gap-2 font-bold uppercase tracking-widest text-sm py-4 rounded-2xl transition-all mt-6 ${uploading
                                     ? 'bg-zinc-800 cursor-not-allowed text-zinc-500 shadow-none'
-                                    : 'bg-white hover:bg-zinc-200 text-black shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                                    : 'bg-white hover:bg-zinc-200 text-black shadow-sm'
                                 }`}
                         >
                             {uploading ? 'Processing...' : 'Add Chapter'}

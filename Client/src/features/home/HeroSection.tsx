@@ -128,19 +128,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
             {/* Desktop Hero Layout */}
             <div className="relative w-full h-[85vh] min-h-[600px] items-center justify-center overflow-hidden pt-20 hidden lg:flex desktop-hero-wrapper">
                 
-                {/* Dynamic Blurred Background */}
+                {/* Subtle Clean Background */}
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                     {featuredComics.map((comic, idx) => (
                         <div 
                             key={`bg-${comic._id || comic.id}`}
-                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-15' : 'opacity-0'}`}
                         >
                             <img 
                                 src={comic.cover_url || comic.cover || ''} 
-                                className="w-full h-full object-cover blur-[80px] scale-125 saturate-[1.5] brightness-75" 
+                                className="w-full h-full object-cover blur-2xl" 
                                 alt="" 
                             />
-                            <div className="absolute inset-0 desktop-hero-overlay" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-[var(--bg-primary)]" />
                         </div>
                     ))}
                 </div>
@@ -211,9 +211,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ featuredComics }) => {
                             style={{ transformStyle: 'preserve-3d' }}
                         >
                             <LazyImage src={currentComic.cover_url || currentComic.cover || ''} fill={true} className="object-cover" alt={currentComic.title} />
-                            {/* Elegant reflection/shimmer overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent mix-blend-overlay pointer-events-none rounded-[2rem]"></div>
-                            <div className="absolute inset-0 ring-1 ring-inset ring-[var(--border)] rounded-[2rem] pointer-events-none"></div>
                         </div>
                     </div>
                 </div>

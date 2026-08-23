@@ -54,7 +54,7 @@ const CreatorStudio: React.FC = () => {
             {/* Sidebar */}
             <aside className="w-72 bg-black border-r border-white/5 flex flex-col relative z-20">
                 <div className="p-8 border-b border-white/5 flex items-center gap-4">
-                    <div className="w-9 h-9 rounded-lg bg-[var(--accent)] flex items-center justify-center font-bold text-white text-lg shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                    <div className="w-9 h-9 rounded-lg bg-[var(--accent)] flex items-center justify-center font-bold text-white text-lg shadow-sm">
                         C
                     </div>
                     <h1 className="text-xl font-medium tracking-tight text-white">

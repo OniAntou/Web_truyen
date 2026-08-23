@@ -63,7 +63,7 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
                             className={`w-full font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 ${
                                 isProcessing 
                                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
-                                : 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]'
+                                : 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-sm'
                             }`}
                         >
                             {isProcessing ? 'Đang xử lý...' : 'Xác Nhận & Mở Khóa'}

@@ -247,7 +247,7 @@ const ComicEditor: React.FC = () => {
                 <div className="pt-6">
                     <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 text-black font-semibold py-4 rounded-2xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.25)] text-sm tracking-widest uppercase cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 bg-white hover:bg-zinc-200 text-black font-semibold py-4 rounded-2xl transition-colors text-sm tracking-widest uppercase cursor-pointer shadow-sm"
                     >
                         {isEditing ? 'Update Comic' : 'Create Comic'}
                     </button>
