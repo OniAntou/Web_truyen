@@ -30,10 +30,15 @@ const ReaderHeader: React.FC<ReaderHeaderProps> = ({
                     </span>
                 )}
 
-                <button 
+                <button
+                    type="button"
                     onClick={onOpenReport}
-                    className="ml-auto flex items-center gap-2 text-zinc-500 hover:text-rose-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-500/10 text-xs font-medium"
+                    className="ml-auto flex items-center gap-2 transition-colors px-3 py-1.5 rounded-lg text-xs font-medium"
+                    style={{ color: 'var(--text-secondary)' }}
                     title="Báo lỗi chương"
+                    aria-label="Báo lỗi chương"
+                    onMouseOver={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
+                    onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
                 >
                     <Flag size={14} />
                     <span className="hidden sm:inline">Báo lỗi</span>

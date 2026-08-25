@@ -51,11 +51,11 @@ const Navbar: React.FC = () => {
                     {/* Desktop Actions */}
                     <div className="nav-actions hidden md:flex">
                         {user?.role === 'creator' ? (
-                            <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-[var(--accent)] hover:bg-orange-600 text-white rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
+                            <Link to="/studio" className="hidden md:flex items-center justify-center px-3 py-1.5 text-xs font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                                 Studio
                             </Link>
                         ) : user?.role !== 'admin' ? (
-                            <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-[0.65rem] font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
+                            <Link to="/become-creator" className="hidden md:flex items-center justify-center px-3 py-1.5 text-xs font-bold tracking-widest uppercase bg-zinc-800/80 hover:bg-white text-white hover:text-black rounded-lg transition-all border border-white/10 mr-2 whitespace-nowrap shadow-lg">
                                 Creator
                             </Link>
                         ) : null}

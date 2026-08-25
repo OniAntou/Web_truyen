@@ -288,15 +288,17 @@ img {
   position: absolute;
   bottom: -6px;
   left: 0;
-  width: 0;
+  width: 100%;
   height: 2px;
   background: var(--accent);
-  transition: width 0.3s ease;
   border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .nav-links a:hover::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 
 .nav-actions {
@@ -760,11 +762,6 @@ img {
       ellipse at 15% 50%,
       rgba(244, 63, 94, 0.06) 0%,
       transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 85% 30%,
-      rgba(139, 92, 246, 0.05) 0%,
-      transparent 45%
     );
   pointer-events: none;
 }
@@ -796,11 +793,6 @@ img {
       ellipse at 15% 50%,
       rgba(244, 63, 94, 0.04) 0%,
       transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 85% 30%,
-      rgba(139, 92, 246, 0.03) 0%,
-      transparent 45%
     );
 }
 
@@ -1263,7 +1255,7 @@ img {
 .reader-info-bar {
   position: relative;
   max-width: 800px;
-  margin:100px auto 0;
+  margin: 1.5rem auto 0;
   padding: 1rem 1.5rem;
 }
 
@@ -1300,9 +1292,9 @@ img {
 }
 
 .reader-info-back:hover {
-  background: var(--accent);
+  background: var(--accent-hover);
   color: white;
-  border-color: var(--accent);
+  border-color: var(--accent-hover);
   transform: translateX(-2px);
 }
 
@@ -1440,12 +1432,12 @@ img {
 }
 
 .reader-end-btn-primary {
-  background: var(--accent);
+  background: var(--accent-hover);
   color: white;
 }
 
 .reader-end-btn-primary:hover {
-  background: var(--accent-hover);
+  filter: brightness(1.12);
   transform: translateY(-2px);
 }
 
@@ -1507,6 +1499,11 @@ img {
   z-index: 50;
   pointer-events: none;
   /* Let clicks pass through around the bar */
+  transition: transform 0.25s ease;
+}
+
+.reader-controls-fixed.reader-controls-hidden {
+  transform: translateY(120%);
 }
 
 .reader-controls-bar {
@@ -1544,7 +1541,7 @@ img {
 }
 
 .control-btn:hover {
-  color: white;
+  color: var(--text-primary);
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -2234,13 +2231,6 @@ body * {
 }
 
 /* Light Mode: Header Text & UI Elements */
-[data-theme="light"] .popular-header-title {
-  background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 [data-theme="light"] .popular-header-desc {
   color: #52525b;
 }
@@ -2418,10 +2408,10 @@ body * {
   width: 64px;
   height: 64px;
   border-radius: 1rem;
-  background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+  background: var(--accent);
   color: white;
   margin-bottom: 1.25rem;
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.25);
 }
 
 /* Search Bar */
@@ -2879,10 +2869,7 @@ body * {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 0.75rem;
-  background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .popular-header-desc {
@@ -3158,32 +3145,6 @@ body * {
   background: var(--bg-card);
 }
 
-.shimmer {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.04) 50%,
-    transparent 100%
-  );
-  animation: shimmerAnim 1.5s ease-in-out infinite;
-}
-
-@keyframes shimmerAnim {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
 
 /* Empty State */
 .popular-empty-state {
@@ -3194,7 +3155,7 @@ body * {
 
 .popular-empty-state h3 {
   font-size: 1.25rem;
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -3401,6 +3362,53 @@ body * {
   font-size: 0.8rem;
   gap: 0.5rem;
   z-index: 3;
+}
+
+.lazy-image-retry {
+  padding: 0.35rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lazy-image-retry:hover {
+  border-color: var(--text-secondary);
+}
+
+.reader-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.9rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: filter 0.2s ease, border-color 0.2s ease;
+}
+
+.reader-action-btn-primary {
+  background: var(--accent-hover);
+  color: #ffffff;
+}
+
+.reader-action-btn-primary:hover {
+  filter: brightness(1.12);
+}
+
+.reader-action-btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.reader-action-btn-secondary:hover {
+  border-color: var(--text-secondary);
 }
 
 
@@ -3828,12 +3836,13 @@ body * {
 /* ------ MOBILE: Reader ------ */
 @media (max-width: 767px) {
   .reader-info-bar {
-    margin-top: 70px;
+    margin-top: 1rem;
     padding: 0.5rem 0.75rem;
   }
 
   .reader-controls-fixed {
     padding: 0.75rem;
+    padding-bottom: calc(0.75rem + var(--safe-area-bottom));
     bottom: 0;
   }
 
@@ -4428,7 +4437,7 @@ body * {
   z-index: 3000;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: var(--accent);
+  background: var(--accent-hover);
   color: white;
   font-weight: 700;
   transform: translateY(-200%);

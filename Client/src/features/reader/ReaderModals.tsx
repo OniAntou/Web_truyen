@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { formatXu } from '../../constants/pricing';
 
 export interface ConfirmModalState {
     isOpen: boolean;
@@ -13,12 +14,16 @@ export interface AlertModalState {
     title: string;
     message: string;
     isSuccess: boolean;
+    /** Hành động CTA sau khi đóng alert; do caller quyết định, không đoán từ nội dung message. */
+    action?: 'topup' | 'close';
 }
 
 interface ReaderModalsProps {
     confirmModal: ConfirmModalState;
     alertModal: AlertModalState;
     isProcessing: boolean;
+    /** Số dư Xu hiện tại của user (null = chưa biết). */
+    balance?: number | null;
     onConfirm: () => void;
     onCloseConfirm: () => void;
     onCloseAlert: () => void;
@@ -29,6 +34,7 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
     confirmModal,
     alertModal,
     isProcessing,
+    balance = null,
     onConfirm,
     onCloseConfirm,
     onCloseAlert,
@@ -38,33 +44,49 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
         <>
             {/* Confirm Modal */}
             {confirmModal.isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-zinc-950 border border-white/10 p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center">
-                        <button 
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Xác nhận thanh toán"
+                        className="border p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center"
+                        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                    >
+                        <button
+                            type="button"
                             onClick={() => !isProcessing && onCloseConfirm()}
-                            className="absolute right-6 top-6 text-zinc-500 hover:text-white transition-colors"
+                            disabled={isProcessing}
+                            aria-label="Đóng"
+                            className="absolute right-6 top-6 transition-colors disabled:opacity-40"
+                            style={{ color: 'var(--text-secondary)' }}
                         >
                             <X size={20} />
                         </button>
                         <div className="mx-auto w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6">
                             <Lock size={28} className="text-yellow-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">Xác nhận thanh toán</h3>
-                        <p className="text-zinc-400 text-sm mb-8 leading-relaxed">{confirmModal.message}</p>
-                        
-                        <div className="bg-black/40 rounded-xl p-4 mb-8 flex justify-between items-center border border-white/5">
-                            <span className="text-zinc-400 text-sm font-medium">Tổng thanh toán:</span>
-                            <span className="text-yellow-500 font-bold text-lg">{confirmModal.price} Xu</span>
+                        <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Xác nhận thanh toán</h3>
+                        <p className="text-sm mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{confirmModal.message}</p>
+
+                        <div className="rounded-xl p-4 mb-4 flex justify-between items-center border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Tổng thanh toán:</span>
+                            <span className="text-yellow-500 font-bold text-lg">{formatXu(confirmModal.price)} Xu</span>
+                        </div>
+                        <div className="rounded-xl p-4 mb-8 flex justify-between items-center border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Số dư hiện có:</span>
+                            <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
+                                {balance !== null ? `${formatXu(balance)} Xu` : '—'}
+                            </span>
                         </div>
 
-                        <button 
+                        <button
+                            type="button"
                             onClick={onConfirm}
                             disabled={isProcessing}
                             className={`w-full font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 ${
-                                isProcessing 
-                                ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
-                                : 'bg-yellow-500 hover:bg-yellow-400 text-black shadow-sm'
+                                isProcessing ? 'cursor-not-allowed opacity-50' : ''
                             }`}
+                            style={isProcessing ? { background: 'var(--bg-secondary)', color: 'var(--text-secondary)' } : { background: '#eab308', color: '#27272a' }}
                         >
                             {isProcessing ? 'Đang xử lý...' : 'Xác Nhận & Mở Khóa'}
                         </button>
@@ -74,11 +96,20 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
 
             {/* Alert/Result Modal */}
             {alertModal.isOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in zoom-in-95 duration-200">
-                    <div className="bg-zinc-950 border border-white/10 p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center">
-                        <button 
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div
+                        role="alertdialog"
+                        aria-modal="true"
+                        aria-label={alertModal.title}
+                        className="border p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center"
+                        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                    >
+                        <button
+                            type="button"
                             onClick={onCloseAlert}
-                            className="absolute right-6 top-6 text-zinc-500 hover:text-white transition-colors"
+                            aria-label="Đóng"
+                            className="absolute right-6 top-6 transition-colors"
+                            style={{ color: 'var(--text-secondary)' }}
                         >
                             <X size={20} />
                         </button>
@@ -89,23 +120,25 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
                                 <AlertCircle size={36} className="text-red-500" />
                             )}
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-3">{alertModal.title}</h3>
-                        <p className="text-zinc-400 text-sm mb-8 leading-relaxed">{alertModal.message}</p>
-                        
-                        <button 
+                        <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>{alertModal.title}</h3>
+                        <p className="text-sm mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{alertModal.message}</p>
+
+                        <button
+                            type="button"
                             onClick={() => {
                                 onCloseAlert();
-                                if(!alertModal.isSuccess && alertModal.message.includes("không đủ")) {
+                                if (alertModal.action === 'topup') {
                                     onNavigateTopup();
                                 }
                             }}
-                            className={`w-full font-bold py-3.5 px-6 rounded-xl transition-all ${
-                                alertModal.isSuccess 
-                                ? 'bg-white hover:bg-zinc-200 text-black' 
-                                : 'bg-red-500 hover:bg-red-400 text-white'
-                            }`}
+                            className="w-full font-bold py-3.5 px-6 rounded-xl transition-all hover:brightness-110"
+                            style={
+                                alertModal.isSuccess || alertModal.action === 'topup'
+                                    ? { background: '#eab308', color: '#27272a' }
+                                    : { background: 'var(--accent-hover)', color: '#ffffff' }
+                            }
                         >
-                            {alertModal.isSuccess ? 'Đang tải lại...' : (alertModal.message.includes("không đủ") ? 'Nạp Xu Ngay' : 'Đóng')}
+                            {alertModal.isSuccess ? 'Đọc Tiếp' : alertModal.action === 'topup' ? 'Nạp Xu Ngay' : 'Đóng'}
                         </button>
                     </div>
                 </div>

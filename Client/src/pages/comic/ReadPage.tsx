@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import Navbar from '../../layouts/Navbar';
 import ReaderControls from '../../features/reader/ReaderControls';
+import { Home, RotateCw } from 'lucide-react';
 import LazyImage from '../../components/ui/LazyImage';
 import Footer from '../../layouts/Footer';
 import CommentSection from '../../features/comic/CommentSection';
@@ -16,13 +16,14 @@ import LockedChapterView from '../../features/reader/LockedChapterView';
 import ReaderModals, { ConfirmModalState, AlertModalState } from '../../features/reader/ReaderModals';
 import ReaderHeader from '../../features/reader/ReaderHeader';
 import ReaderFooterSection from '../../features/reader/ReaderFooterSection';
+import ReaderErrorState from '../../features/reader/ReaderErrorState';
 
 import { comicService } from '../../services/comicService';
 import { chapterService } from '../../services/chapterService';
 import { userService } from '../../services/userService';
 import { saveReadingHistory } from '../../utils/readingHistory';
+import { VIP_PRICE_PER_MONTH_XU, formatXu } from '../../constants/pricing';
 
-import { useThemeStore } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
 import { extractComicId } from '../../utils/format';
 
@@ -47,7 +48,7 @@ interface LockedError {
     message: string;
     price: number;
     early_access_end_date?: string;
-    comic?: any;
+    comic?: Partial<Comic>;
 }
 
 const ReadPage: React.FC = () => {
@@ -61,15 +62,16 @@ const ReadPage: React.FC = () => {
     const [reportModalOpen, setReportModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     
-    const theme = useThemeStore(state => state.theme);
-    const isDarkTheme = theme !== 'light';
     const user = useAuthStore(state => state.user);
+    const balance = typeof user?.balance === 'number'
+        ? user.balance
+        : typeof user?.coins === 'number' ? user.coins : null;
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [chapterId]);
 
-    const { data, isLoading, error: queryError } = useQuery<ReaderData, Error | LockedError>({
+    const { data, isLoading, error: queryError, refetch } = useQuery<ReaderData, Error | LockedError>({
         queryKey: ['readerData', comicId, chapterId],
         queryFn: () => comicService.getReaderData(comicId!, chapterId!),
         retry: false,
@@ -77,6 +79,7 @@ const ReadPage: React.FC = () => {
 
     const comic = data?.comic ? { ...data.comic, chapters: data?.all_chapters } : null;
     const chapter = data?.chapter;
+    const pages = chapter?.pages || [];
 
     const error = queryError && (queryError as LockedError).is_locked ? {
         type: 'locked',
@@ -87,7 +90,6 @@ const ReadPage: React.FC = () => {
     } as LockedError : queryError;
 
     const viewedRef = React.useRef<string | null>(null);
-
     // Mark chapter as read
     useEffect(() => {
         if (user && comic && chapter && chapter.pages && chapter.pages.length > 0 && comicId) {
@@ -99,18 +101,57 @@ const ReadPage: React.FC = () => {
                 chapterTitle: chapter.title || '',
                 chapterNumber: chapter.chapter_number
             });
-            updateReadingProgress(1);
         }
     }, [chapter?._id, chapter?.pages?.length, user, comicId]);
 
-    const updateReadingProgress = async (pageNum: number) => {
-        if (!user || !comic || !chapter || !comicId || !chapter._id) return;
-        try {
-            await comicService.updateReadingProgress(comicId, chapter._id, pageNum);
-        } catch (err) {
-            console.error('Error updating reading progress:', err);
-        }
-    };
+    const lastSavedPageRef = useRef(1);
+
+    // Phục hồi vị trí đọc cho đúng chapter này (không bao giờ lùi tiến độ).
+    useEffect(() => {
+        if (!user || !comicId || !chapter?._id) return;
+        let cancelled = false;
+        comicService.getReadingProgress(comicId)
+            .then((progress) => {
+                if (cancelled || !progress?.hasProgress || progress.chapter_id !== chapter._id) return;
+                const targetPage = Math.max(1, progress.page_number || 1);
+                lastSavedPageRef.current = targetPage;
+                if (targetPage > 1) {
+                    requestAnimationFrame(() => {
+                        document.getElementById(`reader-page-${targetPage}`)?.scrollIntoView({ block: 'start' });
+                    });
+                }
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [user, comicId, chapter?._id]);
+
+    // Lưu tiến độ theo trang đang xem; chỉ lưu khi tiến về phía trước.
+    useEffect(() => {
+        const pageCount = pages.length;
+        if (!user || !comicId || !chapter?._id || pageCount === 0) return;
+        let raf = 0;
+        const onScroll = () => {
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+                raf = 0;
+                let visiblePage = 1;
+                for (let i = 1; i <= pageCount; i++) {
+                    const el = document.getElementById(`reader-page-${i}`);
+                    if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) visiblePage = i;
+                    else break;
+                }
+                if (visiblePage > lastSavedPageRef.current && chapter._id) {
+                    lastSavedPageRef.current = visiblePage;
+                    comicService.updateReadingProgress(comicId, chapter._id, visiblePage).catch(() => {});
+                }
+            });
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            if (raf) cancelAnimationFrame(raf);
+        };
+    }, [user, comicId, chapter?._id, pages.length]);
 
     // Track views
     useEffect(() => {
@@ -149,23 +190,44 @@ const ReadPage: React.FC = () => {
 
     const handleUnlock = () => {
         if (!user) return navigate('/auth');
-        setConfirmModal({ 
-            isOpen: true, 
-            type: 'unlock', 
-            message: `Xác nhận dùng ${(error as LockedError)?.price || 0} Xu để mở khóa chapter này?`, 
-            price: (error as LockedError)?.price || 0 
+        const price = (error as LockedError)?.price || 0;
+        if (balance !== null && balance < price) {
+            setAlertModal({
+                isOpen: true,
+                title: 'Số dư không đủ',
+                message: `Bạn cần ${formatXu(price)} Xu để mở khóa chapter này nhưng chỉ có ${formatXu(balance)} Xu.`,
+                isSuccess: false,
+                action: 'topup'
+            });
+            return;
+        }
+        setConfirmModal({
+            isOpen: true,
+            type: 'unlock',
+            message: `Xác nhận dùng ${formatXu(price)} Xu để mở khóa chapter này?`,
+            price
         });
     };
 
     const handleUpgradeVip = () => {
         if (!user) return navigate('/auth');
-        setConfirmModal({ 
-            isOpen: true, 
-            type: 'vip', 
-            message: 'Xác nhận dùng 50.000 Xu để nâng cấp VIP 30 ngày?', 
-            price: 50000 
+        if (balance !== null && balance < VIP_PRICE_PER_MONTH_XU) {
+            setAlertModal({
+                isOpen: true,
+                title: 'Số dư không đủ',
+                message: `Gói VIP 30 ngày giá ${formatXu(VIP_PRICE_PER_MONTH_XU)} Xu nhưng bạn chỉ có ${formatXu(balance)} Xu.`,
+                isSuccess: false,
+                action: 'topup'
+            });
+            return;
+        }
+        setConfirmModal({
+            isOpen: true,
+            type: 'vip',
+            message: `Xác nhận dùng ${formatXu(VIP_PRICE_PER_MONTH_XU)} Xu để nâng cấp VIP 30 ngày?`,
+            price: VIP_PRICE_PER_MONTH_XU
         });
-    };
+    }
 
     const confirmAction = async () => {
         setIsProcessing(true);
@@ -173,18 +235,18 @@ const ReadPage: React.FC = () => {
             if (confirmModal.type === 'unlock') {
                 await chapterService.unlockChapter(chapter?._id || chapterId!);
                 setConfirmModal({ ...confirmModal, isOpen: false });
-                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true });
+                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Mở khóa chapter thành công!', isSuccess: true, action: 'close' });
                 queryClient.invalidateQueries({ queryKey: ['readerData', comicId, chapterId] });
             } else if (confirmModal.type === 'vip') {
                 await userService.upgradeVip();
                 setConfirmModal({ ...confirmModal, isOpen: false });
-                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Nâng cấp VIP thành công! Hệ thống sẽ tự động tải lại trang.', isSuccess: true });
+                setAlertModal({ isOpen: true, title: 'Thành công', message: 'Nâng cấp VIP thành công! Chương đã được mở.', isSuccess: true, action: 'close' });
                 queryClient.invalidateQueries({ queryKey: ['readerData', comicId, chapterId] });
             }
         } catch (err: unknown) {
             setConfirmModal({ ...confirmModal, isOpen: false });
             const message = err instanceof Error ? err.message : "Lỗi không xác định";
-            setAlertModal({ isOpen: true, title: 'Giao dịch thất bại', message, isSuccess: false });
+            setAlertModal({ isOpen: true, title: 'Giao dịch thất bại', message, isSuccess: false, action: 'close' });
         } finally {
             setIsProcessing(false);
         }
@@ -195,19 +257,18 @@ const ReadPage: React.FC = () => {
     if (error && (error as LockedError).type === 'locked') {
         return (
             <div className="reader-page">
-                <Navbar />
-                <LockedChapterView 
+                <LockedChapterView
                     error={error as LockedError}
-                    isDarkTheme={isDarkTheme}
                     onUnlock={handleUnlock}
                     onUpgradeVip={handleUpgradeVip}
                 />
                 <Footer />
 
-                <ReaderModals 
+                <ReaderModals
                     confirmModal={confirmModal}
                     alertModal={alertModal}
                     isProcessing={isProcessing}
+                    balance={balance}
                     onConfirm={confirmAction}
                     onCloseConfirm={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                     onCloseAlert={() => setAlertModal({ ...alertModal, isOpen: false })}
@@ -217,10 +278,38 @@ const ReadPage: React.FC = () => {
         );
     }
 
-    if (error) return <div style={{ paddingTop: '5rem', textAlign: 'center', color: 'red' }}>Error: {error instanceof Error ? error.message : (error as LockedError).message || 'Unknown error'}</div>;
-    if (!comic || !chapter) return <div style={{ paddingTop: '5rem', textAlign: 'center', color: 'white' }}>Content not found</div>;
+    if (error) {
+        return (
+            <div className="reader-page">
+                <ReaderErrorState
+                    title="Không tải được chương"
+                    message={error instanceof Error ? error.message : (error as LockedError).message || 'Đã xảy ra lỗi khi tải dữ liệu.'}
+                >
+                    <button type="button" className="reader-action-btn reader-action-btn-primary" onClick={() => refetch()}>
+                        <RotateCw size={16} /> Thử lại
+                    </button>
+                    <button type="button" className="reader-action-btn reader-action-btn-secondary" onClick={() => navigate('/')}>
+                        <Home size={16} /> Về trang chủ
+                    </button>
+                </ReaderErrorState>
+            </div>
+        );
+    }
+    if (!comic || !chapter) {
+        return (
+            <div className="reader-page">
+                <ReaderErrorState
+                    title="Không tìm thấy nội dung"
+                    message="Chapter hoặc truyện bạn tìm không tồn tại hoặc đã bị xoá."
+                >
+                    <button type="button" className="reader-action-btn reader-action-btn-primary" onClick={() => navigate('/')}>
+                        <Home size={16} /> Về trang chủ
+                    </button>
+                </ReaderErrorState>
+            </div>
+        );
+    }
 
-    const pages = chapter.pages || [];
 
     return (
         <div className="reader-page">
@@ -228,7 +317,7 @@ const ReadPage: React.FC = () => {
                 <title>{comic.title} - {chapter.title} | Web Truyện</title>
                 <meta name="description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
                 <link rel="canonical" href={window.location.href} />
-                <meta property="og:title" content={`${comic.title} - {chapter.title} | Web Truyện`} />
+                <meta property="og:title" content={`${comic.title} - ${chapter.title} | Web Truyện`} />
                 <meta property="og:description" content={`Đọc ${chapter.title} của truyện ${comic.title} bản quyền, chất lượng cao cực nhanh.`} />
                 <meta property="og:image" content={comic.cover || comic.cover_url} />
                 <meta property="og:url" content={window.location.href} />
@@ -260,7 +349,6 @@ const ReadPage: React.FC = () => {
                     })}
                 </script>
             </Helmet>
-            <Navbar />
             <main>
                 <ReaderHeader 
                     comicId={comicId!}
@@ -272,18 +360,19 @@ const ReadPage: React.FC = () => {
                 <div className="reader-container reader-container-spacing">
                     {pages.length > 0 ? (
                         pages.map((page, index) => (
-                            <LazyImage
-                                key={index}
-                                src={page.image_url}
-                                alt={`Page ${index + 1}`}
-                                className="reader-page-img"
-                                aspectRatio={2 / 3}
-                                releaseAspectRatioOnLoad
-                            />
+                            <div key={index} id={`reader-page-${index + 1}`}>
+                                <LazyImage
+                                    src={page.image_url}
+                                    alt={`Trang ${index + 1}`}
+                                    className="reader-page-img"
+                                    aspectRatio={2 / 3}
+                                    releaseAspectRatioOnLoad
+                                />
+                            </div>
                         ))
                     ) : (
-                        <div style={{ padding: '4rem', textAlign: 'center', color: 'gray' }}>
-                            <p>No images in this chapter.</p>
+                        <div className="py-16 text-center" style={{ color: 'var(--text-secondary)' }}>
+                            <p>Chapter này chưa có trang nào.</p>
                         </div>
                     )}
 
@@ -317,10 +406,11 @@ const ReadPage: React.FC = () => {
             </main>
             <Footer />
             
-            <ReaderModals 
+            <ReaderModals
                 confirmModal={confirmModal}
                 alertModal={alertModal}
                 isProcessing={isProcessing}
+                balance={balance}
                 onConfirm={confirmAction}
                 onCloseConfirm={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                 onCloseAlert={() => setAlertModal({ ...alertModal, isOpen: false })}

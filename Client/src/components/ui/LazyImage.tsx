@@ -35,7 +35,14 @@ const LazyImage: React.FC<LazyImageProps> = ({
     const [isVisible, setIsVisible] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(false);
+    const [attempt, setAttempt] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    const handleRetry = () => {
+        setError(false);
+        setIsLoaded(false);
+        setAttempt(a => a + 1);
+    };
 
     // Fill mode means the image should occupy its container completely
     const isFillMode = fill;
@@ -95,12 +102,14 @@ const LazyImage: React.FC<LazyImageProps> = ({
             
             {error ? (
                 <div className="lazy-image-error">
-                    <AlertCircle size={24} className="opacity-40" />
-                    <span className="text-[10px] uppercase tracking-wider opacity-40">Lỗi tải ảnh</span>
+                    <AlertCircle size={24} className="opacity-40" aria-hidden="true" />
+                    <span className="text-xs opacity-60">Lỗi tải ảnh</span>
+                    <button type="button" onClick={handleRetry} className="lazy-image-retry">Thử lại</button>
                 </div>
             ) : (
                 isVisible && (
                     <img
+                        key={attempt}
                         src={src}
                         alt={alt || ''}
                         className={`lazy-img ${isLoaded ? 'lazy-img-loaded' : ''} ${isFillMode ? 'w-full h-full' : ''} ${className}`}

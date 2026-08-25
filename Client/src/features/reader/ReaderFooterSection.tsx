@@ -30,18 +30,18 @@ const ReaderFooterSection: React.FC<ReaderFooterSectionProps> = ({
                         disabled={!hasPrev}
                     >
                         <ChevronLeft size={18} />
-                        Previous
+                        Chương trước
                     </button>
                     <Link to={`/p/${slugify(comicTitle)}-${comicId}`} className="reader-end-btn reader-end-btn-outline">
                         <BookOpen size={16} />
-                        Comic Info
+                        Thông tin truyện
                     </Link>
                     <button 
                         onClick={onNext}
                         className={`reader-end-btn reader-end-btn-primary ${!hasNext ? 'reader-end-btn-disabled' : ''}`}
                         disabled={!hasNext}
                     >
-                        Next
+                        Chương sau
                         <ChevronRight size={18} />
                     </button>
                 </div>

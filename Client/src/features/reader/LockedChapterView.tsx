@@ -1,5 +1,6 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
+import { VIP_PRICE_PER_MONTH_XU, formatXu } from '../../constants/pricing';
 import { Comic } from '../../types/comic';
 
 interface LockedError {
@@ -13,61 +14,59 @@ interface LockedError {
 
 interface LockedChapterViewProps {
     error: LockedError;
-    isDarkTheme: boolean;
     onUnlock: () => void;
     onUpgradeVip: () => void;
 }
 
-const LockedChapterView: React.FC<LockedChapterViewProps> = ({ 
-    error, 
-    isDarkTheme, 
-    onUnlock, 
-    onUpgradeVip 
+const LockedChapterView: React.FC<LockedChapterViewProps> = ({
+    error,
+    onUnlock,
+    onUpgradeVip
 }) => {
     const earlyAccessDate = error.early_access_end_date;
     const isEarlyAccess = !!(earlyAccessDate && new Date(earlyAccessDate).getTime() > Date.now());
 
     return (
-        <div style={{ 
-            paddingTop: '8rem', 
-            textAlign: 'center', 
-            color: isDarkTheme ? 'white' : 'var(--text-primary)', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            minHeight: '60vh' 
-        }}>
-            <div className={`${isDarkTheme ? 'bg-zinc-900/50 border-white/10' : 'bg-white border-zinc-200'} p-8 rounded-3xl border backdrop-blur-md max-w-md w-full shadow-xl`}>
+        <div
+            className="flex flex-col items-center justify-center px-4"
+            style={{ paddingTop: '8rem', textAlign: 'center', color: 'var(--text-primary)', minHeight: '60vh' }}
+        >
+            <div className="p-8 rounded-3xl border backdrop-blur-md max-w-md w-full shadow-xl"
+                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+            >
                 <Lock size={48} className="mx-auto text-yellow-500 mb-4" />
-                
+
                 {isEarlyAccess && (
                     <div className="mb-4">
-                        <span className="bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full text-[0.7rem] uppercase tracking-widest font-bold border border-yellow-500/20 inline-block shadow-sm">
+                        <span className="bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-bold border border-yellow-500/20 inline-block shadow-sm">
                             Mở miễn phí vào {new Date(earlyAccessDate!).toLocaleDateString('vi-VN')}
                         </span>
                     </div>
                 )}
-                
+
                 <h2 className="text-xl font-bold mb-2">Chapter Yêu Cầu Trả Phí</h2>
-                <p className={`${isDarkTheme ? 'text-zinc-400' : 'text-zinc-500'} text-sm mb-6 leading-relaxed`}>
-                    Bạn cần dùng Xu để đọc trước chapter này. <br/>
+                <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Bạn cần dùng Xu để đọc trước chapter này. <br />
                     Hoặc đăng ký tài khoản VIP để đọc toàn bộ truyện miễn phí!
                 </p>
-                
+
                 <div className="space-y-3 w-full max-w-[300px] mx-auto">
-                    <button 
+                    <button
+                        type="button"
                         onClick={onUnlock}
-                        className={`w-full ${isDarkTheme ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-100 hover:bg-zinc-200'} border border-white/5 text-${isDarkTheme ? 'white' : 'black'} font-semibold py-3 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-sm`}
+                        className="w-full border font-semibold py-3 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-sm hover:brightness-110"
+                        style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
                     >
                         <Lock size={16} className="text-yellow-500" />
-                        Mở khóa ({error.price} Xu)
+                        Mở khóa ({formatXu(error.price)} Xu)
                     </button>
-                    <button 
+                    <button
+                        type="button"
                         onClick={onUpgradeVip}
-                        className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-6 rounded-2xl transition-colors shadow-sm text-sm"
+                        className="w-full bg-yellow-500 hover:bg-yellow-400 font-bold py-3 px-6 rounded-2xl transition-colors shadow-sm text-sm"
+                        style={{ color: '#27272a' }}
                     >
-                        Đăng ký VIP (50.000 Xu / Tháng)
+                        Đăng ký VIP ({formatXu(VIP_PRICE_PER_MONTH_XU)} Xu / Tháng)
                     </button>
                 </div>
             </div>

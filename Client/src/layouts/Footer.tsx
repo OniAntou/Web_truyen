@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
                     </div>
 
                     <div className="mt-6 pt-4 border-t flex justify-between items-center gap-4" style={{ borderColor: 'var(--border)' }}>
-                        <p className="text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
+                        <p className="text-[0.7rem] opacity-50" style={{ color: 'var(--text-primary)' }}>
                             © {currentYear} ComicVerse. All rights reserved.
                         </p>
                         <div className="flex items-center gap-4 text-[0.7rem] uppercase tracking-widest opacity-50" style={{ color: 'var(--text-primary)' }}>
