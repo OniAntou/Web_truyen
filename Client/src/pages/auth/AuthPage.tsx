@@ -206,7 +206,7 @@ const AuthPage: React.FC = () => {
 
           <button 
             type="submit" 
-            className="w-full py-4 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-lg shadow-lg shadow-rose-500/20 transition-colors disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-[var(--accent-hover)] hover:brightness-110 text-white font-bold text-lg shadow-lg transition-colors disabled:opacity-50"
             disabled={loading}
           >
             {loading ? t('processing') : (isLogin ? t('login_btn') : t('register_btn'))}

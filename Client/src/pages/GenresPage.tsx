@@ -19,7 +19,7 @@ const GenreCard: React.FC<GenreCardProps> = ({ genre, isSelected, onClick }) => 
             onClick={onClick}
             className={`w-full flex items-center justify-start gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 group outline-none ${
                 isSelected 
-                    ? 'bg-[var(--accent)] text-white shadow-md shadow-[var(--accent)]/20' 
+                    ? 'bg-[var(--accent)] text-white shadow-md'
                     : 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] border border-transparent hover:border-[var(--border)]'
             }`}
         >
