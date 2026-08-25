@@ -23,6 +23,7 @@ import { chapterService } from '../../services/chapterService';
 import { userService } from '../../services/userService';
 import { saveReadingHistory } from '../../utils/readingHistory';
 import { VIP_PRICE_PER_MONTH_XU, formatXu } from '../../constants/pricing';
+import { describePaymentError, describeReaderError } from '../../utils/readerErrors';
 
 import { useAuthStore } from '../../store/authStore';
 import { extractComicId } from '../../utils/format';
@@ -245,8 +246,7 @@ const ReadPage: React.FC = () => {
             }
         } catch (err: unknown) {
             setConfirmModal({ ...confirmModal, isOpen: false });
-            const message = err instanceof Error ? err.message : "Lỗi không xác định";
-            setAlertModal({ isOpen: true, title: 'Giao dịch thất bại', message, isSuccess: false, action: 'close' });
+            setAlertModal({ isOpen: true, title: 'Giao dịch thất bại', message: describePaymentError(err), isSuccess: false, action: 'close' });
         } finally {
             setIsProcessing(false);
         }
@@ -279,12 +279,10 @@ const ReadPage: React.FC = () => {
     }
 
     if (error) {
+        const info = describeReaderError(error);
         return (
             <div className="reader-page">
-                <ReaderErrorState
-                    title="Không tải được chương"
-                    message={error instanceof Error ? error.message : (error as LockedError).message || 'Đã xảy ra lỗi khi tải dữ liệu.'}
-                >
+                <ReaderErrorState title={info.title} message={info.message}>
                     <button type="button" className="reader-action-btn reader-action-btn-primary" onClick={() => refetch()}>
                         <RotateCw size={16} /> Thử lại
                     </button>
@@ -292,6 +290,7 @@ const ReadPage: React.FC = () => {
                         <Home size={16} /> Về trang chủ
                     </button>
                 </ReaderErrorState>
+                <Footer />
             </div>
         );
     }

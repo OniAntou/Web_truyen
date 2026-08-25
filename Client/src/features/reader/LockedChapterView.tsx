@@ -34,11 +34,11 @@ const LockedChapterView: React.FC<LockedChapterViewProps> = ({
             <div className="p-8 rounded-3xl border backdrop-blur-md max-w-md w-full shadow-xl"
                 style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
             >
-                <Lock size={48} className="mx-auto text-yellow-500 mb-4" />
+                <Lock size={48} className="mx-auto mb-4" style={{ color: 'var(--warning)' }} />
 
                 {isEarlyAccess && (
                     <div className="mb-4">
-                        <span className="bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-bold border border-yellow-500/20 inline-block shadow-sm">
+                        <span className="bg-yellow-500/10 px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-bold border border-yellow-500/20 inline-block shadow-sm" style={{ color: 'var(--warning)' }}>
                             Mở miễn phí vào {new Date(earlyAccessDate!).toLocaleDateString('vi-VN')}
                         </span>
                     </div>
@@ -57,7 +57,7 @@ const LockedChapterView: React.FC<LockedChapterViewProps> = ({
                         className="w-full border font-semibold py-3 px-6 rounded-2xl transition-colors flex items-center justify-center gap-2 text-sm hover:brightness-110"
                         style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
                     >
-                        <Lock size={16} className="text-yellow-500" />
+                        <Lock size={16} style={{ color: 'var(--warning)' }} />
                         Mở khóa ({formatXu(error.price)} Xu)
                     </button>
                     <button

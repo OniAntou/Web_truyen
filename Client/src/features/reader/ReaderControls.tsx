@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { comicService } from "../../services/comicService";
 import { slugify } from "../../utils/format";
+import { useDialogA11y } from "../../hooks/useDialogA11y";
 import { useAutoHideOnScroll } from "../../hooks/useAutoHideOnScroll";
 import { Chapter } from "../../types/comic";
 
@@ -31,6 +32,7 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
 
   // Auto-hide pill khi đang cuộn xuống đọc, hiện lại khi cuộn lên
   const controlsHidden = useAutoHideOnScroll();
+  const chaptersDialogRef = useDialogA11y<HTMLDivElement>(showChapters, () => setShowChapters(false));
 
   const currentChapter = chapters?.find(ch => (ch._id || ch.id) === currentChapterId);
 
@@ -105,11 +107,12 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
       </div>
 
       {showChapters && (
-        <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
-          onClick={() => setShowChapters(false)}
-        >
           <div
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
+            onClick={() => setShowChapters(false)}
+          >
+          <div
+            ref={chaptersDialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Danh sách chapter"
@@ -122,8 +125,7 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
               <button
                 type="button"
                 onClick={() => setShowChapters(false)}
-                aria-label="Đóng danh sách chapter"
-                className="transition-colors p-2 rounded-full hover:bg-white/10"
+                className="reader-icon-btn transition-colors p-2 rounded-full"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 <X size={20} />

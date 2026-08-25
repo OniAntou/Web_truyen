@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import { formatXu } from '../../constants/pricing';
+import { useDialogA11y } from '../../hooks/useDialogA11y';
 
 export interface ConfirmModalState {
     isOpen: boolean;
@@ -40,15 +41,25 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
     onCloseAlert,
     onNavigateTopup
 }) => {
+    const confirmDialogRef = useDialogA11y<HTMLDivElement>(confirmModal.isOpen, () => {
+        if (!isProcessing) onCloseConfirm();
+    });
+    const alertDialogRef = useDialogA11y<HTMLDivElement>(alertModal.isOpen, onCloseAlert);
+
     return (
         <>
             {/* Confirm Modal */}
             {confirmModal.isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                    onClick={() => !isProcessing && onCloseConfirm()}
+                >
                     <div
+                        ref={confirmDialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-label="Xác nhận thanh toán"
+                        onClick={(e) => e.stopPropagation()}
                         className="border p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center"
                         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                     >
@@ -63,14 +74,14 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
                             <X size={20} />
                         </button>
                         <div className="mx-auto w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6">
-                            <Lock size={28} className="text-yellow-500" />
+                            <Lock size={28} style={{ color: 'var(--warning)' }} />
                         </div>
                         <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Xác nhận thanh toán</h3>
                         <p className="text-sm mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{confirmModal.message}</p>
 
                         <div className="rounded-xl p-4 mb-4 flex justify-between items-center border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
                             <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Tổng thanh toán:</span>
-                            <span className="text-yellow-500 font-bold text-lg">{formatXu(confirmModal.price)} Xu</span>
+                            <span className="font-bold text-lg" style={{ color: 'var(--warning)' }}>{formatXu(confirmModal.price)} Xu</span>
                         </div>
                         <div className="rounded-xl p-4 mb-8 flex justify-between items-center border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
                             <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Số dư hiện có:</span>
@@ -96,11 +107,13 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
 
             {/* Alert/Result Modal */}
             {alertModal.isOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onCloseAlert}>
                     <div
+                        ref={alertDialogRef}
                         role="alertdialog"
                         aria-modal="true"
                         aria-label={alertModal.title}
+                        onClick={(e) => e.stopPropagation()}
                         className="border p-8 rounded-[2rem] max-w-sm w-full shadow-2xl relative text-center"
                         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
                     >
@@ -115,9 +128,9 @@ const ReaderModals: React.FC<ReaderModalsProps> = ({
                         </button>
                         <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-6 border-4 ${alertModal.isSuccess ? 'border-green-500/20 bg-green-500/10' : 'border-red-500/20 bg-red-500/10'}`}>
                             {alertModal.isSuccess ? (
-                                <CheckCircle size={36} className="text-green-500" />
+                                <CheckCircle size={36} style={{ color: 'var(--success)' }} />
                             ) : (
-                                <AlertCircle size={36} className="text-red-500" />
+                                <AlertCircle size={36} style={{ color: 'var(--danger)' }} />
                             )}
                         </div>
                         <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>{alertModal.title}</h3>
