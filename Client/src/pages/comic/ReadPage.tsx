@@ -62,6 +62,8 @@ const ReadPage: React.FC = () => {
     const [alertModal, setAlertModal] = useState<AlertModalState>({ isOpen: false, title: '', message: '', isSuccess: false });
     const [reportModalOpen, setReportModalOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [resumeFromPage, setResumeFromPage] = useState<number | null>(null);
     
     const user = useAuthStore(state => state.user);
     const balance = typeof user?.balance === 'number'
@@ -111,19 +113,26 @@ const ReadPage: React.FC = () => {
     useEffect(() => {
         if (!user || !comicId || !chapter?._id) return;
         let cancelled = false;
+        let resumeToastTimer = 0;
         comicService.getReadingProgress(comicId)
             .then((progress) => {
                 if (cancelled || !progress?.hasProgress || progress.chapter_id !== chapter._id) return;
                 const targetPage = Math.max(1, progress.page_number || 1);
                 lastSavedPageRef.current = targetPage;
+                setCurrentPage(targetPage);
                 if (targetPage > 1) {
+                    setResumeFromPage(targetPage);
+                    resumeToastTimer = window.setTimeout(() => setResumeFromPage(null), 3000);
                     requestAnimationFrame(() => {
                         document.getElementById(`reader-page-${targetPage}`)?.scrollIntoView({ block: 'start' });
                     });
                 }
             })
             .catch(() => {});
-        return () => { cancelled = true; };
+        return () => {
+            window.clearTimeout(resumeToastTimer);
+            cancelled = true;
+        };
     }, [user, comicId, chapter?._id]);
 
     // Lưu tiến độ theo trang đang xem; chỉ lưu khi tiến về phía trước.
@@ -141,6 +150,7 @@ const ReadPage: React.FC = () => {
                     if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) visiblePage = i;
                     else break;
                 }
+                setCurrentPage(visiblePage);
                 if (visiblePage > lastSavedPageRef.current && chapter._id) {
                     lastSavedPageRef.current = visiblePage;
                     comicService.updateReadingProgress(comicId, chapter._id, visiblePage).catch(() => {});
@@ -252,6 +262,24 @@ const ReadPage: React.FC = () => {
         }
     };
 
+    const chapterNavRef = useRef({ prev: handlePrevChapter, next: handleNextChapter });
+    chapterNavRef.current = { prev: handlePrevChapter, next: handleNextChapter };
+
+    // Accelerator: mũi tên trái/phải đổi chương (bỏ qua khi modal mở hoặc đang gõ).
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (confirmModal.isOpen || alertModal.isOpen || reportModalOpen) return;
+            const target = e.target as HTMLElement | null;
+            if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+            if (e.key === 'ArrowRight') chapterNavRef.current.next();
+            else if (e.key === 'ArrowLeft') chapterNavRef.current.prev();
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [confirmModal.isOpen, alertModal.isOpen, reportModalOpen]);
+
+    const goToTopup = () => navigate(`/payment/topup?return=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`);
+
     if (isLoading) return <ReadPageSkeleton />;
 
     if (error && (error as LockedError).type === 'locked') {
@@ -356,6 +384,12 @@ const ReadPage: React.FC = () => {
                     onOpenReport={() => setReportModalOpen(true)}
                 />
 
+                {resumeFromPage !== null && (
+                    <div className="reader-resume-toast" role="status">
+                        Đã tiếp tục từ trang {resumeFromPage}
+                    </div>
+                )}
+
                 <div className="reader-container reader-container-spacing">
                     {pages.length > 0 ? (
                         pages.map((page, index) => (
@@ -380,8 +414,10 @@ const ReadPage: React.FC = () => {
                         comicTitle={comic.title}
                         chapters={comic?.chapters || []}
                         currentChapterId={chapter?._id as string}
-                        onPrev={handlePrevChapter} 
-                        onNext={handleNextChapter} 
+                        onPrev={handlePrevChapter}
+                        onNext={handleNextChapter}
+                        currentPage={currentPage}
+                        totalPages={pages.length}
                     />
                 </div>
             
@@ -392,8 +428,8 @@ const ReadPage: React.FC = () => {
                     hasNext={hasNext}
                     onPrev={handlePrevChapter}
                     onNext={handleNextChapter}
+                    chapterNumber={chapter.chapter_number}
                 />
-
                 <CommentSection comicId={comicId!} chapterId={chapter._id || chapterId!} />
 
                 <ReportModal 
@@ -413,7 +449,7 @@ const ReadPage: React.FC = () => {
                 onConfirm={confirmAction}
                 onCloseConfirm={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                 onCloseAlert={() => setAlertModal({ ...alertModal, isOpen: false })}
-                onNavigateTopup={() => navigate('/payment/topup')}
+                onNavigateTopup={goToTopup}
             />
         </div>
     );

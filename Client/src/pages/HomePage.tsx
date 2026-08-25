@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
+import { AlertCircle } from 'lucide-react';
 import HeroSection from '../features/home/HeroSection';
 import ComicGrid from '../features/home/ComicGrid';
 import { comicService } from '../services/comicService';
@@ -16,9 +17,9 @@ interface HomeData {
 
 const HomePage: React.FC = () => {
     const homeVersion = localStorage.getItem('home_data_version') || '1';
-    const { data, isLoading: loading } = useQuery<HomeData>({ 
-        queryKey: ['comics', 'home', homeVersion], 
-        queryFn: () => comicService.getHomeData(homeVersion) 
+    const { data, isLoading: loading, isError, refetch } = useQuery<HomeData>({
+        queryKey: ['comics', 'home', homeVersion],
+        queryFn: () => comicService.getHomeData(homeVersion)
     });
     
     const popularComics = data?.popular || [];
@@ -29,6 +30,35 @@ const HomePage: React.FC = () => {
 
     if (loading) {
         return <HomePageSkeleton />;
+    }
+
+    if (isError) {
+        return (
+            <div role="alert" className="flex flex-col items-center gap-3 px-4 text-center" style={{ minHeight: '70vh', justifyContent: 'center', paddingTop: '6rem', paddingBottom: '6rem', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+                <AlertCircle size={44} style={{ color: 'var(--text-secondary)' }} aria-hidden="true" />
+                <h2 className="text-xl font-bold">Không tải được trang chủ</h2>
+                <p className="max-w-[26rem] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Không nhận được dữ liệu từ máy chủ. Kiểm tra mạng rồi thử lại nhé.
+                </p>
+                <button type="button" className="reader-action-btn reader-action-btn-primary" style={{ marginTop: '1rem' }} onClick={() => refetch()}>
+                    Thử lại
+                </button>
+            </div>
+        );
+    }
+
+    if (featuredComics.length === 0 && popularComics.length === 0 && newComics.length === 0) {
+        return (
+            <div className="flex flex-col items-center gap-3 px-4 text-center" style={{ minHeight: '70vh', justifyContent: 'center', paddingTop: '6rem', paddingBottom: '6rem', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+                <h2 className="text-xl font-bold">Chưa có truyện nào để hiển thị</h2>
+                <p className="max-w-[26rem] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Nội dung có thể đang được cập nhật. Thử tải lại sau ít phút nhé.
+                </p>
+                <button type="button" className="reader-action-btn reader-action-btn-secondary" style={{ marginTop: '1rem' }} onClick={() => refetch()}>
+                    Tải lại
+                </button>
+            </div>
+        );
     }
 
     return (

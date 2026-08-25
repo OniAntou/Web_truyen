@@ -20,9 +20,12 @@ interface ReaderControlsProps {
     currentChapterId: string;
     onPrev: () => void;
     onNext: () => void;
+    /** Trang đang xem trong chapter (để hiển thị vị trí). */
+    currentPage?: number;
+    totalPages?: number;
 }
 
-const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, chapters, currentChapterId, onPrev, onNext }) => {
+const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, chapters, currentChapterId, onPrev, onNext, currentPage = 1, totalPages = 0 }) => {
   const [showChapters, setShowChapters] = useState(false);
   const [chaptersWithStatus, setChaptersWithStatus] = useState<ReaderChapter[]>([]);
   const [loadingStatus, setLoadingStatus] = useState(true);
@@ -91,7 +94,9 @@ const ReaderControls: React.FC<ReaderControlsProps> = ({ comicId, comicTitle, ch
             title="Danh sách chapter"
             aria-label="Mở danh sách chapter"
           >
-            {currentChapter ? `Chapter ${currentChapter.chapter_number}` : 'Danh sách chapter'}
+            {currentChapter
+                ? `Chapter ${currentChapter.chapter_number}${totalPages > 0 ? ` · Trang ${Math.min(Math.max(currentPage, 1), totalPages)}/${totalPages}` : ''}`
+                : 'Danh sách chapter'}
           </button>
 
           <button

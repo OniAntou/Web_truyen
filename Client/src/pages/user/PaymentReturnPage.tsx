@@ -10,7 +10,8 @@ const PaymentReturnPage: React.FC = () => {
     const [status, setStatus] = useState<'loading' | 'success' | 'failed' | 'error'>('loading');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-
+    // Ngữ cảnh quay lại: TopUpPage lưu route đang đọc trước khi rời đi.
+    const [continueUrl] = useState(() => sessionStorage.getItem('topup:return') || '');
     useEffect(() => {
         const verifyPayment = async () => {
             try {
@@ -57,11 +58,25 @@ const PaymentReturnPage: React.FC = () => {
                                 <CheckCircle2 size={48} />
                             </div>
                             <h2 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', fontSize: '1.75rem' }}>Thanh toán thành công!</h2>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>Linh thạch đã được cộng vào tài khoản của bạn.</p>
-                            <button 
-                                onClick={() => navigate('/profile')} 
+                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>Xu đã được cộng vào tài khoản của bạn.</p>
+                            {continueUrl && (
+                                <button
+                                    onClick={() => {
+                                        sessionStorage.removeItem('topup:return');
+                                        navigate(continueUrl);
+                                    }}
+                                    className="nav-button accent"
+                                    style={{ width: '100%', height: '3.5rem', borderRadius: '0.75rem', fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.75rem' }}
+                                >
+                                    Tiếp tục đọc
+                                </button>
+                            )}
+                            <button
+                                onClick={() => navigate('/profile')}
                                 className="nav-button accent"
-                                style={{ width: '100%', height: '3.5rem', borderRadius: '0.75rem', fontSize: '1.1rem', fontWeight: 'bold' }}
+                                style={continueUrl
+                                    ? { width: '100%', height: '3.5rem', borderRadius: '0.75rem', fontWeight: 'bold', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)', cursor: 'pointer' }
+                                    : { width: '100%', height: '3.5rem', borderRadius: '0.75rem', fontSize: '1.1rem', fontWeight: 'bold' }}
                             >
                                 Quay lại Trang cá nhân
                             </button>

@@ -47,6 +47,7 @@ const LockedChapterView: React.FC<LockedChapterViewProps> = ({
                 <h2 className="text-xl font-bold mb-2">Chapter Yêu Cầu Trả Phí</h2>
                 <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     Bạn cần dùng Xu để đọc trước chapter này. <br />
+                    Xu là điểm trong trang — nạp thêm tại mục Nạp Xu. <br />
                     Hoặc đăng ký tài khoản VIP để đọc toàn bộ truyện miễn phí!
                 </p>
 

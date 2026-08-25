@@ -1,10 +1,21 @@
-import { useState } from 'react';
-
-
-import { CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { CreditCard, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
 import apiClient from '../../services/apiClient';
+ 
 
 const TopUpPage: React.FC = () => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const returnUrl = searchParams.get('return') || '';
+
+    // Giữ ngữ cảnh: sau khi thanh toán xong, PaymentReturnPage đưa user về đúng chỗ đang đọc.
+    useEffect(() => {
+        if (returnUrl) {
+            sessionStorage.setItem('topup:return', returnUrl);
+        }
+    }, [returnUrl]);
+
     const [amount, setAmount] = useState(50000);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -43,6 +54,17 @@ const TopUpPage: React.FC = () => {
             <div className="flex-1 w-full max-w-5xl mx-auto px-4 pt-24 pb-16">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2 pb-4" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border)' }}>Nạp Xu</h1>
+                    {returnUrl && (
+                        <button
+                            type="button"
+                            onClick={() => navigate(returnUrl)}
+                            className="flex items-center gap-1.5 text-sm font-semibold transition-colors hover:opacity-80"
+                            style={{ color: 'var(--text-secondary)' }}
+                        >
+                            <ArrowLeft size={14} />
+                            Quay lại đọc truyện
+                        </button>
+                    )}
                     <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>Mua Xu để mở khóa truy cập sớm các chapter truyện đặc quyền.</p>
                 </div>
 
